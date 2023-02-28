@@ -1,0 +1,19 @@
+{
+    "name":"Sensor",
+    "build": {
+        "srcDir": "modules",
+        "flags": [
+            "-I modules/i2c",
+            "-I modules/hal_sensors/sensor_base",
+            "-I modules/hal_sensors/sensor_compression",
+            "-I modules/hal_sensors/sensor_differentialpressure",
+            "-I modules/hal_sensors/sensor_fingerposition"
+        ]
+    },
+    "dependencies":
+    [
+        {
+            "name":"googletest"
+        }
+    ]
+}
