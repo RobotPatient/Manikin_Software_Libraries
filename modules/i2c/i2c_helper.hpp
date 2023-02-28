@@ -6,7 +6,7 @@
 #include "Wire.h"
 #define i2c_peripheral_t TwoWire*
 #else
-#include "i2c_testclass.hpp"
+#include "testing/i2c_testclass.hpp"
 #define i2c_peripheral_t i2c_testClass*
 #endif
 
