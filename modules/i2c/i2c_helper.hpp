@@ -11,7 +11,7 @@
 #endif
 
 typedef enum{
-i2c_speed_100KHz= 100000, i2c_speed_400KHz = 400000,
+ki2cSpeed_100KHz= 100000,  ki2cSpeed_400KHz = 400000,
 }i2c_speed_t;
 
 class I2CDriver{

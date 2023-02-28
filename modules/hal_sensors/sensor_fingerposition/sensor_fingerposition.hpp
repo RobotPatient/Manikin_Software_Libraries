@@ -7,7 +7,7 @@ class FingerPositionSensor : public UniversalSensor {
  public:
   explicit FingerPositionSensor(i2c_peripheral_t i2c_peripheral)
       : UniversalSensor(i2c_peripheral) {
-    i2c_handle_ = new I2CDriver(i2c_peripheral, i2c_speed_400KHz, kSensorI2CAddress_);
+    i2c_handle_ = new I2CDriver(i2c_peripheral, ki2cSpeed_400KHz, kSensorI2CAddress_);
     ads7138_handle_ = new ADS7138(i2c_handle_);
   }
   void Initialize() override;
