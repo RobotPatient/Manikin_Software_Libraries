@@ -30,8 +30,11 @@
 #ifdef __arm__
 #include "Arduino.h"
 #define sleep(ms) delay(ms)
-#else
-#define sleep(ms) usleep(1000*ms)
+#elif _WIN32
+#include<windows.h>
+#define sleep(ms) Sleep(ms)
+#else 
+usleep(1000*ms)
 #endif
 
 
