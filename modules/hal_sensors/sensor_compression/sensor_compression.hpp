@@ -2,10 +2,8 @@
 #define SENSOR_COMPRESSION_HPP
 
 #include "sensor_base.hpp"
-#include "VL6180X_REGISTERS.hpp"
+#include "VL6180X_REGISTERS.h"
 #include <i2c_helper.hpp>
-
-#define SENSOR_ADDR (uint8_t)0x29
 
 class CompressionSensor : public UniversalSensor {
  public:
