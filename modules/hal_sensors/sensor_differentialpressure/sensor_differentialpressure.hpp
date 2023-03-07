@@ -2,25 +2,34 @@
 #define SENSOR_DIFFERENTIALPRESSURE_H
 
 #include "sensor_base.hpp"
-#include "drivers/SDP810.hpp"
+#include "./SDP810_REGISTERS.h"
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
-  explicit DifferentialPressureSensor(i2c_peripheral_t i2c_peripheral)
-      : UniversalSensor(i2c_peripheral) {
+  explicit DifferentialPressureSensor(i2c_peripheral_t i2c_peripheral): UniversalSensor(i2c_peripheral) {
     i2c_handle_ = new I2CDriver(i2c_peripheral, ki2cSpeed_400KHz, kSensorI2CAddress_);
-    sdp810_handle_ = new SDP810(i2c_handle_);
   }
+
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
   ~DifferentialPressureSensor() {
     Uninitialize();
   }
+
  private:
-  const uint8_t kSensorI2CAddress_ = 0x25;
+  const uint8_t kSensorI2CAddress_ = SDP_ADDR;
   I2CDriver *i2c_handle_;
-  SDP810 *sdp810_handle_;
   SensorData sensor_data_{};
+
+// Low level driver functions:
+  int16_t sensorRaw;
+  int16_t conversionFactor;
+  uint8_t buffer[BUFFER_BYTES_SIZE];
+
+  void beginSDP810();
+  void readSDP810();
+  int16_t getRawSDP810();
+  int16_t getVolumeSDP810();
 };
 #endif  // SENSOR_DIFFERENTIALPRESSURE_H
