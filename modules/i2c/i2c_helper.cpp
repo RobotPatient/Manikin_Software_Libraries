@@ -5,7 +5,7 @@ void I2CDriver::init(){
 }
 
 void I2CDriver::change_address(uint8_t new_i2c_address){
-  this->_i2c_addr = new_i2c_address;
+  _i2c_addr = new_i2c_address;
 }
 
 void I2CDriver::write_reg(uint16_t reg, uint8_t data){
