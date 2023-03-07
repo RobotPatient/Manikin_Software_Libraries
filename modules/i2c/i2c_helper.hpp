@@ -21,9 +21,12 @@ class I2CDriver{
         this->_i2c_addr = i2c_addr;
         this->_speed=speed;                                 
     }
-    void init();
-    void change_address(uint8_t new_i2c_addr);
     
+    I2CDriver(i2c_peripheral_t i2c_peripheral, i2c_speed_t speed){
+        this->_i2c_peripheral = i2c_peripheral;
+        this->_speed=speed;                                 
+    }
+    void init();
     void write_reg(uint16_t reg, uint8_t data);
     void write_reg16(uint16_t reg, uint16_t data);
     uint8_t read_reg (uint16_t reg);
