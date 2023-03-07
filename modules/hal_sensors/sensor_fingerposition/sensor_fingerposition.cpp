@@ -11,7 +11,8 @@ sleep(ms) usleep(1000*ms)
 #endif
 
 void FingerPositionSensor::Initialize() {
-  //ads7138_handle_->initDefaultRead();
+  i2c_handle_->change_address(kSensorI2CAddress_);
+  initDefaultRead();
 }
 
 SensorData FingerPositionSensor::GetSensorData() {
