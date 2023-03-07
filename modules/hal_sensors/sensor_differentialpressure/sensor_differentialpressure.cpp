@@ -29,7 +29,7 @@ int16_t DifferentialPressureSensor::getRawSDP810() {
 }
 
 int16_t DifferentialPressureSensor::getVolumeSDP810() {
-  assert("Error, function not implemented.");
+  //assert("Error, function not implemented.");
   return 0;
 }
 
