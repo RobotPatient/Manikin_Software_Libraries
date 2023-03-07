@@ -4,6 +4,10 @@ void I2CDriver::init(){
     _i2c_peripheral->begin();
 }
 
+void I2CDriver::change_address(uint8_t new_i2c_address){
+  this->_i2c_addr = new_i2c_address;
+}
+
 void I2CDriver::write_reg(uint16_t reg, uint8_t data){
         _i2c_peripheral->beginTransmission(_i2c_addr);
     _i2c_peripheral->write((reg >> 8) & 0xFF); // MSB of register address

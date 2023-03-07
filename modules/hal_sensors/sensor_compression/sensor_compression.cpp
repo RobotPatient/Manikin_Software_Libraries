@@ -11,6 +11,7 @@ sleep(ms) usleep(1000*ms)
 #endif
 
 void CompressionSensor::Initialize() {
+  i2c_handle_->change_address(kSensorI2CAddress_);
   initVL6180x();
   VL6180xDefautSettings();
 }
