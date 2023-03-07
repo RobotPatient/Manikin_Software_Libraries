@@ -34,7 +34,7 @@ class I2CDriver{
 	
 	void read_bytes(uint8_t* buffer, uint8_t num_of_bytes);
 	void send_bytes(uint8_t* buffer, uint8_t num_of_bytes); 
-	
+	void change_address(uint8_t new_i2c_address);
     private:
     uint8_t _i2c_addr;
     i2c_peripheral_t _i2c_peripheral;

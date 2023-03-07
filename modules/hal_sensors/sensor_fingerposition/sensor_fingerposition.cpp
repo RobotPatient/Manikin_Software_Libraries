@@ -21,7 +21,7 @@ SensorData FingerPositionSensor::GetSensorData() {
   // 16-bit is 2-bytes therefore the channels times 2
   const uint8_t kAmount_of_bytes_to_read = 2*kADC_channels_to_read;
   sensor_data_.numOfBytes = kAmount_of_bytes_to_read;
-  //ads7138_handle_->readADC(sensor_data_.buffer);
+  readADC(sensor_data_.buffer);
   return sensor_data_;
 }
 
@@ -35,19 +35,19 @@ void FingerPositionSensor::initDefaultRead(void) {
 void FingerPositionSensor::readADC(uint16_t *dest) {
   startReadSEQ();
   uint8_t temp[2] = {0x0, 0x0};
-  uint16_t buf[8];
+  static uint16_t buf[8];
 
-  for(int i = 0; i < 8; i++) {
+   for(int i = 0; i < 8; i++) {
       getReading(temp);
-      buf[i] = (temp[0] << 4) | (temp[1] >> 4); // 12b conversion.
-      //sleep(50);
+       buf[i] = (temp[0] << 4) | (temp[1] >> 4); // 12b conversion.
+  //     sleep(50);
   }
   reindexArray(dest, buf);
   stopReadSEQ();
 }
 
 uint16_t FingerPositionSensor::assembleRegister(uint8_t opcode, uint8_t regAddr) {
-  uint16_t asmb_register = opcode | (regAddr << 8);
+  uint16_t asmb_register = regAddr | (opcode << 8);
   return asmb_register; 
 }
 
