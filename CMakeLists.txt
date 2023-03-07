@@ -14,3 +14,5 @@ SUBDIRLIST(SUBDIRS ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 FOREACH(subdir ${SUBDIRS})
         ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/modules/${subdir})
 ENDFOREACH()
+
+add_subdirectory(unit_tests)
