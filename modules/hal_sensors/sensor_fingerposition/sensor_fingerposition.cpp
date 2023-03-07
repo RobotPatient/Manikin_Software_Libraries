@@ -7,7 +7,7 @@
 #include<windows.h>
 #define sleep(ms) Sleep(ms)
 #else 
-sleep(ms) usleep(1000*ms)
+#define sleep(ms) usleep(1000*ms)
 #endif
 
 void FingerPositionSensor::Initialize() {
