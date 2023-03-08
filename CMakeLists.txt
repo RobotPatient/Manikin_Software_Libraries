@@ -1,3 +1,21 @@
+cmake_minimum_required(VERSION 3.8)
+
+# Enable CMake unit-testing
+enable_testing()
+
+# Automatically fetch googletest (including gmock)
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  # Specify the commit you depend on and update it regularly.
+  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP true
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+# Automatically find all submodules in the modules folder and add them to the build
 macro(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
   SET(dirlist "")
