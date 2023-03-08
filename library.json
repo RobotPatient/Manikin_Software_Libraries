@@ -1,13 +1,14 @@
 {
     "name":"Sensor",
     "build": {
-        "srcDir": "modules",
+        "srcDir": "modules/",
+        "srcFilter": "+<*> -<*/test/> -<hal_sensors/*/test>",
         "flags": [
-            "-I modules/i2c",
-            "-I modules/hal_sensors/sensor_base",
-            "-I modules/hal_sensors/sensor_compression",
-            "-I modules/hal_sensors/sensor_differentialpressure",
-            "-I modules/hal_sensors/sensor_fingerposition"
+            "-I modules/i2c/src",
+            "-I modules/hal_sensors/sensor_base/src",
+            "-I modules/hal_sensors/sensor_compression/src",
+            "-I modules/hal_sensors/sensor_differentialpressure/src",
+            "-I modules/hal_sensors/sensor_fingerposition/src"
         ]
     },
     "dependencies":
@@ -17,3 +18,4 @@
         }
     ]
 }
+
