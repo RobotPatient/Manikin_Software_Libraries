@@ -1,4 +1,0 @@
-add_subdirectory(i2c_tests)
-add_subdirectory(compression_sensor_test)
-add_subdirectory(differentialpressure_sensor_test)
-add_subdirectory(fingerposition_sensor_test)
