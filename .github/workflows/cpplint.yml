@@ -1,6 +1,9 @@
 name: cpplint
-on: [push, pull_request]:
-  branches: [ "stable" ]
+on:
+  push:
+    branches: [ "stable" ]
+  pull_request:
+    branches: [ "stable" ]
 jobs:
   cpplint:
     runs-on: ubuntu-latest
