@@ -3,8 +3,8 @@
 
 #include "sensor_base.hpp"
 
-const uint8_t kSDP810I2CAddr = 0x25;
-const uint8_t kSDP810BufferSize = 9;
+const uint8_t kSdp810I2CAddr = 0x25;
+const uint8_t kSdp810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
@@ -20,14 +20,14 @@ class DifferentialPressureSensor : public UniversalSensor {
   }
 
  private:
-  const uint8_t kSensorI2CAddress_ = kSDP810I2CAddr;
+  const uint8_t kSensorI2CAddress_ = kSdp810I2CAddr;
   I2CDriver *i2c_handle_;
   SensorData sensor_data_{};
 
 // Low level driver functions:
   int16_t sensor_raw_;
   int16_t conversion_factor_;
-  uint8_t sensor_buffer_[kSDP810BufferSize];
+  uint8_t sensor_buffer_[kSdp810BufferSize];
 
   void BeginSDP810();
   void ReadSDP810();
