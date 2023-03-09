@@ -8,8 +8,8 @@
 #define i2c_peripheral_t I2CPeripheralMock*
 
 typedef enum {
-  ki2cSpeed_100KHz = 100000, ki2cSpeed_400KHz = 400000,
-} i2c_speed_t;
+  kI2cSpeed_100KHz = 100000, kI2cSpeed_400KHz = 400000,
+} I2CSpeed;
 
 class I2CDriver {
  public:
@@ -21,7 +21,7 @@ class I2CDriver {
   MOCK_METHOD(void, ReadBytes, (uint8_t * buffer, uint8_t num_of_bytes));
   MOCK_METHOD(void, SendBytes, (uint8_t * buffer, uint8_t num_of_bytes));
   MOCK_METHOD(void, ChangeAddress, (uint8_t new_i2c_address));
-  MOCK_METHOD(void, constructor_called, (i2c_peripheral_t i2c_peripheral, i2c_speed_t speed, uint8_t i2c_addr));
+  MOCK_METHOD(void, constructor_called, (i2c_peripheral_t i2c_peripheral, I2CSpeed speed, uint8_t i2c_addr));
 };
 
 #endif

@@ -11,18 +11,18 @@
 #endif
 
 typedef enum {
-  ki2cSpeed_100KHz = 100000, ki2cSpeed_400KHz = 400000,
-} i2c_speed_t;
+  kI2cSpeed_100KHz = 100000, kI2cSpeed_400KHz = 400000,
+} I2CSpeed;
 
 class I2CDriver {
  public:
-  I2CDriver(i2c_peripheral_t i2c_peripheral, i2c_speed_t speed, uint8_t i2c_addr) {
+  I2CDriver(i2c_peripheral_t i2c_peripheral, I2CSpeed speed, uint8_t i2c_addr) {
     this->_i2c_peripheral = i2c_peripheral;
     this->_i2c_addr = i2c_addr;
     this->_speed = speed;
   }
 
-  I2CDriver(i2c_peripheral_t i2c_peripheral, i2c_speed_t speed) {
+  I2CDriver(i2c_peripheral_t i2c_peripheral, I2CSpeed speed) {
     this->_i2c_peripheral = i2c_peripheral;
     this->_speed = speed;
   }
@@ -39,7 +39,7 @@ class I2CDriver {
  private:
   uint8_t _i2c_addr;
   i2c_peripheral_t _i2c_peripheral;
-  i2c_speed_t _speed;
+  I2CSpeed _speed;
 };
 
 #endif
