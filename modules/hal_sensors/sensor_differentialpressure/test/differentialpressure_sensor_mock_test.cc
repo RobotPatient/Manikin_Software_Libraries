@@ -1,7 +1,7 @@
+#include <gmock/gmock.h>
 #include <i2c_helper.hpp>
 #include <sensor_differentialpressure.hpp>
-#include <sdp810_registers.h>
-#include <gmock/gmock.h>
+#include <sdp810_registers.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;

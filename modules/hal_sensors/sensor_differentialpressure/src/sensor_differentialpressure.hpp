@@ -1,7 +1,7 @@
-#ifndef SENSOR_DIFFERENTIALPRESSURE_H
-#define SENSOR_DIFFERENTIALPRESSURE_H
+#ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
+#define SENSOR_DIFFERENTIALPRESSURE_HPP_
 
-#include "sensor_base.hpp"
+#include <sensor_base.hpp>
 
 const uint8_t kSdp810I2CAddr = 0x25;
 const uint8_t kSdp810BufferSize = 9;
@@ -33,4 +33,4 @@ class DifferentialPressureSensor : public UniversalSensor {
   void ReadSdp810();
   int16_t GetRawSDP810();
 };
-#endif  // SENSOR_DIFFERENTIALPRESSURE_H
+#endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_

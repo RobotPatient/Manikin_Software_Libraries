@@ -1,7 +1,7 @@
-#ifndef SENSOR_COMPRESSION_HPP
-#define SENSOR_COMPRESSION_HPP
+#ifndef SENSOR_COMPRESSION_HPP_
+#define SENSOR_COMPRESSION_HPP_
 
-#include "sensor_base.hpp"
+#include <sensor_base.hpp>
 #include <i2c_helper.hpp>
 
 const uint8_t kSensorAddr = 0x29;
@@ -30,8 +30,8 @@ struct VL6180xIdentification {
 
 class CompressionSensor : public UniversalSensor {
  public:
-  explicit CompressionSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
-    i2c_handle_ = I2C_handle;
+  explicit CompressionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
+    i2c_handle_ = i2c_handle;
   }
 
   void Initialize() override;
@@ -42,7 +42,7 @@ class CompressionSensor : public UniversalSensor {
   }
 
  private:
-  uint8_t sensor_i2c_address_ = kSensorAddr; // ! Was CONSTANT, for now rm const. !
+  uint8_t sensor_i2c_address_ = kSensorAddr;
   SensorData sensor_data_{};
   I2CDriver *i2c_handle_;
 
@@ -54,4 +54,4 @@ class CompressionSensor : public UniversalSensor {
   void GetIdentification(struct VL6180xIdentification *dest);
   uint8_t ChangeAddress(uint8_t old_address, uint8_t new_address);
 };
-#endif  // SENSOR_COMPRESSION_HPP
+#endif  // SENSOR_COMPRESSION_HPP_

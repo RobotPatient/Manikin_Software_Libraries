@@ -1,5 +1,5 @@
 #include <sensor_fingerposition.hpp>
-#include "ads7138_registers.h"
+#include <ads7138_registers.hpp>
 
 #ifdef __arm__
 #include "Arduino.h"
@@ -9,7 +9,7 @@
 #define sleep(ms) Sleep(ms)
 #else
 #define sleep(ms) usleep(1000*ms)
-#endif
+#endif  // __arm__
 
 void FingerPositionSensor::Initialize() {
   i2c_handle_->ChangeAddress(kSensorI2CAddress_);
@@ -36,8 +36,7 @@ void FingerPositionSensor::readADC(uint16_t *dest) {
 
   for (int i = 0; i < 8; i++) {
     getReading(temp);
-    buf[i] = (temp[0] << 4) | (temp[1] >> 4); // 12b conversion.
-    //     sleep(50);
+    buf[i] = (temp[0] << 4) | (temp[1] >> 4);  // 12b conversion.
   }
   reindexArray(dest, buf);
   stopReadSEQ();

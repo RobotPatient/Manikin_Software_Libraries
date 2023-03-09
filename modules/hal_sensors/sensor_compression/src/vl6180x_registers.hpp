@@ -1,5 +1,5 @@
-#ifndef SENSOR_COMPRESSION_VL6180X_REGISTERS_H
-#define SENSOR_COMPRESSION_VL6180X_REGISTERS_H
+#ifndef SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_
+#define SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_
 
 const uint8_t kVl6180XFailureReset = -1;
 const uint16_t kVl6180XIdentificationModelId = 0x0000;
@@ -7,8 +7,8 @@ const uint16_t kVl6180XIdentificationModelRevMajor = 0x0001;
 const uint16_t kVl6180XIdentificationModelRevMinor = 0x0002;
 const uint16_t kVl6180XIdentificationModuleRevMajor = 0x0003;
 const uint16_t kVl6180XIdentificationModuleRevMinor = 0x0004;
-const uint16_t kVl6180XIdentificationDate = 0x0006; // 16bit value
-const uint16_t kVl6180XIdentificationTime = 0x0008; // 16bit value
+const uint16_t kVl6180XIdentificationDate = 0x0006;  // 16bit value
+const uint16_t kVl6180XIdentificationTime = 0x0008;  // 16bit value
 
 const uint16_t kVl6180XSystemModeGpio1 = 0x0011;
 const uint16_t kVl6180XSystemInterruptConfigGpio = 0x0014;
@@ -35,4 +35,4 @@ const uint16_t kVl6180XReadoutAveragingSamplePeriod = 0x010A;
 const uint16_t kVl6180XFirmwareResultScaler = 0x0120;
 const uint16_t kVl6180Xi2CSlaveDeviceAddress = 0x0212;
 
-#endif // SENSOR_COMPRESSION_VL6180X_REGISTERS_H
+#endif  // SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_

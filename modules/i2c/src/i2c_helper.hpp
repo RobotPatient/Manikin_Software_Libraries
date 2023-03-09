@@ -1,12 +1,12 @@
-#ifndef I2C_HELPER_H
-#define I2C_HELPER_H
+#ifndef I2C_HELPER_HPP_
+#define I2C_HELPER_HPP_
 #include <stdint.h>
 
 #ifdef __arm__
-#include "Wire.h"
+#include <Wire.h>
 #define I2C_PERIPHERAL_T TwoWire*
 #else
-#include "i2c_peripheral_mock.hpp"
+#include <i2c_peripheral_mock.hpp>
 #define I2C_PERIPHERAL_T I2CPeripheralMock*
 #endif
 
@@ -36,10 +36,11 @@ class I2CDriver {
   void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
   void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
   void ChangeAddress(uint8_t new_i2c_address);
+
  private:
   uint8_t i2c_addr_;
   I2C_PERIPHERAL_T i2c_peripheral_;
   I2CSpeed speed_;
 };
 
-#endif
+#endif  // I2C_HELPER_HPP_

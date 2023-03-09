@@ -1,5 +1,5 @@
-#ifndef ADS7138_REGISTERS_H
-#define ADS7138_REGISTERS_H
+#ifndef ADS7138_REGISTERS_HPP_
+#define ADS7138_REGISTERS_HPP_
 
 const uint8_t kReadNumOfBytes = 2;
 const uint8_t kNumOfAdcChannels = 8;
@@ -26,4 +26,4 @@ enum ChipOpcodes {
 
 
 
-#endif // ADS7138_REGISTERS_H
+#endif  // ADS7138_REGISTERS_HPP_

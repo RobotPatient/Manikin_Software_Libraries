@@ -1,9 +1,9 @@
-#ifndef I2C_HELPER_HPP
-#define I2C_HELPER_HPP
+#ifndef I2C_HELPER_HPP_
+#define I2C_HELPER_HPP_
 
+#include <gmock/gmock.h>
 #include <stdint.h>
 #include <i2c_peripheral_mock.hpp>
-#include <gmock/gmock.h>
 
 #define I2C_PERIPHERAL_T I2CPeripheralMock*
 
@@ -24,4 +24,4 @@ class I2CDriver {
   MOCK_METHOD(void, constructor_called, (I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, uint8_t i2c_addr));
 };
 
-#endif
+#endif  // I2C_HELPER_HPP_

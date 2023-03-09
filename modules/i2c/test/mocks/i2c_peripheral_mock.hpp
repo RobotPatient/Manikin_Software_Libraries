@@ -1,5 +1,5 @@
-#ifndef I2C_TESTCLASS_H
-#define I2C_TESTCLASS_H
+#ifndef I2C_PERIPHERAL_MOCK_HPP_
+#define I2C_PERIPHERAL_MOCK_HPP_
 #ifndef __arm__
 #include <stdint.h>
 #include <string.h>
@@ -18,5 +18,5 @@ class I2CPeripheralMock {
   MOCK_METHOD3(requestFrom, uint8_t(uint8_t address, size_t quantity, bool stopBit));
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
 };
-#endif
-#endif
+#endif  // __arm__
+#endif  // I2C_PERIPHERAL_MOCK_HPP_

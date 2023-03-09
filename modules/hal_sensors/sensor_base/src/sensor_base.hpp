@@ -1,5 +1,5 @@
-#ifndef SENSOR_BASE_H
-#define SENSOR_BASE_H
+#ifndef SENSOR_BASE_HPP_
+#define SENSOR_BASE_HPP_
 
 #include <i2c_helper.hpp>
 

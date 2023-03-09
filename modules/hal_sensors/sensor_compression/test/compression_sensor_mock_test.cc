@@ -1,7 +1,7 @@
+#include <gmock/gmock.h>
 #include <i2c_helper.hpp>
 #include <sensor_compression.hpp>
-#include <gmock/gmock.h>
-#include "vl6180x_registers.h"
+#include <vl6180x_registers.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
@@ -43,39 +43,49 @@ void InitVL6180xCalls(I2CDriver *i2c_handle_mock) {
 }
 
 void SetVL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
-
   // Set GPIO1 high when sample complete
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4)));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4)));
+  // Set GPIO1 high when sample complete
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSystemModeGpio1, 0x10));
+  // Set Avg sample period
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XReadoutAveragingSamplePeriod, 0x30));
+  // Set the ALS gain
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysalsAnalogueGain, 0x46));
+  // Set auto calibration period (Max = 255)/(OFF = 0)
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysrangeVhvRepeatRate, 0xFF));
+  // Set ALS integration time to 100ms
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysalsIntegrationPeriod, 0x63));
+  // perform a single temperature calibration
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysrangeVhvRecalibrate, 0x01));
 
+  // Optional settings from datasheet:
+  // Set default ranging inter-measurement period to 100ms
   EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSystemModeGpio1, 0x10));               // Set GPIO1 high when sample complete
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XReadoutAveragingSamplePeriod, 0x30)); // Set Avg sample period
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSysalsAnalogueGain, 0x46));            // Set the ALS gain
+              WriteReg(kVl6180XSysrangeIntermeasurementPeriod, 0x09));
+  // Set default ALS inter-measurement period to 100ms
   EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSysrangeVhvRepeatRate,
-                       0xFF));        // Set auto calibration period (Max = 255)/(OFF = 0)
+              WriteReg(kVl6180XSysalsIntermeasurementPeriod, 0x0A));
+  // Configures interrupt on ‘New Sample Ready threshold event’
   EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSysalsIntegrationPeriod, 0x63));       // Set ALS integration time to 100ms
-  EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSysrangeVhvRecalibrate, 0x01));        // perform a single temperature calibration
-
-  // Optional settings from datasheet
-  // http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00122600.pdf
-  EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSysrangeIntermeasurementPeriod,
-                       0x09)); // Set default ranging inter-measurement period to 100ms
-  EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSysalsIntermeasurementPeriod,
-                       0x0A));   // Set default ALS inter-measurement period to 100ms
-  EXPECT_CALL(*i2c_handle_mock,
-              WriteReg(kVl6180XSystemInterruptConfigGpio,
-                       0x24));     // Configures interrupt on ‘New Sample Ready threshold event’
+              WriteReg(kVl6180XSystemInterruptConfigGpio, 0x24));
   // Additional settings defaults from community
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSysrangeMaxConvergenceTime, 0x32));
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSysrangeRangeCheckEnables, 0x10 | 0x01));
-  EXPECT_CALL(*i2c_handle_mock, WriteReg16(kVl6180XSysrangeEarlyConvergenceEstimate, 0x7B));
-  EXPECT_CALL(*i2c_handle_mock, WriteReg16(kVl6180XSysalsIntegrationPeriod, 0x64));
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XReadoutAveragingSamplePeriod, 0x30));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysrangeMaxConvergenceTime, 0x32));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XSysrangeRangeCheckEnables, 0x10 | 0x01));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg16(kVl6180XSysrangeEarlyConvergenceEstimate, 0x7B));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg16(kVl6180XSysalsIntegrationPeriod, 0x64));
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(kVl6180XReadoutAveragingSamplePeriod, 0x30));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSysalsAnalogueGain, 0x40));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XFirmwareResultScaler, 0x01));
 }
@@ -88,7 +98,6 @@ TEST(compressionTest, initCalls) {
     InSequence seq;
     InitVL6180xCalls(&i2c_handle_mock);
     SetVL6180xDefaultSettingsCalls(&i2c_handle_mock);
-
   }
   CompSensor.Initialize();
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);

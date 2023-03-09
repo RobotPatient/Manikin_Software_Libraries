@@ -1,4 +1,4 @@
-#include "i2c_helper.hpp"
+#include <i2c_helper.hpp>
 
 inline uint8_t GetUpperByte(uint16_t number) {
   return (number >> 8) & 0xff;
@@ -21,9 +21,9 @@ void I2CDriver::WriteReg(uint16_t reg, uint8_t data) {
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
   i2c_peripheral_->beginTransmission(i2c_addr_);
-  i2c_peripheral_->write(kRegUpperByte); // MSB of register address
-  i2c_peripheral_->write(kRegLowerByte); // LSB of register address
-  i2c_peripheral_->write(data);           // Data/setting to be sent to device.
+  i2c_peripheral_->write(kRegUpperByte);
+  i2c_peripheral_->write(kRegLowerByte);
+  i2c_peripheral_->write(data);
   i2c_peripheral_->endTransmission();
 }
 
@@ -32,8 +32,8 @@ void I2CDriver::WriteReg16(uint16_t reg, uint16_t data) {
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
   i2c_peripheral_->beginTransmission(i2c_addr_);
-  i2c_peripheral_->write(kRegUpperByte); // MSB of register address
-  i2c_peripheral_->write(kRegLowerByte);        // LSB of register address
+  i2c_peripheral_->write(kRegUpperByte);
+  i2c_peripheral_->write(kRegLowerByte);
 
   uint8_t temp;
   temp = GetUpperByte(data);
@@ -47,12 +47,12 @@ uint8_t I2CDriver::ReadReg(uint16_t reg) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);    // Address set on class instantiation
-  i2c_peripheral_->write(GetUpperByte(kRegUpperByte)); // MSB of register address
-  i2c_peripheral_->write(GetLowerByte(kRegLowerByte));        // LSB of register address
-  i2c_peripheral_->endTransmission(false);            // Send address and register address bytes
+  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->write(GetUpperByte(kRegUpperByte));
+  i2c_peripheral_->write(GetLowerByte(kRegLowerByte));
+  i2c_peripheral_->endTransmission(false);
   i2c_peripheral_->requestFrom(i2c_addr_, 1);
-  uint8_t data = i2c_peripheral_->read(); // Read Data from selected register
+  uint8_t data = i2c_peripheral_->read();
   return data;
 }
 
@@ -64,13 +64,13 @@ uint16_t I2CDriver::ReadReg16(uint16_t reg) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);    // Address set on class instantiation
-  i2c_peripheral_->write(kRegUpperByte); // MSB of register address
-  i2c_peripheral_->write(kRegLowerByte);        // LSB of register address
-  i2c_peripheral_->endTransmission(false);            // Send address and register address bytes
+  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->write(kRegUpperByte);
+  i2c_peripheral_->write(kRegLowerByte);
+  i2c_peripheral_->endTransmission(false);
   i2c_peripheral_->requestFrom(i2c_addr_, 2);
-  data_high = i2c_peripheral_->read(); // Read Data from selected register
-  data_low = i2c_peripheral_->read();  // Read Data from selected register
+  data_high = i2c_peripheral_->read();
+  data_low = i2c_peripheral_->read();
   data = (data_high << 8) | data_low;
   return data;
 }

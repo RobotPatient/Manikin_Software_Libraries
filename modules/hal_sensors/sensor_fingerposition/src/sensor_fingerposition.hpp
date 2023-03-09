@@ -1,7 +1,7 @@
-#ifndef SENSOR_FINGERPOSITION_H
-#define SENSOR_FINGERPOSITION_H
+#ifndef SENSOR_FINGERPOSITION_HPP_
+#define SENSOR_FINGERPOSITION_HPP_
 
-#include "sensor_base.hpp"
+#include <sensor_base.hpp>
 
 const uint8_t kAds7138Addr = 0x10;
 
@@ -38,7 +38,7 @@ class FingerPositionSensor : public UniversalSensor {
   void readADC(uint16_t *dest);
   uint16_t assembleRegister(uint8_t opcode, uint8_t reg_addr);
 
-  // Low Level I2C communication: 
+  // Low Level I2C communication:
   void writeRegister(uint8_t reg_addr, uint8_t data);
   void setRegister(uint8_t reg_addr, uint8_t data);
   void clearRegister(uint8_t reg_addr, uint8_t data);
@@ -49,4 +49,4 @@ class FingerPositionSensor : public UniversalSensor {
   void reindexArray(uint16_t *dest, uint16_t *original);
   void getReading(uint8_t *buf);
 };
-#endif  // SENSOR_FINGERPOSITION_H
+#endif  // SENSOR_FINGERPOSITION_HPP_
