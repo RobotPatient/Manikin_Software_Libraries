@@ -21,7 +21,7 @@ using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::Mock;
 
-uint16_t assembleRegister(uint8_t opcode, uint8_t regAddr) {
+uint16_t AssembleRegister(uint8_t opcode, uint8_t regAddr) {
   uint16_t asmb_register = regAddr | (opcode << 8);
   return asmb_register; 
 }
@@ -33,26 +33,26 @@ bufferindex += 2;
 
 TEST(FingerPositionTest, initCalls) {
   /* Generated Parameters*/
-  const uint16_t reg1 = assembleRegister(SET_BIT, PIN_CFG);
+  const uint16_t reg1 = AssembleRegister(SET_BIT, PIN_CFG);
   const uint8_t data1 = 0x00;
-  const uint16_t reg2 = assembleRegister(SET_BIT, GENERAL_CFG);
+  const uint16_t reg2 = AssembleRegister(SET_BIT, GENERAL_CFG);
   const uint8_t data2 = 0x02;
-  const uint16_t reg3 = assembleRegister(SET_BIT, AUTO_SEQ_CH_SEL);
+  const uint16_t reg3 = AssembleRegister(SET_BIT, AUTO_SEQ_CH_SEL);
   const uint8_t data3 = 0xFF;
-  const uint16_t reg4 = assembleRegister(SET_BIT, SEQUENCE_CFG);
+  const uint16_t reg4 = AssembleRegister(SET_BIT, SEQUENCE_CFG);
   const uint8_t data4 = 0x01;
   /* Initialize handles and classes*/
   i2c_testClass class_mock;
   I2CDriver i2c_handle_mock;
   FingerPositionSensor FingerPosSensor = FingerPositionSensor(&i2c_handle_mock);
   /* Setup mock calls*/
-  EXPECT_CALL(i2c_handle_mock, change_address(ADS7138_ADDR));
+  EXPECT_CALL(i2c_handle_mock, ChangeAddress(ADS7138_ADDR));
   {
     InSequence Seq;
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg1, data1));
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg2, data2));
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg3, data3));
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg4, data4));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg1, data1));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg2, data2));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg3, data3));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg4, data4));
   }
   /* Run the "real" call*/
   FingerPosSensor.Initialize();
@@ -62,9 +62,9 @@ TEST(FingerPositionTest, initCalls) {
 TEST(FingerPositionTest, GetSensorData) {
   using ::testing::_;
   /* Initialize handles and classes*/
-  const uint16_t reg1 = assembleRegister(SET_BIT, SEQUENCE_CFG);
+  const uint16_t reg1 = AssembleRegister(SET_BIT, SEQUENCE_CFG);
   const uint8_t data1 = 1 << 4;
-  const uint16_t reg2 = assembleRegister(CLEAR_BIT, SEQUENCE_CFG);
+  const uint16_t reg2 = AssembleRegister(CLEAR_BIT, SEQUENCE_CFG);
   const uint8_t data2 = 1 << 4;
   i2c_testClass class_mock;
   I2CDriver i2c_handle_mock;
@@ -72,12 +72,12 @@ TEST(FingerPositionTest, GetSensorData) {
   /* Setup mock calls*/
   {
     InSequence seq;
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg1, data1));
-    EXPECT_CALL(i2c_handle_mock, read_bytes(_,TWO_BYTE)).Times(8).WillRepeatedly(Invoke(returnReadBytesMethod));
-    EXPECT_CALL(i2c_handle_mock, write_reg(reg2, data2));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg1, data1));
+    EXPECT_CALL(i2c_handle_mock, ReadBytes(_,TWO_BYTE)).Times(8).WillRepeatedly(Invoke(returnReadBytesMethod));
+    EXPECT_CALL(i2c_handle_mock, WriteReg(reg2, data2));
   }
   SensorData data = FingerPosSensor.GetSensorData();
-  EXPECT_EQ(16, data.numOfBytes);
+  EXPECT_EQ(16, data.num_of_bytes);
   for(uint16_t i =0; i< 8; i++){
     EXPECT_EQ(arb_testbuffer_reindexed[i], data.buffer[i]);
   }

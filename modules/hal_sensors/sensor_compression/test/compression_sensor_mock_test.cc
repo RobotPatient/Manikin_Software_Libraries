@@ -92,13 +92,13 @@ TEST(compressionTest, GetSensorData) {
   I2CDriver i2c_handle_mock;
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;
-  ExpectedOutput.numOfBytes = 1;
+  ExpectedOutput.num_of_bytes = 1;
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_START, 0x01));
   EXPECT_CALL(i2c_handle_mock, WriteReg(VL6180X_SYSTEM_INTERRUPT_CLEAR, 0x07));
   EXPECT_CALL(i2c_handle_mock, ReadReg(VL6180X_RESULT_RANGE_VAL)).WillOnce(Return(0xAF));
   SensorData data = CompSensor.GetSensorData();
-  EXPECT_EQ(ExpectedOutput.numOfBytes, data.numOfBytes);
+  EXPECT_EQ(ExpectedOutput.num_of_bytes, data.num_of_bytes);
   EXPECT_EQ(ExpectedOutput.buffer[0], data.buffer[0]);
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);  
 }

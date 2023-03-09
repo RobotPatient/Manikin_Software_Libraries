@@ -18,7 +18,7 @@ void CompressionSensor::Initialize() {
 
 SensorData CompressionSensor::GetSensorData() {
   uint8_t distance = getDistance();
-  sensor_data_.numOfBytes = 1;
+  sensor_data_.num_of_bytes = 1;
   sensor_data_.buffer[0] = distance;
   return sensor_data_;
 }

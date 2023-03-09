@@ -25,9 +25,9 @@ class DifferentialPressureSensor : public UniversalSensor {
   SensorData sensor_data_{};
 
 // Low level driver functions:
-  int16_t sensorRaw;
-  int16_t conversionFactor;
-  uint8_t buffer[kSDP810BufferSize];
+  int16_t sensor_raw_;
+  int16_t conversion_factor_;
+  uint8_t sensor_buffer_[kSDP810BufferSize];
 
   void BeginSDP810();
   void ReadSDP810();

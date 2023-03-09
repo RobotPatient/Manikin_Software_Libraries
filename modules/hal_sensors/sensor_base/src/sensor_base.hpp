@@ -5,7 +5,7 @@
 
 typedef struct SensorData {
   uint16_t buffer[8];
-  uint8_t numOfBytes;
+  uint8_t num_of_bytes;
 } SensorData_t;
 
 class UniversalSensor {
