@@ -5,6 +5,7 @@
 
 using ::testing::Return;
 using ::testing::InSequence;
+using ::testing::Mock;
 
 void InitVL6180xCalls(I2CDriver *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, ReadReg(kVl6180XSystemFreshOutOfReset))
@@ -41,7 +42,7 @@ void InitVL6180xCalls(I2CDriver *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, WriteReg(0x0030, 0x00));
 }
 
-void VL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
+void SetVL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
 
   // Set GPIO1 high when sample complete
   EXPECT_CALL(*i2c_handle_mock, WriteReg(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4)));
@@ -80,15 +81,13 @@ void VL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
 }
 
 TEST(compressionTest, initCalls) {
-  using ::testing::Mock;
-  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(kSensorAddr));
   {
     InSequence seq;
     InitVL6180xCalls(&i2c_handle_mock);
-    VL6180xDefaultSettingsCalls(&i2c_handle_mock);
+    SetVL6180xDefaultSettingsCalls(&i2c_handle_mock);
 
   }
   CompSensor.Initialize();
@@ -96,8 +95,6 @@ TEST(compressionTest, initCalls) {
 }
 
 TEST(compressionTest, GetSensorData) {
-  using ::testing::Mock;
-  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;
@@ -105,7 +102,9 @@ TEST(compressionTest, GetSensorData) {
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, WriteReg(kVl6180XSysrangeStart, 0x01));
   EXPECT_CALL(i2c_handle_mock, WriteReg(kVl6180XSystemInterruptClear, 0x07));
-  EXPECT_CALL(i2c_handle_mock, ReadReg(kVl6180XResultRangeVal)).WillOnce(Return(0xAF));
+  EXPECT_CALL(i2c_handle_mock, ReadReg(kVl6180XResultRangeVal))
+      .WillOnce(Return(ExpectedOutput.buffer[0]));
+  // Do the "Real" call
   SensorData data = CompSensor.GetSensorData();
   EXPECT_EQ(ExpectedOutput.num_of_bytes, data.num_of_bytes);
   EXPECT_EQ(ExpectedOutput.buffer[0], data.buffer[0]);
