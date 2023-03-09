@@ -34,4 +34,4 @@
 #include <sensor_differentialpressure.hpp>
 #include <sensor_fingerposition.hpp>
 
-#endif  //SENSOR_HELPER_HPP_
+#endif  // SENSOR_HELPER_HPP_

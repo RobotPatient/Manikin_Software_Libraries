@@ -27,7 +27,7 @@
 ***********************************************************************************************/
 
 #include <sensor_differentialpressure.hpp>
-#include "sdp810_registers.hpp"
+#include <sdp810_registers.hpp>
 
 void DifferentialPressureSensor::Initialize() {
   i2c_handle_->ChangeAddress(kSensorI2CAddress_);

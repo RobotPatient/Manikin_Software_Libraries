@@ -153,7 +153,7 @@ uint8_t CompressionSensor::GetDistance(void) {
 }
 
 float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
-  i2c_handle_->WriteReg(kVl6180XSysalsAnalogueGain,(0x40 | vl6180x_als_gain));
+  i2c_handle_->WriteReg(kVl6180XSysalsAnalogueGain, (0x40 | vl6180x_als_gain));
 
   // Start ALS Measurement
   i2c_handle_->WriteReg(kVl6180XSysalsStart, 0x01);
