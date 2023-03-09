@@ -26,6 +26,7 @@ class I2CDriver {
     this->_i2c_peripheral = i2c_peripheral;
     this->_speed = speed;
   }
+
   void init();
   void WriteReg(uint16_t reg, uint8_t data);
   void WriteReg16(uint16_t reg, uint16_t data);
