@@ -1,7 +1,7 @@
 #include <i2c_helper.hpp>
 #include <sensor_fingerposition.hpp>
 #include <gmock/gmock.h>
-#include "ADS7138_REGISTERS.h"
+#include "ads7138_registers.h"
 
 using ::testing::Return;
 using ::testing::InSequence;

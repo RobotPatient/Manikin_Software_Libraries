@@ -1,5 +1,5 @@
 #include <sensor_fingerposition.hpp>
-#include "ADS7138_REGISTERS.h"
+#include "ads7138_registers.h"
 
 #ifdef __arm__
 #include "Arduino.h"
