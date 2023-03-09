@@ -40,7 +40,7 @@ TEST(I2CWrapperTest, write_regCallsRightMethods) {
   }
   EXPECT_CALL(i2c_peripheral_mock, endTransmission());
   /* The object method which calls to mock methods under the hood*/
-  driver_handle.write_reg(reg, data);
+  driver_handle.WriteReg(reg, data);
 }
 
 TEST(I2CWrapperTest, write_reg16CallsRightMethods) {

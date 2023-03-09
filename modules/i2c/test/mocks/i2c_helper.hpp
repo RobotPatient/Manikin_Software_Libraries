@@ -14,7 +14,7 @@ typedef enum {
 class I2CDriver {
     public:
     MOCK_METHOD(void, init, ());
-    MOCK_METHOD(void, write_reg, (uint16_t reg, uint8_t data));
+    MOCK_METHOD(void, WriteReg, (uint16_t reg, uint8_t data));
     MOCK_METHOD(void, write_reg16, (uint16_t reg, uint16_t data));
     MOCK_METHOD(uint8_t, read_reg, (uint16_t reg));
     MOCK_METHOD(uint16_t, read_reg16, (uint16_t reg));

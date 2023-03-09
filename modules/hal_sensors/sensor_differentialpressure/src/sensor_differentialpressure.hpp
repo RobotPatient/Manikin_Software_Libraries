@@ -2,7 +2,9 @@
 #define SENSOR_DIFFERENTIALPRESSURE_H
 
 #include "sensor_base.hpp"
-#include "./SDP810_REGISTERS.h"
+
+const uint8_t kSDP810I2CAddr = 0x25;
+const uint8_t kSDP810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
@@ -18,18 +20,17 @@ class DifferentialPressureSensor : public UniversalSensor {
   }
 
  private:
-  const uint8_t kSensorI2CAddress_ = SDP_ADDR;
+  const uint8_t kSensorI2CAddress_ = kSDP810I2CAddr;
   I2CDriver *i2c_handle_;
   SensorData sensor_data_{};
 
 // Low level driver functions:
   int16_t sensorRaw;
   int16_t conversionFactor;
-  uint8_t buffer[BUFFER_BYTES_SIZE];
+  uint8_t buffer[kSDP810BufferSize];
 
   void beginSDP810();
   void readSDP810();
   int16_t getRawSDP810();
-  int16_t getVolumeSDP810();
 };
 #endif  // SENSOR_DIFFERENTIALPRESSURE_H
