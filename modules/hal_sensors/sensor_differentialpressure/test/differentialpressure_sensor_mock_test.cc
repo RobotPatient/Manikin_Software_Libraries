@@ -7,17 +7,17 @@ using ::testing::Return;
 using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::Mock;
-using::testing::_;
+using ::testing::_;
 
 uint8_t initialize_test_temp_buffer[2];
 uint8_t arb_test_buffer[kSdp810BufferSize] = {0x20, 0x50, 0x70, 0x90,
                                               0x72, 0x10, 0x05, 0x02, 0x09};
 
-void CopyExampleBufferToBuffer(uint8_t* buffer, uint8_t num_of_bytes){
+void CopyExampleBufferToBuffer(uint8_t *buffer, uint8_t num_of_bytes) {
   memcpy(buffer, arb_test_buffer, num_of_bytes);
 }
 
-void CopyBufferToTestBuffer(uint8_t* buffer, uint8_t num_of_bytes){
+void CopyBufferToTestBuffer(uint8_t *buffer, uint8_t num_of_bytes) {
   memcpy(initialize_test_temp_buffer, buffer, num_of_bytes);
 }
 
@@ -36,7 +36,7 @@ TEST(DifferentialPressureSensorTest, Initialize) {
 TEST(DifferentialPressureSensorTest, GetSensorData) {
   // ToDo: Check the conversion-factor for the SDP810 sensor
   /* Generated Parameters */
-  const int  kConversionFactor  = arb_test_buffer[6] << (kSdp810BufferSize - 1) | arb_test_buffer[7];
+  const int kConversionFactor = arb_test_buffer[6] << (kSdp810BufferSize - 1) | arb_test_buffer[7];
   const int kSensorOutput = (arb_test_buffer[0] << (kSdp810BufferSize - 1) | arb_test_buffer[1]) / kConversionFactor;
   I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
