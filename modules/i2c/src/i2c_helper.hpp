@@ -6,8 +6,8 @@
 #include "Wire.h"
 #define i2c_peripheral_t TwoWire*
 #else
-#include "i2c_testclass.hpp"
-#define i2c_peripheral_t i2c_testClass*
+#include "i2c_peripheral_mock.hpp"
+#define i2c_peripheral_t I2CPeripheralMock*
 #endif
 
 typedef enum{

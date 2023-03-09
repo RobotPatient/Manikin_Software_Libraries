@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <i2c_helper.hpp>
-#include <i2c_testclass.hpp>
+#include <i2c_peripheral_mock.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
@@ -11,7 +11,7 @@ uint8_t kTestingBytes[8] = {0x10, 0x40, 0x30, 0x20, 0x10, 0xFF, 0x50, 0x01};
 
 TEST(I2CWrapperTest, initCallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   EXPECT_CALL(i2c_peripheral_mock, begin());
@@ -21,7 +21,7 @@ TEST(I2CWrapperTest, initCallsRightMethods) {
 TEST(I2CWrapperTest, write_regCallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Parameters used in this test*/
@@ -46,7 +46,7 @@ TEST(I2CWrapperTest, write_regCallsRightMethods) {
 TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Parameters used in this test*/
@@ -74,7 +74,7 @@ TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
 TEST(I2CWrapperTest, read_regCallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Parameters used in this test*/
@@ -105,7 +105,7 @@ TEST(I2CWrapperTest, read_regCallsRightMethods) {
 TEST(I2CWrapperTest, read_reg16CallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Parameters used in this test*/
@@ -145,7 +145,7 @@ size_t CopyTestArray(uint8_t *buffer, size_t length) {
 TEST(I2CWrapperTest, readBytesCallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Generate mock method input parameters*/
@@ -167,7 +167,7 @@ TEST(I2CWrapperTest, readBytesCallsRightMethods) {
 TEST(I2CWrapperTest, sendBytesCallsRightMethods) {
   const uint8_t kI2C_Address = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  i2c_testClass i2c_peripheral_mock;
+  I2CPeripheralMock i2c_peripheral_mock;
   I2CDriver driver_handle = I2CDriver(&i2c_peripheral_mock,
                                       ki2cSpeed_100KHz, kI2C_Address);
   /* Parameters used in this test*/

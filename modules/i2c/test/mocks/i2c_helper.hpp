@@ -2,10 +2,10 @@
 #define I2C_HELPER_HPP
 
 #include <stdint.h>
-#include <i2c_testclass.hpp>
+#include <i2c_peripheral_mock.hpp>
 #include <gmock/gmock.h>
 
-#define i2c_peripheral_t i2c_testClass*
+#define i2c_peripheral_t I2CPeripheralMock*
 
 typedef enum {
  ki2cSpeed_100KHz= 100000,  ki2cSpeed_400KHz = 400000,

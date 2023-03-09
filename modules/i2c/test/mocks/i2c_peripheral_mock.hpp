@@ -5,7 +5,7 @@
 #include <string.h>
 #include "gmock/gmock.h"  // Brings in Google Mock.
 
-class i2c_testClass{
+class I2CPeripheralMock{
     public:
     MOCK_METHOD0(begin, void());
     MOCK_METHOD1(beginTransmission, void(uint8_t address));

@@ -72,7 +72,7 @@ void VL6180xDefaultSettingsCalls(I2CDriver* i2c_handle_mock){
 
 TEST(compressionTest, initCalls) {
   using ::testing::Mock;
-  i2c_testClass class_mock;
+  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(SENSOR_ADDR));
@@ -88,7 +88,7 @@ TEST(compressionTest, initCalls) {
 
 TEST(compressionTest, GetSensorData) {
   using ::testing::Mock;
-  i2c_testClass class_mock;
+  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;

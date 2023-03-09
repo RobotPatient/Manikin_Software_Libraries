@@ -2,7 +2,7 @@ set(This compression_sensor_mock_test)
 
 set(Sources
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/i2c_helper.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/i2c_testclass.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/i2c_peripheral_mock.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../sensor_base/src/sensor_base.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/sensor_compression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/sensor_compression.cpp

@@ -42,7 +42,7 @@ TEST(FingerPositionTest, initCalls) {
   const uint16_t reg4 = AssembleRegister(SET_BIT, SEQUENCE_CFG);
   const uint8_t data4 = 0x01;
   /* Initialize handles and classes*/
-  i2c_testClass class_mock;
+  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   FingerPositionSensor FingerPosSensor = FingerPositionSensor(&i2c_handle_mock);
   /* Setup mock calls*/
@@ -66,7 +66,7 @@ TEST(FingerPositionTest, GetSensorData) {
   const uint8_t data1 = 1 << 4;
   const uint16_t reg2 = AssembleRegister(CLEAR_BIT, SEQUENCE_CFG);
   const uint8_t data2 = 1 << 4;
-  i2c_testClass class_mock;
+  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   FingerPositionSensor FingerPosSensor = FingerPositionSensor(&i2c_handle_mock);
   /* Setup mock calls*/
