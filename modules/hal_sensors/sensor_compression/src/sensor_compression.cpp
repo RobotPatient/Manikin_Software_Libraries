@@ -11,7 +11,7 @@
 #endif
 
 void CompressionSensor::Initialize() {
-  i2c_handle_->change_address(kSensorI2CAddress_);
+  i2c_handle_->ChangeAddress(kSensorI2CAddress_);
   initVL6180x();
   VL6180xDefautSettings();
 }
@@ -26,7 +26,7 @@ SensorData CompressionSensor::GetSensorData() {
 uint8_t CompressionSensor::initVL6180x(void) {
   uint8_t data = 0;
 
-  data = i2c_handle_->read_reg(VL6180X_SYSTEM_FRESH_OUT_OF_RESET);
+  data = i2c_handle_->ReadReg(VL6180X_SYSTEM_FRESH_OUT_OF_RESET);
 
   if (data != 1)
     return VL6180x_FAILURE_RESET;
@@ -88,8 +88,8 @@ void CompressionSensor::VL6180xDefautSettings(void) {
   // Additional settings defaults from community
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_MAX_CONVERGENCE_TIME, 0x32);
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_RANGE_CHECK_ENABLES, 0x10 | 0x01);
-  i2c_handle_->write_reg16(VL6180X_SYSRANGE_EARLY_CONVERGENCE_ESTIMATE, 0x7B);
-  i2c_handle_->write_reg16(VL6180X_SYSALS_INTEGRATION_PERIOD, 0x64);
+  i2c_handle_->WriteReg16(VL6180X_SYSRANGE_EARLY_CONVERGENCE_ESTIMATE, 0x7B);
+  i2c_handle_->WriteReg16(VL6180X_SYSALS_INTEGRATION_PERIOD, 0x64);
   i2c_handle_->WriteReg(VL6180X_READOUT_AVERAGING_SAMPLE_PERIOD, 0x30);
   i2c_handle_->WriteReg(VL6180X_SYSALS_ANALOGUE_GAIN, 0x40);
   i2c_handle_->WriteReg(VL6180X_FIRMWARE_RESULT_SCALER, 0x01);
@@ -101,7 +101,7 @@ uint8_t CompressionSensor::getDistance(void) {
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_START, 0x01);
   sleep(10);
   i2c_handle_->WriteReg(VL6180X_SYSTEM_INTERRUPT_CLEAR, 0x07);
-  distance = i2c_handle_->read_reg(VL6180X_RESULT_RANGE_VAL);
+  distance = i2c_handle_->ReadReg(VL6180X_RESULT_RANGE_VAL);
   return distance;
 }
 
@@ -116,10 +116,10 @@ float CompressionSensor::getAmbientLight(vl6180x_als_gain VL6180X_ALS_GAIN) {
   i2c_handle_->WriteReg(VL6180X_SYSTEM_INTERRUPT_CLEAR, 0x07);
 
   // Retrieve the Raw ALS value from the sensoe
-  unsigned int alsRaw = i2c_handle_->read_reg16(VL6180X_RESULT_ALS_VAL);
+  unsigned int alsRaw = i2c_handle_->ReadReg16(VL6180X_RESULT_ALS_VAL);
 
   // Get Integration Period for calculation, we do this everytime incase someone changes it on us.
-  unsigned int alsIntegrationPeriodRaw = i2c_handle_->read_reg16(VL6180X_SYSALS_INTEGRATION_PERIOD);
+  unsigned int alsIntegrationPeriodRaw = i2c_handle_->ReadReg16(VL6180X_SYSALS_INTEGRATION_PERIOD);
   float alsIntegrationPeriod = 100.0f/alsIntegrationPeriodRaw;
 
   // Calculate actual LUX from Appnotes
@@ -159,13 +159,13 @@ float CompressionSensor::getAmbientLight(vl6180x_als_gain VL6180X_ALS_GAIN) {
 }
 
 void CompressionSensor::getIdentification(struct VL6180xIdentification *dest) {
-  dest->idModel           = i2c_handle_->read_reg(VL6180X_IDENTIFICATION_MODEL_ID);
-  dest->idModelRevMajor   = i2c_handle_->read_reg(VL6180X_IDENTIFICATION_MODEL_REV_MAJOR);
-  dest->idModelRevMinor   = i2c_handle_->read_reg(VL6180X_IDENTIFICATION_MODEL_REV_MINOR);
-  dest->idModuleRevMajor  = i2c_handle_->read_reg(VL6180X_IDENTIFICATION_MODULE_REV_MAJOR);
-  dest->idModuleRevMinor  = i2c_handle_->read_reg(VL6180X_IDENTIFICATION_MODULE_REV_MINOR);
-  dest->idDate            = i2c_handle_->read_reg16(VL6180X_IDENTIFICATION_DATE);
-  dest->idTime            = i2c_handle_->read_reg16(VL6180X_IDENTIFICATION_TIME);
+  dest->idModel           = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_ID);
+  dest->idModelRevMajor   = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MAJOR);
+  dest->idModelRevMinor   = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MINOR);
+  dest->idModuleRevMajor  = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MAJOR);
+  dest->idModuleRevMinor  = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MINOR);
+  dest->idDate            = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_DATE);
+  dest->idTime            = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_TIME);
 }
 
 uint8_t CompressionSensor::changeAddress(uint8_t old_address, uint8_t new_address) {
@@ -178,7 +178,7 @@ uint8_t CompressionSensor::changeAddress(uint8_t old_address, uint8_t new_addres
 
   i2c_handle_->WriteReg(VL6180X_I2C_SLAVE_DEVICE_ADDRESS, new_address);
   kSensorI2CAddress_ = new_address;
-  return i2c_handle_->read_reg(VL6180X_I2C_SLAVE_DEVICE_ADDRESS);
+  return i2c_handle_->ReadReg(VL6180X_I2C_SLAVE_DEVICE_ADDRESS);
 }
 
 void CompressionSensor::Uninitialize() {}

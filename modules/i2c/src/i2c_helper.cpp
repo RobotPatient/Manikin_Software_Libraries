@@ -4,7 +4,7 @@ void I2CDriver::init(){
     _i2c_peripheral->begin();
 }
 
-void I2CDriver::change_address(uint8_t new_i2c_address){
+void I2CDriver::ChangeAddress(uint8_t new_i2c_address){
   _i2c_addr = new_i2c_address;
 }
 
@@ -16,7 +16,7 @@ void I2CDriver::WriteReg(uint16_t reg, uint8_t data){
         _i2c_peripheral->endTransmission();
 }
 
-void I2CDriver::write_reg16(uint16_t reg, uint16_t data){
+void I2CDriver::WriteReg16(uint16_t reg, uint16_t data){
     _i2c_peripheral->beginTransmission(_i2c_addr);
     _i2c_peripheral->write((reg >> 8) & 0xFF); // MSB of register address
     _i2c_peripheral->write(reg & 0xFF);        // LSB of register address
@@ -28,7 +28,7 @@ void I2CDriver::write_reg16(uint16_t reg, uint16_t data){
     _i2c_peripheral->endTransmission();
 }
 
-uint8_t I2CDriver::read_reg (uint16_t reg){
+uint8_t I2CDriver::ReadReg (uint16_t reg){
   uint8_t data;
 
   _i2c_peripheral->beginTransmission(_i2c_addr);    // Address set on class instantiation
@@ -40,7 +40,7 @@ uint8_t I2CDriver::read_reg (uint16_t reg){
   return data;
 }
 
-uint16_t I2CDriver::read_reg16(uint16_t reg){
+uint16_t I2CDriver::ReadReg16(uint16_t reg){
   uint8_t data_low;
   uint8_t data_high;
   uint16_t data;
@@ -55,12 +55,12 @@ uint16_t I2CDriver::read_reg16(uint16_t reg){
   return data;
 }
 
-void I2CDriver::read_bytes(uint8_t* buffer, uint8_t num_of_bytes){
+void I2CDriver::ReadBytes(uint8_t* buffer, uint8_t num_of_bytes){
   _i2c_peripheral->requestFrom(_i2c_addr, num_of_bytes, true);
   _i2c_peripheral->readBytes(buffer, num_of_bytes);
 }
 
-void I2CDriver::send_bytes(uint8_t* buffer, uint8_t num_of_bytes){
+void I2CDriver::SendBytes(uint8_t* buffer, uint8_t num_of_bytes){
   _i2c_peripheral->beginTransmission(_i2c_addr);
   _i2c_peripheral->write(buffer, num_of_bytes);
   _i2c_peripheral->endTransmission(true);

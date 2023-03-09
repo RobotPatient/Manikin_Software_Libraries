@@ -68,7 +68,7 @@ TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
   }
   EXPECT_CALL(i2c_peripheral_mock, endTransmission());
   /* The object method which calls to mock methods under the hood*/
-  driver_handle.write_reg16(reg, data);
+  driver_handle.WriteReg16(reg, data);
 }
 
 TEST(I2CWrapperTest, read_regCallsRightMethods) {
@@ -97,7 +97,7 @@ TEST(I2CWrapperTest, read_regCallsRightMethods) {
   EXPECT_CALL(i2c_peripheral_mock, read())
       .WillRepeatedly(Return(data_to_return));
   /* The object method which calls to mock methods under the hood*/
-  uint8_t data_returned = driver_handle.read_reg(reg);
+  uint8_t data_returned = driver_handle.ReadReg(reg);
   /* Check if returned value matched the value that mock function returned*/
   EXPECT_EQ(data_returned, data_to_return);
 }
@@ -132,7 +132,7 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods) {
         .WillOnce(Return(data_lower_byte));
   }
   /* The object method which calls to mock methods under the hood*/
-  uint16_t data_returned = driver_handle.read_reg16(reg);
+  uint16_t data_returned = driver_handle.ReadReg16(reg);
   /* Check if returned value matched the value that mock function returned*/
   EXPECT_EQ(data_returned, data_to_return);
 }
@@ -158,7 +158,7 @@ TEST(I2CWrapperTest, readBytesCallsRightMethods) {
   EXPECT_CALL(i2c_peripheral_mock, readBytes(test_buffer, request_amount_of_bytes))
       .WillOnce(Invoke(CopyTestArray));
   /* The object method which calls to mock methods under the hood*/
-  driver_handle.read_bytes(test_buffer, request_amount_of_bytes);
+  driver_handle.ReadBytes(test_buffer, request_amount_of_bytes);
   /* Check if returned value matched the value that mock function returned*/
   for (uint8_t i = 0; i < request_amount_of_bytes; i++)
     EXPECT_EQ(test_buffer[i], kTestingBytes[i]);
@@ -180,7 +180,7 @@ TEST(I2CWrapperTest, sendBytesCallsRightMethods) {
   EXPECT_CALL(i2c_peripheral_mock, write(kTestingBytes, request_amount_of_bytes));
   EXPECT_CALL(i2c_peripheral_mock, endTransmission(request_stop_bit));
   /* The object method which calls to mock methods under the hood*/
-  driver_handle.send_bytes(kTestingBytes, request_amount_of_bytes);
+  driver_handle.SendBytes(kTestingBytes, request_amount_of_bytes);
 }
 
 int main(int argc, char **argv) {

@@ -11,7 +11,7 @@
 #endif
 
 void FingerPositionSensor::Initialize() {
-  i2c_handle_->change_address(kSensorI2CAddress_);
+  i2c_handle_->ChangeAddress(kSensorI2CAddress_);
   initDefaultRead();
 }
 
@@ -68,7 +68,7 @@ void FingerPositionSensor::clearRegister(uint8_t regAddr, uint8_t data) {
 
 uint8_t FingerPositionSensor::getRegister(uint8_t registerAddr) {
   uint16_t reg = assembleRegister(SINGLE_R, registerAddr);                   
-  return i2c_handle_->read_reg(reg);
+  return i2c_handle_->ReadReg(reg);
 }
 
 void FingerPositionSensor::startReadSEQ(void) {
@@ -91,7 +91,7 @@ void FingerPositionSensor::reindexArray(uint16_t *dest, uint16_t *original) {
 }
 
 void FingerPositionSensor::getReading(uint8_t *buf) {
-    i2c_handle_->read_bytes(buf, TWO_BYTE);
+  i2c_handle_->ReadBytes(buf, TWO_BYTE);
 }
 
 

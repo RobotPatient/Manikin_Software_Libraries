@@ -28,13 +28,13 @@ class I2CDriver{
     }
     void init();
     void WriteReg(uint16_t reg, uint8_t data);
-    void write_reg16(uint16_t reg, uint16_t data);
-    uint8_t read_reg (uint16_t reg);
-    uint16_t read_reg16(uint16_t reg);
+    void WriteReg16(uint16_t reg, uint16_t data);
+    uint8_t ReadReg (uint16_t reg);
+    uint16_t ReadReg16(uint16_t reg);
 	
-	void read_bytes(uint8_t* buffer, uint8_t num_of_bytes);
-	void send_bytes(uint8_t* buffer, uint8_t num_of_bytes); 
-	void change_address(uint8_t new_i2c_address);
+	void ReadBytes(uint8_t* buffer, uint8_t num_of_bytes);
+	void SendBytes(uint8_t* buffer, uint8_t num_of_bytes);
+	void ChangeAddress(uint8_t new_i2c_address);
     private:
     uint8_t _i2c_addr;
     i2c_peripheral_t _i2c_peripheral;

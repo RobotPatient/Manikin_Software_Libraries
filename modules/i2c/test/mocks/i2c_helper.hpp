@@ -15,12 +15,12 @@ class I2CDriver {
     public:
     MOCK_METHOD(void, init, ());
     MOCK_METHOD(void, WriteReg, (uint16_t reg, uint8_t data));
-    MOCK_METHOD(void, write_reg16, (uint16_t reg, uint16_t data));
-    MOCK_METHOD(uint8_t, read_reg, (uint16_t reg));
-    MOCK_METHOD(uint16_t, read_reg16, (uint16_t reg));
-    MOCK_METHOD(void, read_bytes, (uint8_t* buffer, uint8_t num_of_bytes));	
-    MOCK_METHOD(void, send_bytes, (uint8_t* buffer, uint8_t num_of_bytes));
-    MOCK_METHOD(void, change_address, (uint8_t new_i2c_address));
+    MOCK_METHOD(void, WriteReg16, (uint16_t reg, uint16_t data));
+    MOCK_METHOD(uint8_t, ReadReg, (uint16_t reg));
+    MOCK_METHOD(uint16_t, ReadReg16, (uint16_t reg));
+    MOCK_METHOD(void, ReadBytes, (uint8_t* buffer, uint8_t num_of_bytes));
+    MOCK_METHOD(void, SendBytes, (uint8_t* buffer, uint8_t num_of_bytes));
+    MOCK_METHOD(void, ChangeAddress, (uint8_t new_i2c_address));
     MOCK_METHOD(void, constructor_called, (i2c_peripheral_t i2c_peripheral, i2c_speed_t speed, uint8_t i2c_addr));
 };
 
