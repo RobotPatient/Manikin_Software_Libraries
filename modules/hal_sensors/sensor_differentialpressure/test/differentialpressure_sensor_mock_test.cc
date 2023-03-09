@@ -22,7 +22,6 @@ void CopyBufferToTestBuffer(uint8_t *buffer, uint8_t num_of_bytes) {
 }
 
 TEST(DifferentialPressureSensorTest, Initialize) {
-  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(kSdp810I2CAddr));
   DifferentialPressureSensor DiffPressSensor = DifferentialPressureSensor(&i2c_handle_mock);
@@ -38,7 +37,6 @@ TEST(DifferentialPressureSensorTest, GetSensorData) {
   /* Generated Parameters */
   const int kConversionFactor = arb_test_buffer[6] << (kSdp810BufferSize - 1) | arb_test_buffer[7];
   const int kSensorOutput = (arb_test_buffer[0] << (kSdp810BufferSize - 1) | arb_test_buffer[1]) / kConversionFactor;
-  I2CPeripheralMock class_mock;
   I2CDriver i2c_handle_mock;
   DifferentialPressureSensor DiffPressSensor = DifferentialPressureSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, ReadBytes(_, kSdp810BufferSize)).WillOnce(Invoke(CopyExampleBufferToBuffer));
