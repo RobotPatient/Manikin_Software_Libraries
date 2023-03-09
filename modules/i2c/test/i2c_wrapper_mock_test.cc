@@ -14,7 +14,7 @@ TEST(I2CWrapperTest, initCallsRightMethods) {
   I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   EXPECT_CALL(i2c_peripheral_mock, begin());
-  driver.init();
+  driver.Init();
 }
 
 TEST(I2CWrapperTest, write_regCallsRightMethods) {

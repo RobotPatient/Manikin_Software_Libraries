@@ -15,7 +15,7 @@ class UniversalSensor {
   virtual SensorData_t GetSensorData() = 0;
   virtual void Uninitialize() = 0;
  private:
-  i2c_peripheral_t i2c_handle_;
+  I2C_PERIPHERAL_T i2c_handle_;
 };
 
 #endif  // SENSOR_BASE_H
