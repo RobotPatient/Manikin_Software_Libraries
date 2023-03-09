@@ -6,7 +6,7 @@
 #elif _WIN32
 #include<windows.h>
 #define sleep(ms) Sleep(ms)
-#else 
+#else
 #define sleep(ms) usleep(1000*ms)
 #endif
 
@@ -76,15 +76,19 @@ void CompressionSensor::VL6180xDefautSettings(void) {
   i2c_handle_->WriteReg(VL6180X_SYSTEM_MODE_GPIO1, 0x10);               // Set GPIO1 high when sample complete
   i2c_handle_->WriteReg(VL6180X_READOUT_AVERAGING_SAMPLE_PERIOD, 0x30); // Set Avg sample period
   i2c_handle_->WriteReg(VL6180X_SYSALS_ANALOGUE_GAIN, 0x46);            // Set the ALS gain
-  i2c_handle_->WriteReg(VL6180X_SYSRANGE_VHV_REPEAT_RATE, 0xFF);        // Set auto calibration period (Max = 255)/(OFF = 0)
+  i2c_handle_->WriteReg(VL6180X_SYSRANGE_VHV_REPEAT_RATE,
+                        0xFF);        // Set auto calibration period (Max = 255)/(OFF = 0)
   i2c_handle_->WriteReg(VL6180X_SYSALS_INTEGRATION_PERIOD, 0x63);       // Set ALS integration time to 100ms
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_VHV_RECALIBRATE, 0x01);        // perform a single temperature calibration
-  
+
   // Optional settings from datasheet
   // http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00122600.pdf
-  i2c_handle_->WriteReg(VL6180X_SYSRANGE_INTERMEASUREMENT_PERIOD, 0x09); // Set default ranging inter-measurement period to 100ms
-  i2c_handle_->WriteReg(VL6180X_SYSALS_INTERMEASUREMENT_PERIOD, 0x0A);   // Set default ALS inter-measurement period to 100ms
-  i2c_handle_->WriteReg(VL6180X_SYSTEM_INTERRUPT_CONFIG_GPIO, 0x24);     // Configures interrupt on ‘New Sample Ready threshold event’
+  i2c_handle_->WriteReg(VL6180X_SYSRANGE_INTERMEASUREMENT_PERIOD,
+                        0x09); // Set default ranging inter-measurement period to 100ms
+  i2c_handle_->WriteReg(VL6180X_SYSALS_INTERMEASUREMENT_PERIOD,
+                        0x0A);   // Set default ALS inter-measurement period to 100ms
+  i2c_handle_->WriteReg(VL6180X_SYSTEM_INTERRUPT_CONFIG_GPIO,
+                        0x24);     // Configures interrupt on ‘New Sample Ready threshold event’
   // Additional settings defaults from community
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_MAX_CONVERGENCE_TIME, 0x32);
   i2c_handle_->WriteReg(VL6180X_SYSRANGE_RANGE_CHECK_ENABLES, 0x10 | 0x01);
@@ -120,60 +124,51 @@ float CompressionSensor::getAmbientLight(vl6180x_als_gain VL6180X_ALS_GAIN) {
 
   // Get Integration Period for calculation, we do this everytime incase someone changes it on us.
   unsigned int alsIntegrationPeriodRaw = i2c_handle_->ReadReg16(VL6180X_SYSALS_INTEGRATION_PERIOD);
-  float alsIntegrationPeriod = 100.0f/alsIntegrationPeriodRaw;
+  float alsIntegrationPeriod = 100.0f / alsIntegrationPeriodRaw;
 
   // Calculate actual LUX from Appnotes
   float alsGain = 0.0;
 
-  switch (VL6180X_ALS_GAIN)
-  {
-  case kGain_20:
-    alsGain = 20.0f;
-    break;
-  case kGain_10:
-    alsGain = 10.32f;
-    break;
-  case kGain_5:
-    alsGain = 5.21f;
-    break;
-  case kGain_2_5:
-    alsGain = 2.60f;
-    break;
-  case kGain_1_67:
-    alsGain = 1.72f;
-    break;
-  case kGain_1_25:
-    alsGain = 1.28f;
-    break;
-  case kGain_1:
-    alsGain = 1.01f;
-    break;
-  case kGain_40:
-    alsGain = 40.0f;
-    break;
+  switch (VL6180X_ALS_GAIN) {
+    case kGain_20:alsGain = 20.0f;
+      break;
+    case kGain_10:alsGain = 10.32f;
+      break;
+    case kGain_5:alsGain = 5.21f;
+      break;
+    case kGain_2_5:alsGain = 2.60f;
+      break;
+    case kGain_1_67:alsGain = 1.72f;
+      break;
+    case kGain_1_25:alsGain = 1.28f;
+      break;
+    case kGain_1:alsGain = 1.01f;
+      break;
+    case kGain_40:alsGain = 40.0f;
+      break;
   }
 
   // Calculate LUX from formula in AppNotes
-  float alsCalculated = 0.32f * ((float)alsRaw / alsGain) * alsIntegrationPeriod;
+  float alsCalculated = 0.32f * ((float) alsRaw / alsGain) * alsIntegrationPeriod;
   return alsCalculated;
 }
 
 void CompressionSensor::getIdentification(struct VL6180xIdentification *dest) {
-  dest->idModel           = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_ID);
-  dest->idModelRevMajor   = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MAJOR);
-  dest->idModelRevMinor   = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MINOR);
-  dest->idModuleRevMajor  = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MAJOR);
-  dest->idModuleRevMinor  = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MINOR);
-  dest->idDate            = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_DATE);
-  dest->idTime            = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_TIME);
+  dest->idModel = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_ID);
+  dest->idModelRevMajor = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MAJOR);
+  dest->idModelRevMinor = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODEL_REV_MINOR);
+  dest->idModuleRevMajor = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MAJOR);
+  dest->idModuleRevMinor = i2c_handle_->ReadReg(VL6180X_IDENTIFICATION_MODULE_REV_MINOR);
+  dest->idDate = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_DATE);
+  dest->idTime = i2c_handle_->ReadReg16(VL6180X_IDENTIFICATION_TIME);
 }
 
 uint8_t CompressionSensor::changeAddress(uint8_t old_address, uint8_t new_address) {
   // NOTICE:  IT APPEARS THAT CHANGING THE ADDRESS IS NOT STORED IN NON-VOLATILE MEMORY
   //  POWER CYCLING THE DEVICE REVERTS ADDRESS BACK TO 0X29
-  if(old_address == new_address)
+  if (old_address == new_address)
     return old_address;
-  if(new_address > 127)
+  if (new_address > 127)
     return old_address;
 
   i2c_handle_->WriteReg(VL6180X_I2C_SLAVE_DEVICE_ADDRESS, new_address);

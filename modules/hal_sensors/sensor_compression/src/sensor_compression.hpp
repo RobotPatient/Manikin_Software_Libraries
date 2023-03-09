@@ -7,8 +7,8 @@
 
 class CompressionSensor : public UniversalSensor {
  public:
-  explicit CompressionSensor(I2CDriver* I2C_handle) : UniversalSensor(I2C_handle) { 
-    i2c_handle_ = I2C_handle; 
+  explicit CompressionSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
+    i2c_handle_ = I2C_handle;
   }
 
   void Initialize() override;

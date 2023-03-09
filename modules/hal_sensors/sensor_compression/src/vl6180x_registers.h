@@ -5,7 +5,7 @@
 
 // Data sheet shows gain values as binary list
 enum vl6180x_als_gain {
-  kGain_20       = 0,        // Actual ALS Gain of 20
+  kGain_20 = 0,        // Actual ALS Gain of 20
   kGain_10,                  // Actual ALS Gain of 10.32
   kGain_5,                   // Actual ALS Gain of 5.21
   kGain_2_5,                 // Actual ALS Gain of 2.60

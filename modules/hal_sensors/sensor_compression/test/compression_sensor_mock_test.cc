@@ -2,15 +2,12 @@
 #include <sensor_compression.hpp>
 #include <gmock/gmock.h>
 
-#define DISTANCE_READING_DUM_VAL 17
-#define BUFFER_BYTES             1
-
 using ::testing::Return;
 using ::testing::InSequence;
 
-void InitVL6180xCalls(I2CDriver* i2c_handle_mock){
+void InitVL6180xCalls(I2CDriver *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, ReadReg(VL6180X_SYSTEM_FRESH_OUT_OF_RESET))
-  .WillOnce(Return(0x01));
+      .WillOnce(Return(0x01));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(0x0207, 0x01));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(0x0208, 0x01));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(0x0096, 0x00));
@@ -43,23 +40,34 @@ void InitVL6180xCalls(I2CDriver* i2c_handle_mock){
   EXPECT_CALL(*i2c_handle_mock, WriteReg(0x0030, 0x00));
 }
 
-void VL6180xDefaultSettingsCalls(I2CDriver* i2c_handle_mock){
+void VL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
 
   // Set GPIO1 high when sample complete
   EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSTEM_INTERRUPT_CONFIG_GPIO, (4 << 3) | (4)));
 
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSTEM_MODE_GPIO1, 0x10));               // Set GPIO1 high when sample complete
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSTEM_MODE_GPIO1, 0x10));               // Set GPIO1 high when sample complete
   EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_READOUT_AVERAGING_SAMPLE_PERIOD, 0x30)); // Set Avg sample period
   EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSALS_ANALOGUE_GAIN, 0x46));            // Set the ALS gain
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_VHV_REPEAT_RATE, 0xFF));        // Set auto calibration period (Max = 255)/(OFF = 0)
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSALS_INTEGRATION_PERIOD, 0x63));       // Set ALS integration time to 100ms
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_VHV_RECALIBRATE, 0x01));        // perform a single temperature calibration
-  
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSRANGE_VHV_REPEAT_RATE,
+                       0xFF));        // Set auto calibration period (Max = 255)/(OFF = 0)
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSALS_INTEGRATION_PERIOD, 0x63));       // Set ALS integration time to 100ms
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSRANGE_VHV_RECALIBRATE, 0x01));        // perform a single temperature calibration
+
   // Optional settings from datasheet
   // http://www.st.com/st-web-ui/static/active/en/resource/technical/document/application_note/DM00122600.pdf
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_INTERMEASUREMENT_PERIOD, 0x09)); // Set default ranging inter-measurement period to 100ms
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSALS_INTERMEASUREMENT_PERIOD, 0x0A));   // Set default ALS inter-measurement period to 100ms
-  EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSTEM_INTERRUPT_CONFIG_GPIO, 0x24));     // Configures interrupt on ‘New Sample Ready threshold event’
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSRANGE_INTERMEASUREMENT_PERIOD,
+                       0x09)); // Set default ranging inter-measurement period to 100ms
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSALS_INTERMEASUREMENT_PERIOD,
+                       0x0A));   // Set default ALS inter-measurement period to 100ms
+  EXPECT_CALL(*i2c_handle_mock,
+              WriteReg(VL6180X_SYSTEM_INTERRUPT_CONFIG_GPIO,
+                       0x24));     // Configures interrupt on ‘New Sample Ready threshold event’
   // Additional settings defaults from community
   EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_MAX_CONVERGENCE_TIME, 0x32));
   EXPECT_CALL(*i2c_handle_mock, WriteReg(VL6180X_SYSRANGE_RANGE_CHECK_ENABLES, 0x10 | 0x01));
@@ -100,7 +108,7 @@ TEST(compressionTest, GetSensorData) {
   SensorData data = CompSensor.GetSensorData();
   EXPECT_EQ(ExpectedOutput.num_of_bytes, data.num_of_bytes);
   EXPECT_EQ(ExpectedOutput.buffer[0], data.buffer[0]);
-  Mock::VerifyAndClearExpectations(&i2c_handle_mock);  
+  Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
 int main(int argc, char **argv) {
