@@ -7,7 +7,7 @@ void DifferentialPressureSensor::Initialize() {
 }
 
 SensorData DifferentialPressureSensor::GetSensorData() {
-  ReadSDP810();
+  ReadSdp810();
   sensor_data_.num_of_bytes = kSdp810BytesToReturn;
   sensor_data_.buffer[0] = sensor_raw_;
   return sensor_data_;
@@ -18,7 +18,7 @@ void DifferentialPressureSensor::BeginSDP810() {
   i2c_handle_->SendBytes(init_message, kSdp810InitCmdSize);
 }
 
-void DifferentialPressureSensor::ReadSDP810() {
+void DifferentialPressureSensor::ReadSdp810() {
   i2c_handle_->ReadBytes(sensor_buffer_, kSdp810BufferSize);
 
   conversion_factor_  = sensor_buffer_[6] << (kSdp810BufferSize - 1) | sensor_buffer_[7];

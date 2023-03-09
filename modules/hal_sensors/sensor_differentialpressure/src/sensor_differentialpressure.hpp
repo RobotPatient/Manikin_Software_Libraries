@@ -30,7 +30,7 @@ class DifferentialPressureSensor : public UniversalSensor {
   uint8_t sensor_buffer_[kSdp810BufferSize];
 
   void BeginSDP810();
-  void ReadSDP810();
+  void ReadSdp810();
   int16_t GetRawSDP810();
 };
 #endif  // SENSOR_DIFFERENTIALPRESSURE_H
