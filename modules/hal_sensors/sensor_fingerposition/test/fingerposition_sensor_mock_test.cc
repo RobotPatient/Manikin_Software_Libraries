@@ -1,6 +1,7 @@
 #include <i2c_helper.hpp>
 #include <sensor_fingerposition.hpp>
 #include <gmock/gmock.h>
+#include "ADS7138_REGISTERS.h"
 
 using ::testing::Return;
 using ::testing::InSequence;
@@ -16,14 +17,15 @@ uint8_t arb_test_buffer[16] = {0x05, 0x00, 0x85, 0x99,
                                0x91, 0x74, 0x55, 0x14};
 
 uint16_t arb_test_buffer_processed[8] =
-    {ProcessedVal(arb_test_buffer), ProcessedVal(arb_test_buffer + 2), ProcessedVal(arb_test_buffer + 4),
-     ProcessedVal(arb_test_buffer + 6), ProcessedVal(arb_test_buffer + 8), ProcessedVal(arb_test_buffer + 10),
+    {ProcessedVal(arb_test_buffer), ProcessedVal(arb_test_buffer + 2),
+     ProcessedVal(arb_test_buffer + 4), ProcessedVal(arb_test_buffer + 6),
+     ProcessedVal(arb_test_buffer + 8), ProcessedVal(arb_test_buffer + 10),
      ProcessedVal(arb_test_buffer + 12), ProcessedVal(arb_test_buffer + 14)};
 
 uint16_t arb_test_buffer_reindexed[8] =
-    {arb_test_buffer_processed[LOWER], arb_test_buffer_processed[MID_L], arb_test_buffer_processed[MID_M],
-     arb_test_buffer_processed[MID_H], arb_test_buffer_processed[RE_L], arb_test_buffer_processed[RE_H],
-     arb_test_buffer_processed[LI_L], arb_test_buffer_processed[LI_H]};
+    {arb_test_buffer_processed[kLower], arb_test_buffer_processed[kMidL], arb_test_buffer_processed[kMidM],
+     arb_test_buffer_processed[kMidH], arb_test_buffer_processed[kReL], arb_test_buffer_processed[kReH],
+     arb_test_buffer_processed[kLiL], arb_test_buffer_processed[kLiH]};
 
 int buffer_index = 0;
 
@@ -39,19 +41,19 @@ void CopyArbTestBufferToBuffer(uint8_t *buffer, uint8_t num_of_bytes) {
 
 TEST(FingerPositionTest, initCalls) {
   /* Generated Parameters*/
-  const uint16_t kReg1 = AssembleRegister(SET_BIT, PIN_CFG);
+  const uint16_t kReg1 = AssembleRegister(kSetBit, kPinConfig);
   const uint8_t kData1 = 0x00;
-  const uint16_t kReg2 = AssembleRegister(SET_BIT, GENERAL_CFG);
+  const uint16_t kReg2 = AssembleRegister(kSetBit, kGeneralConfig);
   const uint8_t kData2 = 0x02;
-  const uint16_t kReg3 = AssembleRegister(SET_BIT, AUTO_SEQ_CH_SEL);
+  const uint16_t kReg3 = AssembleRegister(kSetBit, kAutoSeqSelChannel);
   const uint8_t kData3 = 0xFF;
-  const uint16_t kReg4 = AssembleRegister(SET_BIT, SEQUENCE_CFG);
+  const uint16_t kReg4 = AssembleRegister(kSetBit, kSequenceConfig);
   const uint8_t kData4 = 0x01;
   /* Initialize handles and classes */
   I2CDriver i2c_mock_handle;
   FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_mock_handle);
   /* Setup mock calls */
-  EXPECT_CALL(i2c_mock_handle, ChangeAddress(ADS7138_ADDR));
+  EXPECT_CALL(i2c_mock_handle, ChangeAddress(kAds7138Addr));
   {
     InSequence Seq;
     EXPECT_CALL(i2c_mock_handle, WriteReg(kReg1, kData1));
@@ -66,9 +68,9 @@ TEST(FingerPositionTest, initCalls) {
 
 TEST(FingerPositionTest, GetSensorData) {
   /* Initialize handles and classes */
-  const uint16_t kReg1 = AssembleRegister(SET_BIT, SEQUENCE_CFG);
+  const uint16_t kReg1 = AssembleRegister(kSetBit, kSequenceConfig);
   const uint8_t kData1 = 1 << 4;
-  const uint16_t kReg2 = AssembleRegister(CLEAR_BIT, SEQUENCE_CFG);
+  const uint16_t kReg2 = AssembleRegister(kClearBit, kSequenceConfig);
   const uint8_t kData2 = 1 << 4;
   // Initialize mocks
   I2CDriver i2c_mock_handle;
@@ -78,7 +80,8 @@ TEST(FingerPositionTest, GetSensorData) {
   {
     InSequence seq;
     EXPECT_CALL(i2c_mock_handle, WriteReg(kReg1, kData1));
-    EXPECT_CALL(i2c_mock_handle, ReadBytes(_, TWO_BYTE)).Times(8).WillRepeatedly(Invoke(CopyArbTestBufferToBuffer));
+    EXPECT_CALL(i2c_mock_handle, ReadBytes(_, kReadNumOfBytes)).Times(kNumOfAdcChannels)
+        .WillRepeatedly(Invoke(CopyArbTestBufferToBuffer));
     EXPECT_CALL(i2c_mock_handle, WriteReg(kReg2, kData2));
   }
 
@@ -86,8 +89,8 @@ TEST(FingerPositionTest, GetSensorData) {
   SensorData data = finger_pos_sensor.GetSensorData();
 
   /* Check the returned data with the preprocessed data */
-  EXPECT_EQ(16, data.num_of_bytes);
-  for (uint8_t i = 0; i < 8; i++) {
+  EXPECT_EQ(kNumOfSensorDataBytes, data.num_of_bytes);
+  for (uint8_t i = 0; i < kNumOfAdcChannels; i++) {
     EXPECT_EQ(arb_test_buffer_reindexed[i], data.buffer[i]);
   }
   Mock::VerifyAndClearExpectations(&i2c_mock_handle);
