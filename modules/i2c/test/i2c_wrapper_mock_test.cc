@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <i2c_helper.hpp>
-#include <i2c_peripheral_mock.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
