@@ -8,7 +8,8 @@
             "-I modules/hal_sensors/sensor_base/src",
             "-I modules/hal_sensors/sensor_compression/src",
             "-I modules/hal_sensors/sensor_differentialpressure/src",
-            "-I modules/hal_sensors/sensor_fingerposition/src"
+            "-I modules/hal_sensors/sensor_fingerposition/src",
+            "-std=gnu++17"
         ]
     },
     "dependencies":
