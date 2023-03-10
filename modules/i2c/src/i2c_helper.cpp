@@ -28,11 +28,11 @@
 
 #include <i2c_helper.hpp>
 
-inline uint8_t GetUpperByte(uint16_t number) {
+constexpr uint8_t GetUpperByte(uint16_t number) {
   return (number >> 8) & 0xff;
 }
 
-inline uint8_t GetLowerByte(uint16_t number) {
+constexpr uint8_t GetLowerByte(uint16_t number) {
   return (number & 0xFF);
 }
 

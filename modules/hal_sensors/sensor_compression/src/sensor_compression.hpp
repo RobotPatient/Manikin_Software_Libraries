@@ -41,7 +41,7 @@
 #include <sensor_base.hpp>
 #include <i2c_helper.hpp>
 
-const uint8_t kSensorAddr = 0x29;
+static constexpr uint8_t kSensorAddr = 0x29;
 
 // Data sheet shows gain values as binary list
 enum VL6180xAlsGain {

@@ -29,8 +29,8 @@
 #ifndef ADS7138_REGISTERS_HPP_
 #define ADS7138_REGISTERS_HPP_
 
-const uint8_t kReadNumOfBytes = 2;
-const uint8_t kNumOfAdcChannels = 8;
+static constexpr uint8_t kReadNumOfBytes = 2;
+static constexpr uint8_t kNumOfAdcChannels = 8;
 
 // 12-bit adc, 16-bit variable is the smallest size that fits this 12-bits.
 // 16-bit is 2-bytes therefore the channels times 2

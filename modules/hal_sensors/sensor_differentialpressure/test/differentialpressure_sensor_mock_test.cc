@@ -38,7 +38,7 @@ using ::testing::Mock;
 using ::testing::_;
 
 uint8_t initialize_test_temp_buffer[2];
-uint8_t arb_test_buffer[kSdp810BufferSize] = {0x20, 0x50, 0x70, 0x90,
+constexpr uint8_t arb_test_buffer[kSdp810BufferSize] = {0x20, 0x50, 0x70, 0x90,
                                               0x72, 0x10, 0x05, 0x02, 0x09};
 
 void CopyExampleBufferToBuffer(uint8_t *buffer, uint8_t num_of_bytes) {

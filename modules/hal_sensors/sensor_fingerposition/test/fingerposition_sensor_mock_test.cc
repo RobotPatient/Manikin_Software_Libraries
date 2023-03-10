@@ -37,7 +37,7 @@ using ::testing::Invoke;
 using ::testing::Mock;
 using ::testing::_;
 
-inline uint16_t ProcessedVal(uint8_t *buffer) {
+constexpr uint16_t ProcessedVal(uint8_t *buffer) {
   return (buffer[0] << 4) | (buffer[1] >> 4);
 }
 
