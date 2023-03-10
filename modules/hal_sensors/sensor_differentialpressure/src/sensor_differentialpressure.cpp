@@ -1,37 +1,58 @@
+/* *******************************************************************************************
+ * Copyright (c) 2023 by RobotPatient Simulators
+ *
+ * Authors: Richard Kroesen en Victor Hogeweij
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction,
+ *
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+ * is furnished to do so,
+ *
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+***********************************************************************************************/
+
 #include <sensor_differentialpressure.hpp>
+#include <sdp810_registers.hpp>
 
 void DifferentialPressureSensor::Initialize() {
-  i2c_handle_->change_address(kSensorI2CAddress_);
-  beginSDP810();
+  i2c_handle_->ChangeAddress(kSensorI2CAddress_);
+  BeginSDP810();
 }
 
 SensorData DifferentialPressureSensor::GetSensorData() {
-  readSDP810();
-  sensor_data_.numOfBytes = SENSOR_BUF_SIZE;
-  sensor_data_.buffer[0] = getRawSDP810();
+  ReadSdp810();
+  sensor_data_.num_of_bytes = kSdp810BytesToReturn;
+  sensor_data_.buffer[0] = sensor_raw_;
   return sensor_data_;
 }
 
-void DifferentialPressureSensor::beginSDP810() {
-  uint8_t initMessage[START_MESG_SIZE] = { CONT_MASSF_AVRR_msb, CONT_MASSF_AVRR_lsb };
-  i2c_handle_->send_bytes(initMessage, START_MESG_SIZE);
+void DifferentialPressureSensor::BeginSDP810() {
+  uint8_t init_message[kSdp810InitCmdSize] = {kContMassFlowAvgMsb,
+                                              kContMassFlowAvgLsb};
+  i2c_handle_->SendBytes(init_message, kSdp810InitCmdSize);
 }
 
-void DifferentialPressureSensor::readSDP810() {
-  i2c_handle_->read_bytes(buffer, BUFFER_BYTES_SIZE); 
-     
-  conversionFactor  = buffer[6] << (BUFFER_BYTES_SIZE-1) | buffer[7];
-  sensorRaw         = buffer[0] << (BUFFER_BYTES_SIZE-1) | buffer[1];
-  sensorRaw         = sensorRaw / conversionFactor; 
-}
+void DifferentialPressureSensor::ReadSdp810() {
+  i2c_handle_->ReadBytes(sensor_buffer_, kSdp810BufferSize);
 
-int16_t DifferentialPressureSensor::getRawSDP810() {
-    return sensorRaw;
-}
-
-int16_t DifferentialPressureSensor::getVolumeSDP810() {
-  //assert("Error, function not implemented.");
-  return 0;
+  conversion_factor_ = (sensor_buffer_[6] << (kSdp810BufferSize - 1) | sensor_buffer_[7]);
+  sensor_raw_ = (sensor_buffer_[0] << (kSdp810BufferSize - 1) | sensor_buffer_[1]);
+  sensor_raw_ = (sensor_raw_ / conversion_factor_);
 }
 
 void DifferentialPressureSensor::Uninitialize() {}

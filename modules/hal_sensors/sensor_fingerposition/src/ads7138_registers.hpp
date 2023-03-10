@@ -26,39 +26,32 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
-#define SENSOR_DIFFERENTIALPRESSURE_HPP_
+#ifndef ADS7138_REGISTERS_HPP_
+#define ADS7138_REGISTERS_HPP_
 
-#include <sensor_base.hpp>
+inline constexpr uint8_t kReadNumOfBytes = 2;
+inline constexpr uint8_t kNumOfAdcChannels = 8;
 
-inline constexpr uint8_t kSdp810I2CAddr = 0x25;
-inline constexpr uint8_t kSdp810BufferSize = 9;
+// 12-bit adc, 16-bit variable is the smallest size that fits this 12-bits.
+// 16-bit is 2-bytes therefore the channels times 2
+inline constexpr const uint8_t kNumOfSensorDataBytes = 2*kNumOfAdcChannels;
 
-class DifferentialPressureSensor : public UniversalSensor {
- public:
-  explicit DifferentialPressureSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
-    i2c_handle_ = I2C_handle;
-  }
-
-  void Initialize() override;
-  SensorData GetSensorData() override;
-  void Uninitialize() override;
-  ~DifferentialPressureSensor() {
-    Uninitialize();
-  }
-
- private:
-  const uint8_t kSensorI2CAddress_ = kSdp810I2CAddr;
-  I2CDriver *i2c_handle_;
-  SensorData sensor_data_{};
-
-// Low level driver functions:
-  int16_t sensor_raw_;
-  int16_t conversion_factor_;
-  uint8_t sensor_buffer_[kSdp810BufferSize];
-
-  void BeginSDP810();
-  void ReadSdp810();
-  int16_t GetRawSDP810();
+enum ChipRegisters {
+  kGeneralConfig = 0x01,
+  kPinConfig = 0x5,
+  kSequenceConfig = 0x10,
+  kAutoSeqSelChannel = 0x12,
 };
-#endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_
+
+enum ChipOpcodes {
+  kSingleRead = 0b00010000,
+  kSingleWrite = 0b00001000,
+  kSetBit = 0b00011000,
+  kClearBit = 0b00100000,
+  kContinuousRead = 0b00110000,
+  kContinuousWrite = 0b00101000,
+};
+
+
+
+#endif  // ADS7138_REGISTERS_HPP_

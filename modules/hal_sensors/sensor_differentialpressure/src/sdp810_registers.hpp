@@ -26,39 +26,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
-#define SENSOR_DIFFERENTIALPRESSURE_HPP_
+#ifndef SDP810_REGISTERS_HPP_
+#define SDP810_REGISTERS_HPP_
 
-#include <sensor_base.hpp>
+inline constexpr uint8_t kSdp810BytesToReturn = 2;
+inline constexpr uint8_t kSdp810InitCmdSize = 2;
+inline constexpr uint8_t kContMassFlowAvgMsb = 0x36;
+inline constexpr uint8_t kContMassFlowAvgLsb = 0x03;
 
-inline constexpr uint8_t kSdp810I2CAddr = 0x25;
-inline constexpr uint8_t kSdp810BufferSize = 9;
-
-class DifferentialPressureSensor : public UniversalSensor {
- public:
-  explicit DifferentialPressureSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
-    i2c_handle_ = I2C_handle;
-  }
-
-  void Initialize() override;
-  SensorData GetSensorData() override;
-  void Uninitialize() override;
-  ~DifferentialPressureSensor() {
-    Uninitialize();
-  }
-
- private:
-  const uint8_t kSensorI2CAddress_ = kSdp810I2CAddr;
-  I2CDriver *i2c_handle_;
-  SensorData sensor_data_{};
-
-// Low level driver functions:
-  int16_t sensor_raw_;
-  int16_t conversion_factor_;
-  uint8_t sensor_buffer_[kSdp810BufferSize];
-
-  void BeginSDP810();
-  void ReadSdp810();
-  int16_t GetRawSDP810();
-};
-#endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_
+#endif  // SDP810_REGISTERS_HPP_
