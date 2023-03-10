@@ -31,7 +31,7 @@
 
 #include <sensor_base.hpp>
 
-static constexpr uint8_t kAds7138Addr = 0x10;
+inline constexpr uint8_t kAds7138Addr = 0x10;
 
 enum SensorMapIndex {
   kLower = 5,

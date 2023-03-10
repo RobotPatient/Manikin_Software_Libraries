@@ -31,8 +31,8 @@
 
 #include <sensor_base.hpp>
 
-static constexpr uint8_t kSdp810I2CAddr = 0x25;
-static constexpr uint8_t kSdp810BufferSize = 9;
+inline constexpr uint8_t kSdp810I2CAddr = 0x25;
+inline constexpr uint8_t kSdp810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
