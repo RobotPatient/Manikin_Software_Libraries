@@ -1,0 +1,4 @@
+#ifndef GPIO_REGISTERS_HPP
+#define GPIO_REGISTERS_HPP
+
+#endif
