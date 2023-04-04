@@ -51,11 +51,14 @@ namespace hal::gpio {
     }
 
     void SetGPIOPinDriveStrength(GPIOPort port_num, uint8_t pin_num, GPIODriveStrength driver_strength) {
-        PORT->Group[port_num].PINCFG[pin_num].bit.DRVSTR = driver_strength == kGPIOStrongDriveStrength ? 1 : 0;
+        if (driver_strength <= 1 && driver_strength > -1) {
+        PORT->Group[port_num].PINCFG[pin_num].bit.DRVSTR = driver_strength;
+        }
     }
 
     void SetGPIOPinFunction(GPIOPort port_num, uint8_t pin_num, GPIOPinFunction pin_function) {
-        PORT->Group[port_num].PINCFG[pin_num].bit.PMUXEN = 0x01;
+        PORT->Group[port_num].PINCFG[pin_num].bit.PMUXEN = 0x01;  // Enable the pin mux function
+        // There is a seperate pin mux for even and odd pin numbers (See datasheet)
         if (pin_num % 2 == 0) {
             PORT->Group[port_num].PMUX[pin_num].bit.PMUXE |= pin_function;
         } else {
@@ -72,11 +75,11 @@ namespace hal::gpio {
     }
 
     uint8_t GetGPIOPinLevel(GPIOPort port_num, uint8_t pin_num) {
-        return (PORT->Group[port_num].OUT.reg & 1 << pin_num) | (1 << pin_num);
+        return (PORT->Group[port_num].OUT.reg >> pin_num) & 1;
     }
 
     uint8_t GetGPIOPinDirection(GPIOPort port_num, uint8_t pin_num) {
-        return (PORT->Group[port_num].DIR.reg & 1 << pin_num) | (1 << pin_num);
+        return (PORT->Group[port_num].DIR.reg >> pin_num) & 1;
     }
 
     uint8_t GetGPIODriveStrength(GPIOPort port_num, uint8_t pin_num) {

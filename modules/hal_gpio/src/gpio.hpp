@@ -73,7 +73,7 @@ namespace hal::gpio {
         kGPIOSampleOnDemand,
         kGPIOSampleContinuously
     } GPIOSamplingMode;
-
+    // TODO(Hoog-V): Implement GPIOEvents.
     typedef enum {
         kGPIOEventOut,
         kGPIOEventSet,
