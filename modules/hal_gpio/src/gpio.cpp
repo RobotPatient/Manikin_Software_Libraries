@@ -28,14 +28,6 @@
 #include <gpio.hpp>
 #include <sam.h>
 
-#ifdef SAMD21G18A
-#include <samd21/include/samd21g18a.h>
-#elif SAMD21E18A
-#include <samd21/include/samd21e18a.h>
-#elif SAMD51G19A
-#include <samd51/include/samd51g19a.h>
-#endif
-
 namespace hal::gpio {
 
     void SetGPIOPinLevel(GPIOPort port_num, uint8_t pin_num, uint8_t level) {
