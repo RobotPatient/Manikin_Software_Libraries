@@ -10,6 +10,8 @@ class SPIMainBoard : public SPISlave{
             data_ = slave_data;
         }
         void begin();
+        uint32_t pollread();
+        void pollwrite(uint32_t data);
         void deinit();
     private:
     SpiSlaveData* data_;
