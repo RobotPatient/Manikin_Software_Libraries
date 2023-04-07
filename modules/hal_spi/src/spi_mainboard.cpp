@@ -8,14 +8,10 @@ namespace hal::spi{
 
 void SPIMainBoard::begin(){
   // Set the core clk of SERCOM0 to the main clock
-  GCLK->PCHCTRL[7].bit.WRTLOCK = 0;
-  GCLK->PCHCTRL[7].bit.CHEN = 1;
-  GCLK->PCHCTRL[7].bit.GEN = 0x0;
+  GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE].reg = 0x0 | (1 << GCLK_PCHCTRL_CHEN_Pos);
 
   // Set the slow core to clock gen 3; 32Khz osc
-  GCLK->PCHCTRL[3].bit.WRTLOCK = 0;
-  GCLK->PCHCTRL[3].bit.CHEN = 1;
-  GCLK->PCHCTRL[3].bit.GEN = 0x3;
+  GCLK->PCHCTRL[SERCOM0_GCLK_ID_SLOW].reg =  0x3 | (1 << GCLK_PCHCTRL_CHEN_Pos);
 
   MCLK->APBAMASK.reg |= MCLK_APBAMASK_SERCOM0;
   
