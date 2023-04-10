@@ -5,19 +5,27 @@
 #include "wiring_private.h"
 bool cmd = true;
 
+void SERCOM3_0_Handler() {
+  Serial.print("SERCOM3_0:");
+  Serial.println(SERCOM3->SPI.INTFLAG.reg);
+}
 
 void SERCOM3_1_Handler() {
   Serial.println("Sercom3_1_Handler!");
-  cmd = false;
+  Serial.print("SERCOM3_1:");
+  Serial.println(SERCOM3->SPI.INTFLAG.reg);
 }
 
 void SERCOM3_2_Handler() {
   Serial.println(SERCOM3->SPI.DATA.reg);
-  NVIC_ClearPendingIRQ(SERCOM3_2_IRQn);
+  Serial.print("SERCOM3_2:");
+  Serial.println(SERCOM3->SPI.INTFLAG.reg);
 }
 
 void SERCOM3_3_Handler() {
   Serial.println("Sercom3_3_Handler!");
+  Serial.print("SERCOM3_3:");
+  Serial.println(SERCOM3->SPI.INTFLAG.reg);
 }
 
 
@@ -97,6 +105,8 @@ void SPIMainBoard::begin(){
   PORT->Group[0].DIRCLR.reg = 1 << 19;
   PORT->Group[0].PINCFG[19].bit.PMUXEN = 1;
   PORT->Group[0].PMUX[19 >> 1].bit.PMUXO = 0x3;
+  // NVIC_EnableIRQ(SERCOM3_0_IRQn);
+  // NVIC_SetPriority(SERCOM3_0_IRQn, 2);
   NVIC_EnableIRQ(SERCOM3_1_IRQn);
   NVIC_SetPriority(SERCOM3_1_IRQn, 2);
   NVIC_EnableIRQ(SERCOM3_2_IRQn);
