@@ -3,6 +3,23 @@
 #include <variant.h>
 #include <Arduino.h>
 #include "wiring_private.h"
+bool cmd = true;
+
+
+void SERCOM3_1_Handler() {
+  Serial.println("Sercom3_1_Handler!");
+  cmd = false;
+}
+
+void SERCOM3_2_Handler() {
+  Serial.println(SERCOM3->SPI.DATA.reg);
+  NVIC_ClearPendingIRQ(SERCOM3_2_IRQn);
+}
+
+void SERCOM3_3_Handler() {
+  Serial.println("Sercom3_3_Handler!");
+}
+
 
 namespace hal::spi{
 
@@ -52,7 +69,7 @@ void SPIMainBoard::begin(){
 	                                  | 0 << SERCOM_SPI_CTRLB_PLOADEN_Pos /* Slave Data Preload Enable: disabled */
 	                                  | 0;
   SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
-	        | 0 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: disabled */
+	        | 1 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
 	        | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
 	        | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
 	        | 1 << SERCOM_SPI_INTENSET_DRE_Pos;   
@@ -80,6 +97,12 @@ void SPIMainBoard::begin(){
   PORT->Group[0].DIRCLR.reg = 1 << 19;
   PORT->Group[0].PINCFG[19].bit.PMUXEN = 1;
   PORT->Group[0].PMUX[19 >> 1].bit.PMUXO = 0x3;
+  NVIC_EnableIRQ(SERCOM3_1_IRQn);
+  NVIC_SetPriority(SERCOM3_1_IRQn, 2);
+  NVIC_EnableIRQ(SERCOM3_2_IRQn);
+  NVIC_SetPriority(SERCOM3_2_IRQn, 2);
+  NVIC_EnableIRQ(SERCOM3_3_IRQn);
+  NVIC_SetPriority(SERCOM3_3_IRQn, 2);
 }
 
 void SPIMainBoard::deinit(){
