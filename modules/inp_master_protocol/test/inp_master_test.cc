@@ -50,8 +50,7 @@ TEST(INP_Master_test, read_register) {
     InSequence seq;
     EXPECT_CALL(i2c_per, requestFrom(dummyHub, 1));
     EXPECT_CALL(i2c_per, available())
-      .Times(1)
-      .WillOnce(testing::Return(true));
+      .WillOnce(testing::Return(1));
     EXPECT_CALL(i2c_per, read())
       .WillOnce(Return(returnDummy)); 
   }

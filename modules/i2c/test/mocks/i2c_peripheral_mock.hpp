@@ -36,6 +36,7 @@
 class I2CPeripheralMock {
  public:
   MOCK_METHOD0(begin, void());
+  MOCK_METHOD1(begin, void(uint8_t));
   MOCK_METHOD1(beginTransmission, void(uint8_t address));
   MOCK_METHOD1(write, size_t(uint8_t ucData));
   MOCK_METHOD2(write, size_t(const uint8_t *data, size_t quantity));
@@ -45,7 +46,11 @@ class I2CPeripheralMock {
   MOCK_METHOD0(read, int());
   MOCK_METHOD3(requestFrom, uint8_t(uint8_t address, size_t quantity, bool stopBit));
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
-  MOCK_METHOD0(available, bool());
+  MOCK_METHOD0(available, int());
+
+  MOCK_METHOD(void, onReceive, (void (*func)(int)));
+  MOCK_METHOD(void, onRequest, (void (*func)(void)));
+
 };
 
 #endif  // __arm__

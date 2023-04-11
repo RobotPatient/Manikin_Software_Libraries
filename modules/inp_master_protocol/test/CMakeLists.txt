@@ -5,6 +5,7 @@ set(Sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../../inp_configs/src/Protocol_Constants.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../inp_configs/src/Register.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/master_i2c.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/master_i2c.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c/test/mocks/i2c_peripheral_mock.hpp
     inp_master_test.cc
 )

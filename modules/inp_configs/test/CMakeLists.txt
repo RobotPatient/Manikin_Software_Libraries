@@ -4,6 +4,9 @@ set(Sources
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/HubRegisters.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/Protocol_Constants.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/Register.hpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/HubRegisters.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/Register.cpp
         )
 
 # We need this directory, and users of our library will need it too
