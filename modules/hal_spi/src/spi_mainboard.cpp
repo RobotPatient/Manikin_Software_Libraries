@@ -3,7 +3,206 @@
 #include <variant.h>
 #include <Arduino.h>
 #include "wiring_private.h"
-bool cmd = true;
+void read_bbset(){
+  for(uint8_t i=0; i< 4; i++){
+    Serial.println(BBSET[0][i]);
+  }
+}
+
+
+
+uint8_t SENSORDATA_size;
+uint8_t ACTDATA_size;
+
+
+uint8_t STATUS;
+uint8_t REQWORDS[NUM_OF_BACKBONES][REQWORDS_REG_SIZE];
+uint8_t BBSET[NUM_OF_BACKBONES][BBSET_REG_SIZE];
+uint8_t *SENSORDATA = NULL;
+uint8_t *ACTDATA = NULL;
+
+
+inline constexpr
+uint8_t STATUS_REG = 0x00;
+
+inline constexpr
+uint8_t BBSETA_REG = 0x01;
+inline constexpr
+uint8_t BBSETB_REG = 0x02;
+inline constexpr
+uint8_t BBSETC_REG = 0x03;
+inline constexpr
+uint8_t BBSETD_REG = 0x04;
+
+inline constexpr
+uint8_t REQWORDSA_REG = 0x10;
+inline constexpr
+uint8_t REQWORDSB_REG = 0x11;
+inline constexpr
+uint8_t REQWORDSC_REG = 0x12;
+inline constexpr
+uint8_t REQWORDSD_REG = 0x13;
+
+inline constexpr
+uint8_t SENSDATA_REG = 0x30;
+inline constexpr
+uint8_t ACTDATA_REG = 0x40;
+
+inline constexpr
+uint8_t first_word_reg_addr(uint8_t reg){
+    return reg & 0x3F;
+}
+inline constexpr
+uint8_t first_word_wr_bit(uint8_t reg){
+    return (reg & 0x40) >> 6;
+}
+inline constexpr
+uint8_t first_word_start_bit(uint8_t reg){
+    return (reg & 0x80) >> 7;
+}
+
+typedef struct {
+    uint8_t *reg;
+    bool WR;
+    bool first_word;
+    bool got_seq_num;
+    int seq_num;
+    int byte_cnt;
+    int max_cnt;
+} spi_transaction;
+
+spi_transaction CurrTransaction = {NULL, 0, true, false, 0, 0};
+
+uint8_t setRegister(uint8_t reg_addr) {
+    switch (reg_addr) {
+        case STATUS_REG: {
+            CurrTransaction.reg = &STATUS;
+            CurrTransaction.max_cnt = STATUS_REG_SIZE;
+            return 1;
+            break;
+        }
+        case BBSETA_REG: {
+            CurrTransaction.reg = &BBSET[0][0];
+            CurrTransaction.max_cnt = BBSET_REG_SIZE;
+            return 1;
+        }
+            break;
+        case BBSETB_REG: {
+            CurrTransaction.reg = &BBSET[1][0];
+            CurrTransaction.max_cnt = BBSET_REG_SIZE;
+            return 1;
+        }
+            break;
+        case BBSETC_REG: {
+            CurrTransaction.reg = &BBSET[2][0];
+            CurrTransaction.max_cnt = BBSET_REG_SIZE;
+            return 1;
+        }
+            break;
+        case BBSETD_REG: {
+            CurrTransaction.reg = &BBSET[3][0];
+            CurrTransaction.max_cnt = BBSET_REG_SIZE;
+            return 1;
+        }
+            break;
+        case REQWORDSA_REG: {
+            CurrTransaction.reg = &REQWORDS[0][0];
+            CurrTransaction.max_cnt = REQWORDS_REG_SIZE;
+            return 1;
+        }
+            break;
+        case REQWORDSB_REG: {
+            CurrTransaction.reg = &REQWORDS[1][0];
+            CurrTransaction.max_cnt = REQWORDS_REG_SIZE;
+            return 1;
+        }
+            break;
+        case REQWORDSC_REG: {
+            CurrTransaction.reg = &REQWORDS[2][0];
+            CurrTransaction.max_cnt = REQWORDS_REG_SIZE;
+            return 1;
+        }
+            break;
+        case REQWORDSD_REG: {
+            CurrTransaction.reg = &REQWORDS[3][0];
+            CurrTransaction.max_cnt = REQWORDS_REG_SIZE;
+            return 1;
+        }
+            break;
+        case SENSDATA_REG: {
+            CurrTransaction.reg = SENSORDATA;
+            CurrTransaction.max_cnt = SENSORDATA_size;
+            return 1;
+        }
+            break;
+        case ACTDATA_REG: {
+            CurrTransaction.reg = ACTDATA;
+            CurrTransaction.max_cnt = ACTDATA_size;
+            return 1;
+        }
+            break;
+        default:
+            return 0;
+    }
+    return 0;
+}
+
+
+void RXD_Complete(uint8_t data) {
+    if (CurrTransaction.first_word) {
+        uint8_t reg_addr = first_word_reg_addr(data);
+        bool valid_register = setRegister(reg_addr);
+         if(valid_register & !first_word_start_bit(data)) {
+             CurrTransaction.WR = first_word_wr_bit(data);
+             CurrTransaction.first_word = false;
+             if(CurrTransaction.WR)
+              SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
+              else
+                SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_TXC;
+  
+         }
+    }
+    else if (!CurrTransaction.got_seq_num){
+        CurrTransaction.seq_num = data;
+        CurrTransaction.got_seq_num = true;
+        CurrTransaction.byte_cnt = 0;
+        if(!CurrTransaction.WR){
+          SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_RXC;
+          SERCOM3->SPI.DATA.reg = CurrTransaction.reg[CurrTransaction.byte_cnt];
+          CurrTransaction.byte_cnt++;
+        }
+
+    }
+    else {
+        if(CurrTransaction.byte_cnt < CurrTransaction.max_cnt && CurrTransaction.WR ) {
+            CurrTransaction.reg[CurrTransaction.byte_cnt] = data;
+            CurrTransaction.byte_cnt++;
+            if(CurrTransaction.byte_cnt == CurrTransaction.max_cnt){
+                CurrTransaction.first_word = true;
+                CurrTransaction.got_seq_num = false;
+            }
+        }
+
+    }
+}
+
+void TXD_Complete(){
+    SERCOM3->SPI.DATA.reg = CurrTransaction.reg[CurrTransaction.byte_cnt];
+    CurrTransaction.byte_cnt++;
+    if(CurrTransaction.byte_cnt == CurrTransaction.max_cnt){
+                CurrTransaction.first_word = true;
+                CurrTransaction.got_seq_num = false;
+                SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
+                SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_RXC;
+                CurrTransaction.byte_cnt = 0;
+    }
+    // else{
+  //    CurrTransaction.first_word = true;
+  //    CurrTransaction.got_seq_num = false;
+  //    SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
+  //    SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_RXC;
+  // }
+}
 
 void SERCOM3_0_Handler() {
   Serial.print("SERCOM3_0:");
@@ -11,15 +210,17 @@ void SERCOM3_0_Handler() {
 }
 
 void SERCOM3_1_Handler() {
-  Serial.println("Sercom3_1_Handler!");
-  Serial.print("SERCOM3_1:");
-  Serial.println(SERCOM3->SPI.INTFLAG.reg);
+  TXD_Complete();
 }
 
 void SERCOM3_2_Handler() {
-  Serial.println(SERCOM3->SPI.DATA.reg);
-  Serial.print("SERCOM3_2:");
-  Serial.println(SERCOM3->SPI.INTFLAG.reg);
+  //SERCOM3->SPI.DATA.reg = 0x10;
+  if(SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC){
+    RXD_Complete(SERCOM3->SPI.DATA.reg);
+  }
+  
+  SERCOM3->SPI.DATA.reg = 0;
+
 }
 
 void SERCOM3_3_Handler() {
@@ -77,10 +278,10 @@ void SPIMainBoard::begin(){
 	                                  | 0 << SERCOM_SPI_CTRLB_PLOADEN_Pos /* Slave Data Preload Enable: disabled */
 	                                  | 0;
   SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
-	        | 1 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
+	        | 0 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
 	        | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
 	        | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
-	        | 1 << SERCOM_SPI_INTENSET_DRE_Pos;   
+	        | 0 << SERCOM_SPI_INTENSET_DRE_Pos;   
   while(SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF);   
   tmp = SERCOM3->SPI.CTRLA.reg;
   tmp &= ~SERCOM_SPI_CTRLA_ENABLE;
