@@ -1,38 +1,49 @@
 #ifndef MASTER_I2C_HPP
 #define MASTER_I2C_HPP
 
-#include <Register_adresses.hpp>
+#include <Protocol_Constants.hpp>
+#include <stdint.h>
 
-#define SLAVE_ADDR 5 // testing define...
+#ifdef __arm__
+#include <Wire.h>
+#define I2C_PERIPHERAL_T TwoWire*
+#else
+#include <i2c_peripheral_mock.hpp>
+#define I2C_PERIPHERAL_T I2CPeripheralMock*
+#endif
 
 class MasterCommunication {
  public:
-    explicit MasterCommunication() {}
+    explicit MasterCommunication(I2C_PERIPHERAL_T i2c_peripheral) :
+      i2c_peripheral_(i2c_peripheral) {
+    }
     ~MasterCommunication() {}
 
     void init() {
-      Wire.begin();
+      i2c_peripheral_->begin();
     }
 
-    void wByte(RegisterAddress_t regAddress, uint8_t value) {
-      Wire.beginTransmission(SLAVE_ADDR);
-      Wire.write(regAddress);
-      Wire.write(value);
-      Wire.endTransmission();
+    void write_register(SlavesAddress_t slave, RegisterAddress_t regAddress, const uint8_t value) {
+      i2c_peripheral_->beginTransmission(slave);
+      i2c_peripheral_->write(regAddress);
+      i2c_peripheral_->write(value);
+      i2c_peripheral_->endTransmission();
     }
 
-    uint8_t rByte(RegisterAddress_t regAddress) {
-      Wire.beginTransmission(SLAVE_ADDR);
-      Wire.write(regAddress);
-      Wire.endTransmission();
+    uint8_t read_register(SlavesAddress_t slave, RegisterAddress_t regAddress) {
+      i2c_peripheral_->beginTransmission(slave);
+      i2c_peripheral_->write(regAddress);
+      i2c_peripheral_->endTransmission();
 
       uint8_t value = 0;
-      Wire.requestFrom(SLAVE_ADDR, 1);
-      while (Wire.available()) {
-         value = Wire.read();
+      i2c_peripheral_->requestFrom(slave, 1);
+      if(i2c_peripheral_->available() == true) {
+         value = i2c_peripheral_->read();
       }
       return value;
     }
+private:
+  I2C_PERIPHERAL_T i2c_peripheral_;
 };
 
 #endif

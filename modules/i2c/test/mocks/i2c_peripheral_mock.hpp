@@ -45,6 +45,8 @@ class I2CPeripheralMock {
   MOCK_METHOD0(read, int());
   MOCK_METHOD3(requestFrom, uint8_t(uint8_t address, size_t quantity, bool stopBit));
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
+  MOCK_METHOD0(available, bool());
 };
+
 #endif  // __arm__
 #endif  // I2C_PERIPHERAL_MOCK_HPP_

@@ -2,7 +2,7 @@
 #define REGISTER_HPP
 
 #include <stdint.h>
-#include <Register_adresses.hpp>
+#include <Register_addresses.hpp>
 
 class INP_Register {
   private:
