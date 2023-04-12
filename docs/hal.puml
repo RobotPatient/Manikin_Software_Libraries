@@ -1,0 +1,103 @@
+@startuml full hal
+
+abstract sam
+
+namespace hal {
+    abstract gpio{
+        enum GPIOPort
+        enum GPIODriveStrength
+        enum GPIOInputEvent
+        enum GPIOPinFunction
+        enum GPIOPull
+        enum GPIOSamplingMode
+        enum GPIOInputEvent
+        void SetGPIOPinLevel()
+        void ToggleGPIOPin()
+        void SetGPIOPinDirection()
+        void SetGPIOPinFunction()
+        void SetGPIOPinDriveStrength()
+        void SetGPIOPinSamplingMode()
+        uint8_t GetGPIOPinLevel()
+        uint8_t GetGPIOPinDirection()
+        uint8_t GetGPIODriveStrength()
+        uint8_t GetGPIOPinFunction()
+    }
+}
+
+sam --o hal.gpio
+
+enum I2CSpeed {
+    kI2cSpeed_100KHz = 100000
+    kI2cSpeed_400KHz = 400000
+}
+
+class I2CDriver {
+    +void Init()
+    +void WriteReg()
+    +void WriteReg16()
+    +uint8_t ReadReg()
+    +uint16_t ReadReg16()
+    +void ReadBytes()
+    +void SendBytes()
+    +void ChangeAddress()
+    -uint8_t i2c_addr_
+    -I2C_PERIPHERAL_T i2c_peripheral_
+    -I2CSpeed speed_
+
+}
+
+abstract Arduino.TwoWire
+
+I2CSpeed --o I2CDriver
+Arduino.TwoWire --* I2CDriver
+
+namespace hal.spi {
+    enum SpiSlaveData {
+        int **data
+        int numOfElements
+    }
+    class SPISlave {
+        +explicit SPISlave()
+        +virtual void begin() = 0
+        +virtual uint32_t pollread() = 0
+        +virtual void pollwrite() = 0
+        +virtual void deinit() = 0
+    }
+    class SPIMainBoard{
+        -SpiSlaveData* data_
+        +explicit  SPIMainBoard()
+        +void begin()
+        +uint32_t pollread()
+        +void pollwrite()
+        +void deinit()
+    }
+    SpiSlaveData --* SPISlave
+    SPIMainBoard <|-- SPISlave
+}
+
+
+struct SensorData {
+    uint16_t buffer[8]
+    uint8_t num_of_bytes
+}
+
+class UniversalSensor {
+    +explicit UniversalSensor()
+    +virtual void Initialize() = 0
+    +virtual SensorData_t GetSensorData() = 0
+    +virtual void Uninitialize() = 0
+    -I2C_PERIPHERAL_T i2c_handle_
+}
+
+class CompressionSensor
+class DifferentialPressureSensor
+class FingerPositionSensor
+
+UniversalSensor *-- I2CDriver
+UniversalSensor o-- SensorData
+
+CompressionSensor <|-- UniversalSensor
+DifferentialPressureSensor <|-- UniversalSensor
+FingerPositionSensor <|-- UniversalSensor
+
+@enduml
