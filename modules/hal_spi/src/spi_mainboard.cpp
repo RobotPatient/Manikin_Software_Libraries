@@ -103,8 +103,7 @@ namespace hal::spi {
                                  | 0 << SERCOM_SPI_CTRLA_CPOL_Pos     /* Clock Polarity: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_CPHA_Pos     /* Clock Phase: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_FORM_Pos     /* Frame Format: 0 */
-                                 | 0
-                                         << SERCOM_SPI_CTRLA_IBON_Pos     /* Immediate Buffer Overflow Notification: disabled */
+                                 | 0 << SERCOM_SPI_CTRLA_IBON_Pos     /* Immediate Buffer Overflow Notification: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_RUNSTDBY_Pos /* Run In Standby: disabled */
                                  | 2 << SERCOM_SPI_CTRLA_MODE_Pos;
 
@@ -128,12 +127,9 @@ namespace hal::spi {
                                  | 0 << SERCOM_SPI_CTRLB_PLOADEN_Pos /* Slave Data Preload Enable: disabled */
                                  | 0;
         SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
-                                    |
-                                    0 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
-                                    |
-                                    1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
-                                    | 0
-                                            << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
+                                    | 0 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
+                                    | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
+                                    | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
                                     | 0 << SERCOM_SPI_INTENSET_DRE_Pos;
         while (SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF);
         tmp = SERCOM3->SPI.CTRLA.reg;
