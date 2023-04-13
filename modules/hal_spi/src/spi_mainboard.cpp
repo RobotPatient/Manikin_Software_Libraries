@@ -154,12 +154,7 @@ void RXD_Complete(uint8_t data) {
         bool valid_register = setRegister(reg_addr);
          if(valid_register & !first_word_start_bit(data)) {
              CurrTransaction.WR = first_word_wr_bit(data);
-             CurrTransaction.first_word = false;
-             if(CurrTransaction.WR)
-              SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
-              else
-                SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_TXC;
-  
+             CurrTransaction.first_word = false;  
          }
     }
     else if (!CurrTransaction.got_seq_num){
@@ -167,15 +162,16 @@ void RXD_Complete(uint8_t data) {
         CurrTransaction.got_seq_num = true;
         CurrTransaction.byte_cnt = 0;
         if(!CurrTransaction.WR){
-          SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_RXC;
-          SERCOM3->SPI.DATA.reg = CurrTransaction.reg[CurrTransaction.byte_cnt];
-          CurrTransaction.byte_cnt++;
+          SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_TXC;
         }
 
     }
     else {
-        if(CurrTransaction.byte_cnt < CurrTransaction.max_cnt && CurrTransaction.WR ) {
-            CurrTransaction.reg[CurrTransaction.byte_cnt] = data;
+        if(CurrTransaction.byte_cnt < CurrTransaction.max_cnt) {
+            if(CurrTransaction.WR)
+                CurrTransaction.reg[CurrTransaction.byte_cnt] = data;
+            else 
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg[CurrTransaction.byte_cnt];
             CurrTransaction.byte_cnt++;
             if(CurrTransaction.byte_cnt == CurrTransaction.max_cnt){
                 CurrTransaction.first_word = true;
@@ -186,32 +182,11 @@ void RXD_Complete(uint8_t data) {
     }
 }
 
-void TXD_Complete(){
-    SERCOM3->SPI.DATA.reg = CurrTransaction.reg[CurrTransaction.byte_cnt];
-    CurrTransaction.byte_cnt++;
-    if(CurrTransaction.byte_cnt == CurrTransaction.max_cnt){
-                CurrTransaction.first_word = true;
-                CurrTransaction.got_seq_num = false;
-                SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
-                SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_RXC;
-                CurrTransaction.byte_cnt = 0;
-    }
-    // else{
-  //    CurrTransaction.first_word = true;
-  //    CurrTransaction.got_seq_num = false;
-  //    SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
-  //    SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTFLAG_RXC;
-  // }
-}
-
 void SERCOM3_0_Handler() {
   Serial.print("SERCOM3_0:");
   Serial.println(SERCOM3->SPI.INTFLAG.reg);
 }
 
-void SERCOM3_1_Handler() {
-  TXD_Complete();
-}
 
 void SERCOM3_2_Handler() {
   //SERCOM3->SPI.DATA.reg = 0x10;
