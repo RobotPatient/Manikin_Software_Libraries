@@ -1,6 +1,8 @@
 #ifndef SPI_MAINBOARD_REGISTER_HPP
 #define SPI_MAINBOARD_REGISTER_HPP
 #include <stdint.h>
+#include <spi_base.hpp>
+#include <stddef.h>
 
 inline constexpr
 uint8_t STATUS_REG_SIZE = 4;
