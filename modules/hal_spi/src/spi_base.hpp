@@ -3,10 +3,12 @@
 #include <stdint.h>
 namespace hal::spi{
 
-typedef struct{
-int **data;
-int numOfElements;
-}SpiSlaveData;
+typedef struct {
+    uint8_t *data;
+    uint8_t size;
+} SpiSlaveData;
+
+
 
 class SPISlave{
 public:
@@ -15,7 +17,6 @@ public:
     virtual uint32_t pollread() = 0;
     virtual void pollwrite(uint32_t data) = 0;
     virtual void deinit() = 0;
-
 };
 }
 #endif
