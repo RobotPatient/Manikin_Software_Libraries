@@ -3,82 +3,23 @@
 #include <variant.h>
 #include <Arduino.h>
 #include "wiring_private.h"
+#include <spi_mainboard_registers.hpp>
 
-uint8_t SENSORDATA_size;
-uint8_t ACTDATA_size;
-
-
-uint8_t STATUS;
-uint8_t REQWORDS[NUM_OF_BACKBONES][REQWORDS_REG_SIZE];
-uint8_t BBSET[NUM_OF_BACKBONES][BBSET_REG_SIZE];
-uint8_t *SENSORDATA = NULL;
-uint8_t *ACTDATA = NULL;
-
-
-inline constexpr
-uint8_t STATUS_REG = 0x00;
-
-inline constexpr
-uint8_t BBSETA_REG = 0x01;
-
-inline constexpr
-uint8_t BBSETB_REG = 0x02;
-
-inline constexpr
-uint8_t BBSETC_REG = 0x03;
-
-inline constexpr
-uint8_t BBSETD_REG = 0x04;
-
-inline constexpr
-uint8_t REQWORDSA_REG = 0x10;
-
-inline constexpr
-uint8_t REQWORDSB_REG = 0x11;
-
-inline constexpr
-uint8_t REQWORDSC_REG = 0x12;
-
-inline constexpr
-uint8_t REQWORDSD_REG = 0x13;
-
-inline constexpr
-uint8_t SENSDATA_REG = 0x30;
-
-inline constexpr
-uint8_t ACTDATA_REG = 0x40;
-
-inline constexpr
-uint8_t first_word_reg_addr(uint8_t reg) {
-    return reg & 0x3F;
-}
-
-inline constexpr
-uint8_t first_word_wr_bit(uint8_t reg) {
-    return (reg & 0x40) >> 6;
-}
-
-inline constexpr
-uint8_t first_word_start_bit(uint8_t reg) {
-    return (reg & 0x80) >> 7;
-}
-
-typedef struct {
-    hal::spi::SpiSlaveData *reg;
-    bool WR;
-    bool first_word;
-    bool got_seq_num;
-    int seq_num;
-    int byte_cnt;
-} spi_transaction;
-
-spi_transaction CurrTransaction = {NULL, 0, true, false, 0, 0};
 
 uint8_t getRegister(uint8_t reg_addr) {
-    if(reg_addr < 0 || reg_addr > 11)
+    if(reg_addr >= 0 && reg_addr <= kBBSETMaxAddr){
+        CurrTransaction.reg = &hal::spi::SPIMainBoard::data[reg_addr];
         return 0;
-
-    CurrTransaction.reg = &hal::spi::SPIMainBoard::data[reg_addr];
+    }else if(reg_addr >= kREQWORDSBaseAddr && reg_addr <= kREQWORDSMaxAddr){
+        CurrTransaction.reg = &hal::spi::SPIMainBoard::data[(reg_addr-kREQWORDSBaseAddr)+kBBSETMaxAddr];
+        return 0;
+    }else if (reg_addr == kSENSDATABaseAddr){
+        CurrTransaction.reg = &hal::spi::SPIMainBoard::data[hal::spi::kSENSDATA_REG];
+        return 0;
+    }else if (reg_addr == kACTDATABaseAddr){
+        CurrTransaction.reg = &hal::spi::SPIMainBoard::data[hal::spi::kACTDATA_REG];
+        return 0;
+    }
     return 1;
 }
 
@@ -119,12 +60,9 @@ void RXD_Complete(uint8_t data) {
 
 
 void SERCOM3_2_Handler() {
-    //SERCOM3->SPI.DATA.reg = 0x10;
     if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC) {
         RXD_Complete(SERCOM3->SPI.DATA.reg);
     }
-
-    SERCOM3->SPI.DATA.reg = 0;
 
 }
 

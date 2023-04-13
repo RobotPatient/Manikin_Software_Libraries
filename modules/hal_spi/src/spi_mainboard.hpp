@@ -3,27 +3,39 @@
 
 #include <spi_base.hpp>
 
-
-inline constexpr
-        uint8_t
-STATUS_REG_SIZE = 4;
-
-inline constexpr
-        uint8_t
-BBSET_REG_SIZE = 3;
-
-inline constexpr
-        uint8_t
-REQWORDS_REG_SIZE = 3;
-
-inline constexpr
-        uint8_t
-NUM_OF_BACKBONES = 4;
-
-void read_bbset();
-
 namespace hal::spi {
+    inline constexpr
+    uint8_t kSTATUS_REG = 0;
 
+    inline constexpr
+    uint8_t kBBSETA_REG = 0x01;
+
+    inline constexpr
+    uint8_t kBBSETB_REG = 0x02;
+
+    inline constexpr
+    uint8_t kBBSETC_REG = 0x03;
+
+    inline constexpr
+    uint8_t kBBSETD_REG = 0x04;
+
+    inline constexpr
+    uint8_t kREQWORDA_REG = 0x05;
+
+    inline constexpr
+    uint8_t kREQWORDB_REG = 0x06;
+
+    inline constexpr
+    uint8_t kREQWORDC_REG = 0x07;
+
+    inline constexpr
+    uint8_t kREQWORDD_REG = 0x08;
+
+    inline constexpr
+    uint8_t kSENSDATA_REG = 0x09;
+
+    inline constexpr
+    uint8_t kACTDATA_REG = 0x0A;
 
     class SPIMainBoard : public SPISlave {
     public:
