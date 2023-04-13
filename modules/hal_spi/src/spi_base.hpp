@@ -12,7 +12,7 @@ typedef struct {
 
 class SPISlave{
 public:
-    explicit SPISlave(SpiSlaveData* slave_data){}
+    explicit SPISlave(){}
     virtual void begin() = 0;
     virtual uint32_t pollread() = 0;
     virtual void pollwrite(uint32_t data) = 0;

@@ -4,6 +4,14 @@
 #include <spi_base.hpp>
 #include <stddef.h>
 
+typedef enum SPIStateMachine{
+STATE_INIT_REG,
+STATE_SEQ_NUM,
+STATE_READ_BYTES,
+STATE_WRITE_BYTES,
+STATE_IGNORE_ISR
+};
+
 inline constexpr
 uint8_t STATUS_REG_SIZE = 4;
 
@@ -61,13 +69,12 @@ uint8_t first_word_start_bit(uint8_t reg) {
 
 typedef struct {
     hal::spi::SpiSlaveData *reg;
+    SPIStateMachine State;
     bool WR;
-    bool first_word;
-    bool got_seq_num;
     int seq_num;
     int byte_cnt;
 } spi_transaction;
 
-spi_transaction CurrTransaction = {NULL, 0, true, false, 0, 0};
+spi_transaction CurrTransaction = {NULL, STATE_INIT_REG, false, 0, 0};
 
 #endif

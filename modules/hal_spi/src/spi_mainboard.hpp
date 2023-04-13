@@ -37,10 +37,11 @@ namespace hal::spi {
     inline constexpr
     uint8_t kACTDATA_REG = 0x0A;
 
+    extern SpiSlaveData SPIMainboard_reg_data_[11];
+
     class SPIMainBoard : public SPISlave {
     public:
-        explicit SPIMainBoard(SpiSlaveData *slave_data) : SPISlave(slave_data) {
-            slave_data = data;
+        explicit SPIMainBoard() : SPISlave() {
         }
 
         void begin();
@@ -50,8 +51,6 @@ namespace hal::spi {
         void pollwrite(uint32_t data);
 
         void deinit();
-
-        static SpiSlaveData data[11];
     private:
 
     };
