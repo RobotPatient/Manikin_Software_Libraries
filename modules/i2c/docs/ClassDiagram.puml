@@ -14,6 +14,9 @@ namespace hal::i2c {
 
     }
 
+    enum I2CAddr
+
+    I2CAddr --o I2CBase
     I2CBase --|> I2CBaseSlave
     I2CBase --|> I2CBaseMaster
     TwoWire --* I2CBase
