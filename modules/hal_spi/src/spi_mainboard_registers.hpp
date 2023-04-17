@@ -42,6 +42,12 @@ uint8_t kACTDATABaseAddr = 0x30;
 inline constexpr
 uint8_t kFirstWordBitMask = 0x3F;
 
+inline constexpr
+uint8_t kValidReg = 0;
+
+inline constexpr
+uint8_t kInvalidReg = 1;
+
 uint8_t SENSORDATA_size;
 uint8_t ACTDATA_size;
 

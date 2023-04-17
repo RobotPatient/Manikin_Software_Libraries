@@ -12,18 +12,18 @@ volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
 uint8_t getRegister(uint8_t reg_addr) {
     if(reg_addr >= 0 && reg_addr <= kBBSETMaxAddr){
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[reg_addr];
-        return 0;
+        return kValidReg;
     }else if(reg_addr >= kREQWORDSBaseAddr && reg_addr <= kREQWORDSMaxAddr){
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[(reg_addr-kREQWORDSBaseAddr)+kBBSETMaxAddr];
-        return 0;
+        return kValidReg;
     }else if (reg_addr == kSENSDATABaseAddr){
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[hal::spi::kSENSDATA_REG];
-        return 0;
+        return kValidReg;
     }else if (reg_addr == kACTDATABaseAddr){
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[hal::spi::kACTDATA_REG];
-        return 0;
+        return kValidReg;
     }
-    return 1;
+    return kInvalidReg;
 }
 
 
@@ -64,8 +64,8 @@ void SERCOM3_2_Handler() {
         {
             CurrTransaction.seq_num = SERCOM3->SPI.DATA.reg;
             if (!CurrTransaction.WR) {
-                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[1];
-                CurrTransaction.byte_cnt = 2;
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
+                CurrTransaction.byte_cnt++;
                 CurrTransaction.State = STATE_WRITE_BYTES;
             }
             else{
@@ -85,9 +85,8 @@ void SERCOM3_2_Handler() {
             break;
         }
         case STATE_WRITE_BYTES:
-            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size+1){
+            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size){
                 CurrTransaction.State = STATE_IGNORE_ISR;            
-                CurrTransaction.byte_cnt = 0;
             }             
             if (CurrTransaction.byte_cnt < CurrTransaction.reg->size+1) {
                  SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
@@ -108,7 +107,11 @@ void SERCOM3_2_Handler() {
 
 
 namespace hal::spi {
-    volatile SpiSlaveData SPIMainboard_reg_data_[11] = {{&STATUS,         4},
+    
+    /* Register mapping!
+    *  This array determines the available registers with the mapping
+    */
+    volatile SpiSlaveData SPIMainboard_reg_data_[11] = {{&STATUS,         STATUS_REG_SIZE},
                                            {&BBSET[0][0], BBSET_REG_SIZE},
                                            {&BBSET[1][0], BBSET_REG_SIZE},
                                            {&BBSET[2][0], BBSET_REG_SIZE},
