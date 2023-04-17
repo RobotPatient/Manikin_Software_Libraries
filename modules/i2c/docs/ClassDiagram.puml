@@ -1,0 +1,22 @@
+@startuml I2C
+
+namespace hal::i2c {
+    class TwoWire
+    class I2CBase{
+
+    }
+
+    class I2CBaseMaster{
+
+    }
+
+    class I2CBaseSlave{
+
+    }
+
+    I2CBase --|> I2CBaseSlave
+    I2CBase --|> I2CBaseMaster
+    TwoWire --* I2CBase
+}
+
+@enduml
