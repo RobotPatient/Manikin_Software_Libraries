@@ -19,7 +19,7 @@ inline constexpr
 uint8_t BBSET_REG_SIZE = 3;
 
 inline constexpr
-uint8_t REQWORDS_REG_SIZE = 3;
+uint8_t REQWORDS_REG_SIZE = 4;
 
 inline constexpr
 uint8_t NUM_OF_BACKBONES = 4;
@@ -70,7 +70,7 @@ uint8_t first_word_wr_bit(uint8_t reg) {
 
 inline constexpr
 uint8_t first_word_start_bit(uint8_t reg) {
-    return (reg & 0x80);
+    return ~(reg & 0x80);
 }
 
 typedef struct {

@@ -30,6 +30,9 @@
 #include <sam.h>
 #include <spi_mainboard_registers.hpp>
 
+inline constexpr uint8_t kSSLInterruptPriority = 1;
+inline constexpr uint8_t kRXCInterruptPriority = 2;
+
 volatile uint8_t clrflag;
 
 volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
@@ -71,15 +74,14 @@ void SERCOM3_2_Handler() {
             uint8_t data = SERCOM3->SPI.DATA.reg;
             uint8_t reg_addr = first_word_reg_addr(data);
             bool valid_register = getRegister(reg_addr) == 0;
-            if (valid_register & !first_word_start_bit(data)) {
+            if (valid_register & first_word_start_bit(data)) {
                 CurrTransaction.WR = first_word_wr_bit(data);
                 CurrTransaction.byte_cnt = 0;
                 if (!CurrTransaction.WR){
                     // READ operation
                     // We need to think two cycles ahead when it comes to sending data
                     // Thats why in this step there will already be data put in to the tx buffer
-                    SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
-                    CurrTransaction.byte_cnt++;
+                    SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
                 }
                 CurrTransaction.State = STATE_SEQ_NUM;
             }
@@ -89,8 +91,7 @@ void SERCOM3_2_Handler() {
         {
             CurrTransaction.seq_num = SERCOM3->SPI.DATA.reg;
             if (!CurrTransaction.WR) {
-                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
-                CurrTransaction.byte_cnt++;
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
                 CurrTransaction.State = STATE_WRITE_BYTES;
             } else{
                 CurrTransaction.State = STATE_READ_BYTES;
@@ -102,16 +103,16 @@ void SERCOM3_2_Handler() {
             if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {             
                 CurrTransaction.State = STATE_IGNORE_ISR;
             }  
-            CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
-            CurrTransaction.byte_cnt++;
+            bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == hal::spi::kPermissionsRW);
+            if(reg_has_write_permission)
+                CurrTransaction.reg->data[CurrTransaction.byte_cnt++] = SERCOM3->SPI.DATA.reg;
             break;
         }
         case STATE_WRITE_BYTES:            
             if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {                
                 CurrTransaction.State = STATE_IGNORE_ISR;
             }
-            SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
-            CurrTransaction.byte_cnt++;
+            SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
             break;
         case STATE_IGNORE_ISR:
         {
@@ -121,8 +122,8 @@ void SERCOM3_2_Handler() {
             clrflag = SERCOM3->SPI.DATA.reg;
             break;
         }
-    }
-    }
+        }
+   }
 
 
 }
@@ -132,19 +133,20 @@ void SERCOM3_2_Handler() {
 namespace hal::spi {
     
     /* Register mapping!
-    *  This array determines the available registers with the mapping
+    *  This array determines the available registers with the mapping and r/w permissions.
+    *  Adding new registers is as simple as adding new entries and editing the macro kMainBoardSPINumOfRegs to desired num of regs
     */
-    volatile SpiSlaveData SPIMainboard_reg_data_[11] = {{&STATUS,         STATUS_REG_SIZE},
-                                           {&BBSET[0][0], BBSET_REG_SIZE},
-                                           {&BBSET[1][0], BBSET_REG_SIZE},
-                                           {&BBSET[2][0], BBSET_REG_SIZE},
-                                           {&BBSET[3][0], BBSET_REG_SIZE},
-                                           {&REQWORDS[0][0], 4},
-                                           {&REQWORDS[1][0], 4},
-                                           {&REQWORDS[2][0], 4},
-                                           {&REQWORDS[3][0], 4},
-                                           {NULL,            0},
-                                           {NULL,            0}};
+    volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs] = {{&STATUS, STATUS_REG_SIZE, kPermissionsRO},
+                                                                            {&BBSET[0][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                                            {&BBSET[1][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                                            {&BBSET[2][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                                            {&BBSET[3][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                                            {&REQWORDS[0][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                                            {&REQWORDS[1][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                                            {&REQWORDS[2][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                                            {&REQWORDS[3][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                                            {SENSORDATA, SENSORDATA_size, kPermissionsRO},
+                                                                            {ACTDATA, ACTDATA_size, kPermissionsRW}};
 
 
     void SPIMainBoard::begin() {
@@ -204,27 +206,27 @@ namespace hal::spi {
         SERCOM3->SPI.CTRLA.reg = tmp;
         while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE));
 
-        PORT->Group[0].OUTCLR.reg = 1 << 22;
-        PORT->Group[0].DIRSET.reg = 1 << 22;
-        PORT->Group[0].PINCFG[22].bit.PMUXEN = 1;
-        PORT->Group[0].PMUX[22 >> 1].bit.PMUXE = 0x2;
+        PORT->Group[0].OUTCLR.reg = PORT_PA22;
+        PORT->Group[0].DIRSET.reg = PORT_PA22;
+        PORT->Group[0].PINCFG[PIN_PA22].reg |= PORT_PINCFG_PMUXEN;
+        PORT->Group[0].PMUX[PIN_PA22 >> 1].bit.PMUXE = MUX_PA22C_SERCOM3_PAD0;
 
-        PORT->Group[0].OUTCLR.reg = 1 << 16;
-        PORT->Group[0].DIRSET.reg = 1 << 16;
-        PORT->Group[0].PINCFG[16].bit.PMUXEN = 1;
-        PORT->Group[0].PMUX[16 >> 1].bit.PMUXE = 0x3;
+        PORT->Group[0].OUTCLR.reg = PORT_PA16;
+        PORT->Group[0].DIRSET.reg = PORT_PA16;
+        PORT->Group[0].PINCFG[PIN_PA16].reg |= PORT_PINCFG_PMUXEN;
+        PORT->Group[0].PMUX[PIN_PA16 >> 1].bit.PMUXE = MUX_PA16D_SERCOM3_PAD1;
 
-        PORT->Group[0].DIRCLR.reg = 1 << 18;
-        PORT->Group[0].PINCFG[18].bit.PMUXEN = 1;
-        PORT->Group[0].PMUX[18 >> 1].bit.PMUXE = 0x3;
+        PORT->Group[0].DIRCLR.reg = PORT_PA18;
+        PORT->Group[0].PINCFG[PIN_PA18].reg |= PORT_PINCFG_PMUXEN;
+        PORT->Group[0].PMUX[PIN_PA18 >> 1].bit.PMUXE = MUX_PA18D_SERCOM3_PAD2;
         
-        PORT->Group[0].DIRCLR.reg = 1 << 19;
-        PORT->Group[0].PINCFG[19].bit.PMUXEN = 1;
-        PORT->Group[0].PMUX[19 >> 1].bit.PMUXO = 0x3;
+        PORT->Group[0].DIRCLR.reg = PORT_PA19;
+        PORT->Group[0].PINCFG[PIN_PA19].reg |= PORT_PINCFG_PMUXEN;
+        PORT->Group[0].PMUX[PIN_PA19 >> 1].bit.PMUXO = MUX_PA19D_SERCOM3_PAD3;
         NVIC_EnableIRQ(SERCOM3_2_IRQn);
-        NVIC_SetPriority(SERCOM3_2_IRQn, 2);
+        NVIC_SetPriority(SERCOM3_2_IRQn, kRXCInterruptPriority);
         NVIC_EnableIRQ(SERCOM3_3_IRQn);
-        NVIC_SetPriority(SERCOM3_3_IRQn, 1);
+        NVIC_SetPriority(SERCOM3_3_IRQn, kSSLInterruptPriority);
     }
 
     void SPIMainBoard::deinit() {

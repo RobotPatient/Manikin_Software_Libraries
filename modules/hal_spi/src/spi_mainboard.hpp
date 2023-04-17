@@ -33,6 +33,7 @@
 
 namespace hal::spi {
     /* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
+    inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;
     inline constexpr uint8_t kSTATUS_REG = 0;
     inline constexpr uint8_t kBBSETA_REG = 0x01;
     inline constexpr uint8_t kBBSETB_REG = 0x02;
@@ -45,7 +46,7 @@ namespace hal::spi {
     inline constexpr uint8_t kSENSDATA_REG = 0x09;
     inline constexpr uint8_t kACTDATA_REG = 0x0A;
     /* The array with the SPI slave registers */
-    extern volatile SpiSlaveData SPIMainboard_reg_data_[11];
+    extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
 
     class SPIMainBoard : public SPISlave {
     public:

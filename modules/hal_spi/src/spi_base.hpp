@@ -31,9 +31,13 @@
 #include <stdint.h>
 namespace hal::spi {
 
+inline constexpr uint8_t kPermissionsRW = 0;
+inline constexpr uint8_t kPermissionsRO = 1;
+
 typedef struct {
     volatile uint8_t *data;
     uint8_t size;
+    const uint8_t access_permissions;
 } SpiSlaveData;
 
 
