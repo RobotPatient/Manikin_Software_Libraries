@@ -55,10 +55,6 @@ namespace hal::spi {
 
         void begin();
 
-        uint32_t pollread();
-
-        void pollwrite(uint32_t data);
-
         void deinit();
     private:
 

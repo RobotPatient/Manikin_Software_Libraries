@@ -46,8 +46,6 @@ class SPISlave {
  public:
     SPISlave() {}
     virtual void begin() = 0;
-    virtual uint32_t pollread() = 0;
-    virtual void pollwrite(uint32_t data) = 0;
     virtual void deinit() = 0;
 };
 }  // namespace hal::spi
