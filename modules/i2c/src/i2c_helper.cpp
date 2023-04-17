@@ -28,6 +28,7 @@
 
 #include <i2c_helper.hpp>
 
+// Maybe make this function static and seperate in a lib. Making it static does not matter for performance tho...
 constexpr uint8_t GetUpperByte(uint16_t number) {
   return (number >> 8) & 0xff;
 }
@@ -36,30 +37,30 @@ constexpr uint8_t GetLowerByte(uint16_t number) {
   return (number & 0xFF);
 }
 
-void I2CDriver::Init() {
+void I2C_helper::init_i2c_helper(void) {
   i2c_peripheral_->begin();
 }
 
-void I2CDriver::ChangeAddress(uint8_t new_i2c_address) {
-  i2c_addr_ = new_i2c_address;
+void I2C_helper::ChangeAddress(uint8_t new_i2c_address) {
+  slave_target_address_ = new_i2c_address;
 }
 
-void I2CDriver::WriteReg(uint16_t reg, uint8_t data) {
+void I2C_helper::write8_reg16b(uint16_t reg, uint8_t data) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->beginTransmission(slave_target_address_);
   i2c_peripheral_->write(kRegUpperByte);
   i2c_peripheral_->write(kRegLowerByte);
   i2c_peripheral_->write(data);
   i2c_peripheral_->endTransmission();
 }
 
-void I2CDriver::WriteReg16(uint16_t reg, uint16_t data) {
+void I2C_helper::write16_reg16b(uint16_t reg, uint16_t data) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->beginTransmission(slave_target_address_);
   i2c_peripheral_->write(kRegUpperByte);
   i2c_peripheral_->write(kRegLowerByte);
 
@@ -68,23 +69,23 @@ void I2CDriver::WriteReg16(uint16_t reg, uint16_t data) {
   i2c_peripheral_->write(temp);
   temp = GetLowerByte(data);
   i2c_peripheral_->write(temp);
-  i2c_peripheral_->endTransmission();
+  i2c_peripheral_->endTransmission(true);
 }
 
-uint8_t I2CDriver::ReadReg(uint16_t reg) {
+uint8_t I2C_helper::send_read8_reg16b(uint16_t reg) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->beginTransmission(slave_target_address_);
   i2c_peripheral_->write(GetUpperByte(kRegUpperByte));
   i2c_peripheral_->write(GetLowerByte(kRegLowerByte));
   i2c_peripheral_->endTransmission(false);
-  i2c_peripheral_->requestFrom(i2c_addr_, 1);
+  i2c_peripheral_->requestFrom(slave_target_address_, 1, true);
   uint8_t data = i2c_peripheral_->read();
   return data;
 }
 
-uint16_t I2CDriver::ReadReg16(uint16_t reg) {
+uint16_t I2C_helper::send_read16_reg16(uint16_t reg) {
   uint8_t data_low;
   uint8_t data_high;
   uint16_t data;
@@ -92,24 +93,28 @@ uint16_t I2CDriver::ReadReg16(uint16_t reg) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
-  i2c_peripheral_->beginTransmission(i2c_addr_);
+  i2c_peripheral_->beginTransmission(slave_target_address_);
   i2c_peripheral_->write(kRegUpperByte);
   i2c_peripheral_->write(kRegLowerByte);
   i2c_peripheral_->endTransmission(false);
-  i2c_peripheral_->requestFrom(i2c_addr_, 2);
+  i2c_peripheral_->requestFrom(slave_target_address_, 2, true);
   data_high = i2c_peripheral_->read();
   data_low = i2c_peripheral_->read();
   data = (data_high << 8) | data_low;
   return data;
 }
 
-void I2CDriver::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
-  i2c_peripheral_->requestFrom(i2c_addr_, num_of_bytes, true);
-  i2c_peripheral_->readBytes(buffer, num_of_bytes);
+void I2C_helper::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+  i2c_peripheral_->beginTransmission(slave_target_address_);
+  i2c_peripheral_->requestFrom(slave_target_address_, num_of_bytes, true);
+  for (uint8_t i = 0; i < num_of_bytes; i++) {
+    buffer[i] = i2c_peripheral_->read();
+  }
+  i2c_peripheral_->endTransmission(true);
 }
 
-void I2CDriver::SendBytes(uint8_t *buffer, uint8_t num_of_bytes) {
-  i2c_peripheral_->beginTransmission(i2c_addr_);
+void I2C_helper::SendBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+  i2c_peripheral_->beginTransmission(slave_target_address_);
   i2c_peripheral_->write(buffer, num_of_bytes);
   i2c_peripheral_->endTransmission(true);
 }

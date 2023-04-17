@@ -26,37 +26,33 @@
 //  * OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************************************/
 
-#ifndef I2C_HELPER_HPP_
-#define I2C_HELPER_HPP_
+// #ifndef I2C_PERIPHERAL_MOCK_HPP_
+// #define I2C_PERIPHERAL_MOCK_HPP_
 
-#include <stdint.h>
-#include <i2c_module_configs.hpp>
-#include <i2c_interface.hpp>
+// #ifndef __arm__
+// #include <stdint.h>
+// #include <string.h>
+// #include "gmock/gmock.h"  // Brings in Google Mock.
 
-// Helper class to create higher level i2c communiction driver functionalities. 
-class I2C_helper {
- public:
-  explicit I2C_helper(I2CInterface* i2c_peripheral, I2CSpeed_t speed, uint8_t i2c_addr) 
-    : i2c_peripheral_(i2c_peripheral), slave_target_address_(i2c_addr), speed_(speed) {}
+// class I2CPeripheralMock {
+//  public:
+//   MOCK_METHOD0(begin, void());
+//   MOCK_METHOD1(begin, void(uint8_t));
+//   MOCK_METHOD1(beginTransmission, void(uint8_t address));
+//   MOCK_METHOD1(write, size_t(uint8_t ucData));
+//   MOCK_METHOD2(write, size_t(const uint8_t *data, size_t quantity));
+//   MOCK_METHOD0(endTransmission, void());
+//   MOCK_METHOD2(requestFrom, uint8_t(uint8_t address, size_t quantity));
+//   MOCK_METHOD2(readBytes, size_t(uint8_t * buffer, size_t length));
+//   MOCK_METHOD0(read, int());
+//   MOCK_METHOD3(requestFrom, uint8_t(uint8_t address, size_t quantity, bool stopBit));
+//   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
+//   MOCK_METHOD0(available, int());
 
-  explicit I2C_helper(I2CInterface* i2c_peripheral, I2CSpeed_t speed) 
-    : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
+//   MOCK_METHOD(void, onReceive, (void (*func)(int)));
+//   MOCK_METHOD(void, onRequest, (void (*func)(void)));
 
-  void init_i2c_helper();
-  void ChangeAddress(uint8_t new_i2c_address);
+// };
 
-  void write8_reg16b(uint16_t reg, uint8_t data);
-  void write16_reg16b(uint16_t reg, uint16_t data);
-
-  uint8_t send_read8_reg16b(uint16_t reg);
-  uint16_t send_read16_reg16(uint16_t reg);
-
-  void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
-  void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
- private:
-  uint8_t slave_target_address_;
-  I2CInterface* i2c_peripheral_;
-  I2CSpeed_t speed_;
-};
-
-#endif // I2C_HELPER_HPP_
+// #endif  // __arm__
+// #endif  // I2C_PERIPHERAL_MOCK_HPP_

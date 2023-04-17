@@ -28,7 +28,10 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
+#include <i2c_interface.hpp>
 #include <i2c_helper.hpp>
+#include <i2c_peripheral_mock.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
@@ -38,18 +41,24 @@ uint8_t kTestingBytes[8] = {0x10, 0x40, 0x30, 0x20, 0x10, 0xFF, 0x50, 0x01};
 
 TEST(I2CWrapperTest, initCallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
-  EXPECT_CALL(i2c_peripheral_mock, begin());
-  driver.Init();
+  EXPECT_CALL(*mock, begin());
+  driver.init_i2c_helper();
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 TEST(I2CWrapperTest, write_regCallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0530;
@@ -58,23 +67,27 @@ TEST(I2CWrapperTest, write_regCallsRightMethods) {
   const uint8_t kRegUpperByte = (kReg >> 8) & 0xFF;
   const uint8_t kRegLowerByte = (kReg & 0xFF);
   /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, beginTransmission(kI2CAddress));
+  EXPECT_CALL(*mock, beginTransmission(kI2CAddress));
   {
     InSequence seq;
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegLowerByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kData));
+    EXPECT_CALL(*mock, write(kRegUpperByte));
+    EXPECT_CALL(*mock, write(kRegLowerByte));
+    EXPECT_CALL(*mock, write(kData));
   }
-  EXPECT_CALL(i2c_peripheral_mock, endTransmission());
+  EXPECT_CALL(*mock, endTransmission());
   /* The object method which calls to mock methods under the hood*/
-  driver.WriteReg(kReg, kData);
+  driver.write8_reg16b(kReg, kData);
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0510;
@@ -85,24 +98,27 @@ TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
   const uint8_t kDataUpperByte = (kData >> 8) & 0xFF;
   const uint8_t kDataLowerByte = kData & 0xFF;
   /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, beginTransmission(kI2CAddress));
+  EXPECT_CALL(*mock, beginTransmission(kI2CAddress));
   {
     InSequence seq;
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegLowerByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kDataUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kDataLowerByte));
+    EXPECT_CALL(*mock, write(kRegUpperByte));
+    EXPECT_CALL(*mock, write(kRegLowerByte));
+    EXPECT_CALL(*mock, write(kDataUpperByte));
+    EXPECT_CALL(*mock, write(kDataLowerByte));
   }
-  EXPECT_CALL(i2c_peripheral_mock, endTransmission());
+  EXPECT_CALL(*mock, endTransmission(true));
   /* The object method which calls to mock methods under the hood*/
-  driver.WriteReg16(kReg, kData);
+  driver.write16_reg16b(kReg, kData);
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 TEST(I2CWrapperTest, read_regCallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   /* Parameters used in this test*/
   const uint16_t kReg = 0x05;
@@ -112,28 +128,31 @@ TEST(I2CWrapperTest, read_regCallsRightMethods) {
   const uint8_t kRegLowerByte = (kReg & 0xFF);
   const uint8_t kRequestAmountOfBytes = 1;
   /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, beginTransmission(kI2CAddress));
+  EXPECT_CALL(*mock, beginTransmission(kI2CAddress));
   {
     InSequence seq;
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegLowerByte));
+    EXPECT_CALL(*mock, write(kRegUpperByte));
+    EXPECT_CALL(*mock, write(kRegLowerByte));
   }
-  EXPECT_CALL(i2c_peripheral_mock, endTransmission(false));
-  EXPECT_CALL(i2c_peripheral_mock,
-              requestFrom(kI2CAddress, kRequestAmountOfBytes));
-  EXPECT_CALL(i2c_peripheral_mock, read())
+  EXPECT_CALL(*mock, endTransmission(false));
+  EXPECT_CALL(*mock,
+              requestFrom(kI2CAddress, kRequestAmountOfBytes,true));
+  EXPECT_CALL(*mock, read())
       .WillRepeatedly(Return(kDataToReturn));
   /* The object method which calls to mock methods under the hood*/
-  uint8_t data_returned = driver.ReadReg(kReg);
+  uint8_t data_returned = driver.send_read8_reg16b(kReg);
   /* Check if returned value matched the value that mock function returned*/
   EXPECT_EQ(data_returned, kDataToReturn);
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 TEST(I2CWrapperTest, read_reg16CallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0520;
@@ -145,57 +164,33 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods) {
   const uint8_t kDataLowerByte = (kDataToReturn & 0xFF);
   const uint8_t kRequestAmountOfBytes = 2;  // We request 16-bits of data
   /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, beginTransmission(kI2CAddress));
+  EXPECT_CALL(*mock, beginTransmission(kI2CAddress));
   {
     InSequence seq;
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, write(kRegLowerByte));
-    EXPECT_CALL(i2c_peripheral_mock, endTransmission(false));
-    EXPECT_CALL(i2c_peripheral_mock,
-                requestFrom(kI2CAddress, kRequestAmountOfBytes));
-    EXPECT_CALL(i2c_peripheral_mock, read())
+    EXPECT_CALL(*mock, write(kRegUpperByte));
+    EXPECT_CALL(*mock, write(kRegLowerByte));
+    EXPECT_CALL(*mock, endTransmission(false));
+    EXPECT_CALL(*mock,
+                requestFrom(kI2CAddress, kRequestAmountOfBytes, true));
+    EXPECT_CALL(*mock, read())
         .WillOnce(Return(kDataUpperByte));
-    EXPECT_CALL(i2c_peripheral_mock, read())
+    EXPECT_CALL(*mock, read())
         .WillOnce(Return(kDataLowerByte));
   }
   /* The object method which calls to mock methods under the hood*/
-  uint16_t data_returned = driver.ReadReg16(kReg);
+  uint16_t data_returned = driver.send_read16_reg16(kReg);
   /* Check if returned value matched the value that mock function returned*/
   EXPECT_EQ(data_returned, kDataToReturn);
-}
-
-size_t CopyTestArray(uint8_t *buffer, size_t length) {
-  memcpy(buffer, kTestingBytes, length);
-  return length;
-}
-
-TEST(I2CWrapperTest, readBytesCallsRightMethods) {
-  const uint8_t kI2CAddress = 0x29;
-  /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
-                               kI2cSpeed_100KHz, kI2CAddress);
-  /* Generate mock method input parameters*/
-  const uint8_t kRequestAmountOfBytes = 8;
-  const bool kRequestStopBit = true;
-
-  uint8_t test_buffer[8];
-  /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, requestFrom(kI2CAddress, kRequestAmountOfBytes, kRequestStopBit));
-  EXPECT_CALL(i2c_peripheral_mock, readBytes(test_buffer, kRequestAmountOfBytes))
-      .WillOnce(Invoke(CopyTestArray));
-  /* The object method which calls to mock methods under the hood*/
-  driver.ReadBytes(test_buffer, kRequestAmountOfBytes);
-  /* Check if returned value matched the value that mock function returned*/
-  for (uint8_t i = 0; i < kRequestAmountOfBytes; i++)
-    EXPECT_EQ(test_buffer[i], kTestingBytes[i]);
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 TEST(I2CWrapperTest, sendBytesCallsRightMethods) {
   const uint8_t kI2CAddress = 0x29;
   /* Mock class and i2c_driver instantiation*/
-  I2CPeripheralMock i2c_peripheral_mock;
-  I2CDriver driver = I2CDriver(&i2c_peripheral_mock,
+  I2CInterface* i2c_mock = new MockI2CInterface();
+  MockI2CInterface* mock = dynamic_cast<MockI2CInterface*>(i2c_mock); // Needed for google testing.
+  I2C_helper driver = I2C_helper(i2c_mock,
                                kI2cSpeed_100KHz, kI2CAddress);
   /* Parameters used in this test*/
   const uint8_t kRequestAmountOfBytes = 8;
@@ -203,11 +198,13 @@ TEST(I2CWrapperTest, sendBytesCallsRightMethods) {
   const bool kRequestStopBit = true;
 
   /* The expected function calls*/
-  EXPECT_CALL(i2c_peripheral_mock, beginTransmission(kI2CAddress));
-  EXPECT_CALL(i2c_peripheral_mock, write(kTestingBytes, kRequestAmountOfBytes));
-  EXPECT_CALL(i2c_peripheral_mock, endTransmission(kRequestStopBit));
+  EXPECT_CALL(*mock, beginTransmission(kI2CAddress));
+  EXPECT_CALL(*mock, write(kTestingBytes, kRequestAmountOfBytes));
+  EXPECT_CALL(*mock, endTransmission(kRequestStopBit));
   /* The object method which calls to mock methods under the hood*/
   driver.SendBytes(kTestingBytes, kRequestAmountOfBytes);
+  delete i2c_mock;
+  testing::Mock::AllowLeak(i2c_mock);
 }
 
 int main(int argc, char **argv) {

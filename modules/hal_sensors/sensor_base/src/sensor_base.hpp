@@ -38,12 +38,12 @@ typedef struct SensorData {
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(I2CDriver *i2c_handle) {}
+  explicit UniversalSensor(I2CInterface* i2c_handle) {}
   virtual void Initialize() = 0;
   virtual SensorData_t GetSensorData() = 0;
   virtual void Uninitialize() = 0;
  private:
-  I2C_PERIPHERAL_T i2c_handle_;
+  I2CInterface* i2c_handle_;
 };
 
 #endif  // SENSOR_BASE_H
