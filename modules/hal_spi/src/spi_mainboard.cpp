@@ -95,6 +95,9 @@ void SERCOM3_2_Handler() {
             break;
         case STATE_IGNORE_ISR:
         {
+            // The datasheet states that the RXC interrupt flag can be cleared by reading the databuffer
+            // or disabling the receiver. Disabling the receiver takes a lot of time to re-enable.
+            // Therefore its more sensible to poll (read) the buffer until the flag is cleared
             clrflag = SERCOM3->SPI.DATA.reg;
             break;
         }
