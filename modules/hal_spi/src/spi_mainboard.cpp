@@ -25,10 +25,10 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-
+#include <spi_mainboard_registers.hpp>
 #include <spi_mainboard.hpp>
 #include <sam.h>
-#include <spi_mainboard_registers.hpp>
+
 
 inline constexpr uint8_t kSSLInterruptPriority = 1;
 inline constexpr uint8_t kRXCInterruptPriority = 2;
@@ -80,7 +80,7 @@ void SERCOM3_2_Handler() {
             if (valid_register & first_word_start_bit(data)) {
                 CurrTransaction.WR = first_word_wr_bit(data);
                 CurrTransaction.byte_cnt = 0;
-                if (!CurrTransaction.WR){
+                if (!CurrTransaction.WR) {
                     // READ operation
                     // We need to think two cycles ahead when it comes to sending data
                     // Thats why in this step there will already be data put in to the tx buffer
@@ -96,25 +96,25 @@ void SERCOM3_2_Handler() {
             if (!CurrTransaction.WR) {
                 SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
                 CurrTransaction.State = STATE_WRITE_BYTES;
-            } else{
+            } else {
                 CurrTransaction.State = STATE_READ_BYTES;
             }
             break;
         }
         case STATE_READ_BYTES:
-        {           
-            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {             
+        {
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {
                 CurrTransaction.State = STATE_IGNORE_ISR;
-            }  
+            }
             bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == hal::spi::kPermissionsRW);
-            if(reg_has_write_permission) {
+            if (reg_has_write_permission) {
                 CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
             }
             CurrTransaction.byte_cnt++;
             break;
         }
-        case STATE_WRITE_BYTES:           
-            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {                
+        case STATE_WRITE_BYTES:
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {
                 CurrTransaction.State = STATE_IGNORE_ISR;
             }
             SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
@@ -129,30 +129,28 @@ void SERCOM3_2_Handler() {
             break;
         }
         }
-   }
-
-
+    }
 }
 
 
 
 namespace hal::spi {
-    
     /* Register mapping!
     *  This array determines the available registers with the mapping and r/w permissions.
     *  Adding new registers is as simple as adding new entries and editing the macro kMainBoardSPINumOfRegs to desired num of regs
     */
-    volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs] = {{&STATUS, STATUS_REG_SIZE, kPermissionsRO},
-                                                                            {&BBSET[0][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                                            {&BBSET[1][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                                            {&BBSET[2][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                                            {&BBSET[3][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                                            {&REQWORDS[0][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                                            {&REQWORDS[1][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                                            {&REQWORDS[2][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                                            {&REQWORDS[3][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                                            {SENSORDATA, SENSORDATA_size, kPermissionsRO},
-                                                                            {ACTDATA, ACTDATA_size, kPermissionsRW}};
+    volatile SpiSlaveData
+    SPIMainboard_reg_data_[kMainBoardSPINumOfRegs] = {{&STATUS, STATUS_REG_SIZE, kPermissionsRO},
+                                                      {&BBSET[0][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[1][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[2][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[3][0], BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[0][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[1][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[2][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[3][0], REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {SENSORDATA, SENSORDATA_size, kPermissionsRO},
+                                                      {ACTDATA, ACTDATA_size, kPermissionsRW}};
 
 
     void SPIMainBoard::begin() {
@@ -166,18 +164,18 @@ namespace hal::spi {
             uint32_t mode = SERCOM_SPI_CTRLA_MODE(2);
             if (SERCOM3->SPI.CTRLA.bit.ENABLE) {
                 SERCOM3->SPI.CTRLA.reg &= ~SERCOM_SPI_CTRLA_ENABLE;
-                while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE));
+                while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE)) {}
             }
             SERCOM3->SPI.CTRLA.reg = (SERCOM_SPI_CTRLA_SWRST | mode);
         }
 
-        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST);
+        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST) {}
 
         SERCOM3->SPI.CTRLA.reg = 0 << SERCOM_SPI_CTRLA_DORD_Pos           /* Data Order: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_CPOL_Pos     /* Clock Polarity: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_CPHA_Pos     /* Clock Phase: disabled */
                                  | 0 << SERCOM_SPI_CTRLA_FORM_Pos     /* Frame Format: 0 */
-                                 | 0 << SERCOM_SPI_CTRLA_IBON_Pos     /* Immediate Buffer Overflow Notification: disabled */
+                                 | 0 << SERCOM_SPI_CTRLA_IBON_Pos     /* Immediate Buffer Overflow Notification*/
                                  | 0 << SERCOM_SPI_CTRLA_RUNSTDBY_Pos /* Run In Standby: disabled */
                                  | 2 << SERCOM_SPI_CTRLA_MODE_Pos;
 
@@ -186,13 +184,13 @@ namespace hal::spi {
         tmp &= ~SERCOM_SPI_CTRLA_DOPO_Msk;
         tmp |= SERCOM_SPI_CTRLA_DOPO(0);
         SERCOM3->SPI.CTRLA.reg = tmp;
-        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_MASK);
+        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_MASK) {}
 
         tmp = SERCOM3->SPI.CTRLA.reg;
         tmp &= ~SERCOM_SPI_CTRLA_DIPO_Msk;
         tmp |= SERCOM_SPI_CTRLA_DIPO(3);
         SERCOM3->SPI.CTRLA.reg = tmp;
-        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_MASK);
+        while (SERCOM3->SPI.SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_MASK) {}
 
         SERCOM3->SPI.CTRLB.reg = 1 << SERCOM_SPI_CTRLB_RXEN_Pos          /* Receiver Enable: enabled */
                                  | 0 << SERCOM_SPI_CTRLB_MSSEN_Pos   /* Master Slave Select Enabl: disabled */
@@ -200,17 +198,17 @@ namespace hal::spi {
                                  | 1 << SERCOM_SPI_CTRLB_SSDE_Pos    /* Slave Select Low Detect Enable: disabled */
                                  | 0 << SERCOM_SPI_CTRLB_PLOADEN_Pos /* Slave Data Preload Enable: disabled */
                                  | 0;
-        SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
-                                    | 1 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
-                                    | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
-                                    | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
+        SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos  /* Error Interrupt Enable: disabled */
+                                    | 1 << SERCOM_SPI_INTENSET_SSL_Pos  /* Slave Select Low Interrupt: enabled */
+                                    | 1 << SERCOM_SPI_INTENSET_RXC_Pos  /* Receive Complete Interrupt: enabled */
+                                    | 0 << SERCOM_SPI_INTENSET_TXC_Pos  /* Transmit Complete Interrupt: disabled */
                                     | 0 << SERCOM_SPI_INTENSET_DRE_Pos;
-        while (SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF);
+        while (SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF) {}
         tmp = SERCOM3->SPI.CTRLA.reg;
         tmp &= ~SERCOM_SPI_CTRLA_ENABLE;
         tmp |= (1 << SERCOM_SPI_CTRLA_ENABLE_Pos);
         SERCOM3->SPI.CTRLA.reg = tmp;
-        while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE));
+        while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE)) {}
 
         PORT->Group[0].OUTCLR.reg = PORT_PA22;
         PORT->Group[0].DIRSET.reg = PORT_PA22;
@@ -225,7 +223,7 @@ namespace hal::spi {
         PORT->Group[0].DIRCLR.reg = PORT_PA18;
         PORT->Group[0].PINCFG[PIN_PA18].reg |= PORT_PINCFG_PMUXEN;
         PORT->Group[0].PMUX[PIN_PA18 >> 1].bit.PMUXE = MUX_PA18D_SERCOM3_PAD2;
-        
+
         PORT->Group[0].DIRCLR.reg = PORT_PA19;
         PORT->Group[0].PINCFG[PIN_PA19].reg |= PORT_PINCFG_PMUXEN;
         PORT->Group[0].PMUX[PIN_PA19 >> 1].bit.PMUXO = MUX_PA19D_SERCOM3_PAD3;
@@ -239,4 +237,4 @@ namespace hal::spi {
         SERCOM3->SPI.CTRLA.reg &= ~SERCOM_SPI_CTRLA_ENABLE;
     }
 
-}
+}  // namespace hal::spi

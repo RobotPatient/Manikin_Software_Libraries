@@ -32,32 +32,28 @@
 #include <spi_base.hpp>
 
 namespace hal::spi {
-    /* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
-    inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;
-    inline constexpr uint8_t kSTATUS_REG = 0;
-    inline constexpr uint8_t kBBSETA_REG = 0x01;
-    inline constexpr uint8_t kBBSETB_REG = 0x02;
-    inline constexpr uint8_t kBBSETC_REG = 0x03;
-    inline constexpr uint8_t kBBSETD_REG = 0x04;
-    inline constexpr uint8_t kREQWORDA_REG = 0x05;
-    inline constexpr uint8_t kREQWORDB_REG = 0x06;
-    inline constexpr uint8_t kREQWORDC_REG = 0x07;
-    inline constexpr uint8_t kREQWORDD_REG = 0x08;
-    inline constexpr uint8_t kSENSDATA_REG = 0x09;
-    inline constexpr uint8_t kACTDATA_REG = 0x0A;
-    /* The array with the SPI slave registers */
-    extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
+/* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
+inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;
+inline constexpr uint8_t kSTATUS_REG = 0;
+inline constexpr uint8_t kBBSETA_REG = 0x01;
+inline constexpr uint8_t kBBSETB_REG = 0x02;
+inline constexpr uint8_t kBBSETC_REG = 0x03;
+inline constexpr uint8_t kBBSETD_REG = 0x04;
+inline constexpr uint8_t kREQWORDA_REG = 0x05;
+inline constexpr uint8_t kREQWORDB_REG = 0x06;
+inline constexpr uint8_t kREQWORDC_REG = 0x07;
+inline constexpr uint8_t kREQWORDD_REG = 0x08;
+inline constexpr uint8_t kSENSDATA_REG = 0x09;
+inline constexpr uint8_t kACTDATA_REG = 0x0A;
+/* The array with the SPI slave registers */
+extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
 
-    class SPIMainBoard : public SPISlave {
-    public:
-        explicit SPIMainBoard() : SPISlave() {
-        }
+class SPIMainBoard : public SPISlave {
+ public:
+  SPIMainBoard() : SPISlave() {}
 
-        void begin();
-
-        void deinit();
-    private:
-
-    };
-}
+  void begin();
+  void deinit();
+};
+}  // namespace hal::spi
 #endif
