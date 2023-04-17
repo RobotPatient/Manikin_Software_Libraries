@@ -105,7 +105,8 @@ void SERCOM3_2_Handler() {
             }  
             bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == hal::spi::kPermissionsRW);
             if(reg_has_write_permission)
-                CurrTransaction.reg->data[CurrTransaction.byte_cnt++] = SERCOM3->SPI.DATA.reg;
+                CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
+            CurrTransaction.byte_cnt++;
             break;
         }
         case STATE_WRITE_BYTES:            
