@@ -1,8 +1,33 @@
+/* *******************************************************************************************
+ * Copyright (c) 2023 by RobotPatient Simulators
+ *
+ * Author: Victor Hogeweij
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction,
+ *
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+ * is furnished to do so,
+ *
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+***********************************************************************************************/
+
 #include <spi_mainboard.hpp>
 #include <sam.h>
-#include <variant.h>
-#include <Arduino.h>
-#include "wiring_private.h"
 #include <spi_mainboard_registers.hpp>
 
 volatile uint8_t clrflag;
@@ -10,16 +35,16 @@ volatile uint8_t clrflag;
 volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
 
 uint8_t getRegister(uint8_t reg_addr) {
-    if(reg_addr >= 0 && reg_addr <= kBBSETMaxAddr){
+    if (reg_addr >= 0 && reg_addr <= kBBSETMaxAddr) {
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[reg_addr];
         return kValidReg;
-    }else if(reg_addr >= kREQWORDSBaseAddr && reg_addr <= kREQWORDSMaxAddr){
+    } else if (reg_addr >= kREQWORDSBaseAddr && reg_addr <= kREQWORDSMaxAddr) {
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[(reg_addr-kREQWORDSBaseAddr)+kBBSETMaxAddr];
         return kValidReg;
-    }else if (reg_addr == kSENSDATABaseAddr){
+    } else if (reg_addr == kSENSDATABaseAddr) {
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[hal::spi::kSENSDATA_REG];
         return kValidReg;
-    }else if (reg_addr == kACTDATABaseAddr){
+    } else if (reg_addr == kACTDATABaseAddr) {
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[hal::spi::kACTDATA_REG];
         return kValidReg;
     }
@@ -28,19 +53,19 @@ uint8_t getRegister(uint8_t reg_addr) {
 
 
 void SERCOM3_3_Handler() {
-    if(SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL){
-        SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously 
-        if(CurrTransaction.State == STATE_IGNORE_ISR){
-            CurrTransaction.State = STATE_INIT_REG; // RESET State machine from IDLE state to INIT reg state
+    if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL) {
+        SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously
+        if (CurrTransaction.State == STATE_IGNORE_ISR) {
+            CurrTransaction.State = STATE_INIT_REG;  // RESET State machine from IDLE state to INIT reg state
         }
-        SERCOM3->SPI.DATA.reg = 0; // Set the TX buffer to 0. We don't want garbled data :) 
+        SERCOM3->SPI.DATA.reg = 0;  // Set the TX buffer to 0. We don't want garbled data :)
     }
 }
 
 
 void SERCOM3_2_Handler() {
     if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC) {
-        switch(CurrTransaction.State){
+        switch (CurrTransaction.State) {
         case STATE_INIT_REG:
         {
             uint8_t data = SERCOM3->SPI.DATA.reg;
@@ -49,7 +74,7 @@ void SERCOM3_2_Handler() {
             if (valid_register & !first_word_start_bit(data)) {
                 CurrTransaction.WR = first_word_wr_bit(data);
                 CurrTransaction.byte_cnt = 0;
-                if(!CurrTransaction.WR){
+                if (!CurrTransaction.WR){
                     // READ operation
                     // We need to think two cycles ahead when it comes to sending data
                     // Thats why in this step there will already be data put in to the tx buffer
@@ -67,30 +92,25 @@ void SERCOM3_2_Handler() {
                 SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
                 CurrTransaction.byte_cnt++;
                 CurrTransaction.State = STATE_WRITE_BYTES;
-            }
-            else{
+            } else{
                 CurrTransaction.State = STATE_READ_BYTES;
             }
             break;
         }
         case STATE_READ_BYTES:
-        {
-            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size-1){
+        {           
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {             
                 CurrTransaction.State = STATE_IGNORE_ISR;
-            }             
-            if (CurrTransaction.byte_cnt < CurrTransaction.reg->size) {
-                CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
-            }
+            }  
+            CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
             CurrTransaction.byte_cnt++;
             break;
         }
-        case STATE_WRITE_BYTES:
-            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size){
-                CurrTransaction.State = STATE_IGNORE_ISR;            
-            }             
-            if (CurrTransaction.byte_cnt < CurrTransaction.reg->size+1) {
-                 SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
+        case STATE_WRITE_BYTES:            
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {                
+                CurrTransaction.State = STATE_IGNORE_ISR;
             }
+            SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
             CurrTransaction.byte_cnt++;
             break;
         case STATE_IGNORE_ISR:
@@ -205,7 +225,6 @@ namespace hal::spi {
         NVIC_SetPriority(SERCOM3_2_IRQn, 2);
         NVIC_EnableIRQ(SERCOM3_3_IRQn);
         NVIC_SetPriority(SERCOM3_3_IRQn, 1);
-        //CurrTransaction =  {NULL, STATE_INIT_REG, false, 0, 0};
     }
 
     void SPIMainBoard::deinit() {
