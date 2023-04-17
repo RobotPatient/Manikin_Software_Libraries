@@ -67,7 +67,7 @@ struct VL6180xIdentification {
 
 class CompressionSensor : public UniversalSensor {
  public:
-  explicit CompressionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
+  explicit CompressionSensor(I2C_helper* i2c_handle) : UniversalSensor(i2c_handle) {
     i2c_handle_ = i2c_handle;
   }
 
@@ -81,7 +81,7 @@ class CompressionSensor : public UniversalSensor {
  private:
   uint8_t sensor_i2c_address_ = kSensorAddr;
   SensorData sensor_data_{};
-  I2CDriver *i2c_handle_;
+  I2C_helper* i2c_handle_;
 
 // Low level driver functions:
   uint8_t InitVL6180X(void);

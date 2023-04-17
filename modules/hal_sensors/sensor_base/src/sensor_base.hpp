@@ -26,8 +26,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#ifndef SENSOR_BASE_HPP_
-#define SENSOR_BASE_HPP_
+#ifndef SENSOR_BASE_HPP
+#define SENSOR_BASE_HPP
 
 #include <i2c_helper.hpp>
 
@@ -38,12 +38,12 @@ typedef struct SensorData {
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(I2CInterface* i2c_handle) {}
+  explicit UniversalSensor(I2C_helper* i2c_handle) {}
   virtual void Initialize() = 0;
   virtual SensorData_t GetSensorData() = 0;
   virtual void Uninitialize() = 0;
  private:
-  I2CInterface* i2c_handle_;
+  I2C_helper* i2c_handle_;
 };
 
-#endif  // SENSOR_BASE_H
+#endif  // SENSOR_BASE_HPP

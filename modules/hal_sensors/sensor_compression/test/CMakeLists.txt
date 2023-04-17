@@ -1,13 +1,15 @@
 set(This compression_sensor_mock_test)
 
 set(Sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/i2c_helper.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/i2c_peripheral_mock.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../sensor_base/src/sensor_base.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/sensor_compression.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/sensor_compression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/src/i2c_interface.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/src/i2c_helper.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/src/i2c_helper.cpp
         compression_sensor_mock_test.cc
-        )
+)
 
 # We need this directory, and users of our library will need it too
 
@@ -19,7 +21,8 @@ set_property(TARGET ${This} PROPERTY CXX_STANDARD 17)
 target_include_directories(${This} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/test/mocks/
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../src/
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../../sensor_base/src/
-                                          .)
+                                          ${CMAKE_CURRENT_SOURCE_DIR}/../../../i2c/src
+                                          )
 add_test(
         NAME ${This}
         COMMAND ${This}

@@ -26,11 +26,10 @@
 //  * OTHER DEALINGS IN THE SOFTWARE.
 // ***********************************************************************************************/
 
-#ifndef I2C_HELPER_HPP_
-#define I2C_HELPER_HPP_
+#ifndef I2C_HELPER_HPP
+#define I2C_HELPER_HPP
 
 #include <stdint.h>
-#include <i2c_module_configs.hpp>
 #include <i2c_interface.hpp>
 
 // Helper class to create higher level i2c communiction driver functionalities. 
@@ -59,4 +58,4 @@ class I2C_helper {
   I2CSpeed_t speed_;
 };
 
-#endif // I2C_HELPER_HPP_
+#endif // I2C_HELPER_HPP

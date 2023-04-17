@@ -10,4 +10,4 @@ typedef enum I2CSpeed {
   kI2cSpeed_400KHz = 400000,
 } I2CSpeed_t;
 
-#endif
+#endif // I2C_MODULE_CONFIGS_HPP

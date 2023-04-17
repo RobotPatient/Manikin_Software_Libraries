@@ -1,14 +1,12 @@
 #ifndef I2C_WIRE_DRIVER_HPP
 #define I2C_WIRE_DRIVER_HPP
-#include <stdint.h>
-
 #ifdef __arm__
+#include <stdint.h>
 #include <Wire.h>
-#define I2C_PERIPHERAL_T TwoWire*
 #include <i2c_interface.hpp>
 
 // Wrapper class for Wire.
-class TwoWireInterface : public I2C_wire_driver {
+class TwoWireInterface : public I2CInterface {
 public:
   void begin() override;
   void begin(uint8_t adddress) override;
@@ -23,7 +21,7 @@ public:
   void onReceive(void(*handler)(int)) override;
   void onRequest(void(*handler)(int)) override;
 private:
-  I2C_PERIPHERAL_T i2c_peripheral_;
+  TwoWire* i2c_peripheral_;
 };
 
 #endif

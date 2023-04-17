@@ -1,7 +1,9 @@
+#ifdef __arm__
+
 #include <i2c_wire_driver.hpp>
 
 void TwoWireInterface::begin() override {
-i2c_peripheral_.begin();
+  i2c_peripheral_.begin();
 }
 
 void TwoWireInterface::begin(uint8_t adddress) override {
@@ -47,3 +49,5 @@ void TwoWireInterface::onReceive(void(*handler)(int)) override {
 void TwoWireInterface::onRequest(void(*handler)(int)) override {
   i2c_peripheral_.onRequest(handler);
 }
+
+#endif

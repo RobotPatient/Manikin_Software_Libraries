@@ -15,7 +15,6 @@ class MockI2CInterface : public I2CInterface {
   MOCK_METHOD1(beginTransmission, void(uint8_t address));
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
   MOCK_METHOD0(endTransmission, uint8_t());
-
   MOCK_METHOD1(write, void(uint8_t data));
   MOCK_METHOD2(write, void(const uint8_t* data, size_t size));
   MOCK_METHOD0(available, size_t());
