@@ -59,12 +59,12 @@ uint8_t first_word_reg_addr(uint8_t reg) {
 
 inline constexpr
 uint8_t first_word_wr_bit(uint8_t reg) {
-    return (reg & 0x40) >> 6;
+    return (reg & 0x40);
 }
 
 inline constexpr
 uint8_t first_word_start_bit(uint8_t reg) {
-    return (reg & 0x80) >> 7;
+    return (reg & 0x80);
 }
 
 typedef struct {

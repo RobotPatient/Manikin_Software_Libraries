@@ -7,7 +7,7 @@
 
 volatile uint8_t clrflag;
 
-volatile spi_transaction CurrTransaction = {NULL, STATE_INIT_REG, true, 0, 0};
+volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
 
 uint8_t getRegister(uint8_t reg_addr) {
     if(reg_addr >= 0 && reg_addr <= kBBSETMaxAddr){
@@ -29,12 +29,11 @@ uint8_t getRegister(uint8_t reg_addr) {
 
 void SERCOM3_3_Handler() {
     if(SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL){
-        SERCOM3->SPI.INTFLAG.bit.SSL = 1;
-        SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTENSET_RXC;
+        SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously 
         if(CurrTransaction.State == STATE_IGNORE_ISR){
-            CurrTransaction.State = STATE_INIT_REG;
+            CurrTransaction.State = STATE_INIT_REG; // RESET State machine from IDLE state to INIT reg state
         }
-        SERCOM3->SPI.DATA.reg = 0;
+        SERCOM3->SPI.DATA.reg = 0; // Set the TX buffer to 0. We don't want garbled data :) 
     }
 }
 
@@ -44,14 +43,18 @@ void SERCOM3_2_Handler() {
         switch(CurrTransaction.State){
         case STATE_INIT_REG:
         {
-            uint8_t reg_addr = first_word_reg_addr(SERCOM3->SPI.DATA.reg);
+            uint8_t data = SERCOM3->SPI.DATA.reg;
+            uint8_t reg_addr = first_word_reg_addr(data);
             bool valid_register = getRegister(reg_addr) == 0;
-            if (valid_register & !first_word_start_bit(SERCOM3->SPI.DATA.reg)) {
-                CurrTransaction.WR = 0;
+            if (valid_register & !first_word_start_bit(data)) {
+                CurrTransaction.WR = first_word_wr_bit(data);
                 CurrTransaction.byte_cnt = 0;
                 if(!CurrTransaction.WR){
-                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[0];
-                CurrTransaction.byte_cnt = 1;
+                    // READ operation
+                    // We need to think two cycles ahead when it comes to sending data
+                    // Thats why in this step there will already be data put in to the tx buffer
+                    SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
+                    CurrTransaction.byte_cnt++;
                 }
                 CurrTransaction.State = STATE_SEQ_NUM;
             }
@@ -165,7 +168,7 @@ namespace hal::spi {
                                  | 0;
         SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
                                     | 1 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
-                                    | 0 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
+                                    | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
                                     | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
                                     | 0 << SERCOM_SPI_INTENSET_DRE_Pos;
         while (SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF);
