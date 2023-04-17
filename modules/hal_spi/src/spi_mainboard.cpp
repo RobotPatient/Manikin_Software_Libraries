@@ -5,9 +5,9 @@
 #include "wiring_private.h"
 #include <spi_mainboard_registers.hpp>
 
-uint8_t del = 0;
+volatile uint8_t clrflag;
 
-
+volatile spi_transaction CurrTransaction = {NULL, STATE_INIT_REG, true, 0, 0};
 
 uint8_t getRegister(uint8_t reg_addr) {
     if(reg_addr >= 0 && reg_addr <= kBBSETMaxAddr){
@@ -27,24 +27,42 @@ uint8_t getRegister(uint8_t reg_addr) {
 }
 
 
-void RXD_Complete(uint8_t data) {
-    switch(CurrTransaction.State){
+void SERCOM3_3_Handler() {
+    if(SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL){
+        SERCOM3->SPI.INTFLAG.bit.SSL = 1;
+        SERCOM3->SPI.INTENSET.reg = SERCOM_SPI_INTENSET_RXC;
+        if(CurrTransaction.State == STATE_IGNORE_ISR){
+            CurrTransaction.State = STATE_INIT_REG;
+        }
+        SERCOM3->SPI.DATA.reg = 0;
+    }
+}
+
+
+void SERCOM3_2_Handler() {
+    if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC) {
+        switch(CurrTransaction.State){
         case STATE_INIT_REG:
         {
-            uint8_t reg_addr = first_word_reg_addr(data);
+            uint8_t reg_addr = first_word_reg_addr(SERCOM3->SPI.DATA.reg);
             bool valid_register = getRegister(reg_addr) == 0;
-            CurrTransaction.byte_cnt = 0;
-            if (valid_register & !first_word_start_bit(data)) {
-                CurrTransaction.WR = first_word_wr_bit(data);
+            if (valid_register & !first_word_start_bit(SERCOM3->SPI.DATA.reg)) {
+                CurrTransaction.WR = 0;
+                CurrTransaction.byte_cnt = 0;
+                if(!CurrTransaction.WR){
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[0];
+                CurrTransaction.byte_cnt = 1;
+                }
                 CurrTransaction.State = STATE_SEQ_NUM;
             }
             break;
         }
         case STATE_SEQ_NUM:
         {
-            CurrTransaction.seq_num = data;
+            CurrTransaction.seq_num = SERCOM3->SPI.DATA.reg;
             if (!CurrTransaction.WR) {
-                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[0];
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[1];
+                CurrTransaction.byte_cnt = 2;
                 CurrTransaction.State = STATE_WRITE_BYTES;
             }
             else{
@@ -54,54 +72,40 @@ void RXD_Complete(uint8_t data) {
         }
         case STATE_READ_BYTES:
         {
-            if(CurrTransaction.byte_cnt == 2){
-                CurrTransaction.State = STATE_INIT_REG;
-                Serial.println("e");
+            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size-1){
+                CurrTransaction.State = STATE_IGNORE_ISR;
             }             
             if (CurrTransaction.byte_cnt < CurrTransaction.reg->size) {
-                CurrTransaction.reg->data[CurrTransaction.byte_cnt] = data;
+                CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
             }
             CurrTransaction.byte_cnt++;
             break;
         }
         case STATE_WRITE_BYTES:
-            if(CurrTransaction.byte_cnt == 2){
-                CurrTransaction.State = STATE_INIT_REG;
-                Serial.println("e");
+            if(CurrTransaction.byte_cnt == CurrTransaction.reg->size+1){
+                CurrTransaction.State = STATE_IGNORE_ISR;            
+                CurrTransaction.byte_cnt = 0;
             }             
-            if (CurrTransaction.byte_cnt < CurrTransaction.reg->size) {
+            if (CurrTransaction.byte_cnt < CurrTransaction.reg->size+1) {
                  SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt];
             }
             CurrTransaction.byte_cnt++;
             break;
         case STATE_IGNORE_ISR:
         {
-            CurrTransaction.State = STATE_INIT_REG;
+            clrflag = SERCOM3->SPI.DATA.reg;
             break;
         }
     }
-
-}
-
-void SERCOM3_1_Handler() {
-if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_TXC) {
-  Serial.println("tx1");
-  SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
-  SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTFLAG_TXC;
-}
-}
-
-void SERCOM3_2_Handler() {
-    if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC) {
-        RXD_Complete(SERCOM3->SPI.DATA.reg);
     }
+
 
 }
 
 
 
 namespace hal::spi {
-    SpiSlaveData SPIMainboard_reg_data_[11] = {{&STATUS,         4},
+    volatile SpiSlaveData SPIMainboard_reg_data_[11] = {{&STATUS,         4},
                                            {&BBSET[0][0], BBSET_REG_SIZE},
                                            {&BBSET[1][0], BBSET_REG_SIZE},
                                            {&BBSET[2][0], BBSET_REG_SIZE},
@@ -156,12 +160,12 @@ namespace hal::spi {
         SERCOM3->SPI.CTRLB.reg = 1 << SERCOM_SPI_CTRLB_RXEN_Pos          /* Receiver Enable: enabled */
                                  | 0 << SERCOM_SPI_CTRLB_MSSEN_Pos   /* Master Slave Select Enabl: disabled */
                                  | 0 << SERCOM_SPI_CTRLB_AMODE_Pos   /* Address Mode: 0 */
-                                 | 0 << SERCOM_SPI_CTRLB_SSDE_Pos    /* Slave Select Low Detect Enable: disabled */
+                                 | 1 << SERCOM_SPI_CTRLB_SSDE_Pos    /* Slave Select Low Detect Enable: disabled */
                                  | 0 << SERCOM_SPI_CTRLB_PLOADEN_Pos /* Slave Data Preload Enable: disabled */
                                  | 0;
         SERCOM3->SPI.INTENSET.reg = 0 << SERCOM_SPI_INTENSET_ERROR_Pos       /* Error Interrupt Enable: disabled */
-                                    | 0 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
-                                    | 1 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
+                                    | 1 << SERCOM_SPI_INTENSET_SSL_Pos   /* Slave Select Low Interrupt Enable: enabled */
+                                    | 0 << SERCOM_SPI_INTENSET_RXC_Pos   /* Receive Complete Interrupt Enable: enabled */
                                     | 0 << SERCOM_SPI_INTENSET_TXC_Pos   /* Transmit Complete Interrupt Enable: disabled */
                                     | 0 << SERCOM_SPI_INTENSET_DRE_Pos;
         while (SERCOM3->SPI.SYNCBUSY.reg & 0xFFFFFFFF);
@@ -184,15 +188,15 @@ namespace hal::spi {
         PORT->Group[0].DIRCLR.reg = 1 << 18;
         PORT->Group[0].PINCFG[18].bit.PMUXEN = 1;
         PORT->Group[0].PMUX[18 >> 1].bit.PMUXE = 0x3;
-
+        
         PORT->Group[0].DIRCLR.reg = 1 << 19;
         PORT->Group[0].PINCFG[19].bit.PMUXEN = 1;
         PORT->Group[0].PMUX[19 >> 1].bit.PMUXO = 0x3;
-        NVIC_EnableIRQ(SERCOM3_1_IRQn);
-        NVIC_SetPriority(SERCOM3_1_IRQn, 2);
         NVIC_EnableIRQ(SERCOM3_2_IRQn);
         NVIC_SetPriority(SERCOM3_2_IRQn, 2);
-        CurrTransaction =  {NULL, STATE_INIT_REG, false, 0, 0};
+        NVIC_EnableIRQ(SERCOM3_3_IRQn);
+        NVIC_SetPriority(SERCOM3_3_IRQn, 1);
+        //CurrTransaction =  {NULL, STATE_INIT_REG, false, 0, 0};
     }
 
     void SPIMainBoard::deinit() {

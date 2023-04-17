@@ -4,7 +4,7 @@
 namespace hal::spi{
 
 typedef struct {
-    uint8_t *data;
+    volatile uint8_t *data;
     uint8_t size;
 } SpiSlaveData;
 

@@ -4,13 +4,13 @@
 #include <spi_base.hpp>
 #include <stddef.h>
 
-typedef enum SPIStateMachine{
+typedef enum {
 STATE_INIT_REG,
 STATE_SEQ_NUM,
 STATE_READ_BYTES,
 STATE_WRITE_BYTES,
 STATE_IGNORE_ISR
-};
+}SPIStateMachine;
 
 inline constexpr
 uint8_t STATUS_REG_SIZE = 4;
@@ -46,11 +46,11 @@ uint8_t SENSORDATA_size;
 uint8_t ACTDATA_size;
 
 
-uint8_t STATUS;
-uint8_t REQWORDS[NUM_OF_BACKBONES][REQWORDS_REG_SIZE];
-uint8_t BBSET[NUM_OF_BACKBONES][BBSET_REG_SIZE];
-uint8_t *SENSORDATA = NULL;
-uint8_t *ACTDATA = NULL;
+volatile uint8_t STATUS;
+volatile uint8_t REQWORDS[NUM_OF_BACKBONES][REQWORDS_REG_SIZE];
+volatile uint8_t BBSET[NUM_OF_BACKBONES][BBSET_REG_SIZE];
+volatile uint8_t *SENSORDATA = NULL;
+volatile uint8_t *ACTDATA = NULL;
 
 inline constexpr
 uint8_t first_word_reg_addr(uint8_t reg) {
@@ -68,13 +68,13 @@ uint8_t first_word_start_bit(uint8_t reg) {
 }
 
 typedef struct {
-    hal::spi::SpiSlaveData *reg;
+    volatile hal::spi::SpiSlaveData *reg;
     SPIStateMachine State;
     bool WR;
     int seq_num;
     int byte_cnt;
 } spi_transaction;
 
-spi_transaction CurrTransaction = {NULL, STATE_INIT_REG, false, 0, 0};
+
 
 #endif

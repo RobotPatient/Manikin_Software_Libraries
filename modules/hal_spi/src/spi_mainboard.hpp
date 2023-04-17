@@ -37,7 +37,7 @@ namespace hal::spi {
     inline constexpr
     uint8_t kACTDATA_REG = 0x0A;
 
-    extern SpiSlaveData SPIMainboard_reg_data_[11];
+    extern volatile SpiSlaveData SPIMainboard_reg_data_[11];
 
     class SPIMainBoard : public SPISlave {
     public:
