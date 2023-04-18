@@ -27,6 +27,7 @@
 ***********************************************************************************************/
 #include <spi_mainboard_registers.hpp>
 #include <spi_mainboard.hpp>
+#include <Arduino.h>
 #include <sam.h>
 
 
@@ -34,8 +35,6 @@ inline constexpr uint8_t kSSLInterruptPriority = 1;
 inline constexpr uint8_t kRXCInterruptPriority = 2;
 
 volatile uint8_t clrflag;
-
-volatile bool write_done = false;
 
 volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
 
@@ -60,8 +59,7 @@ uint8_t getRegister(uint8_t reg_addr) {
 void SERCOM3_3_Handler() {
     if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL) {
         SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously
-        if (CurrTransaction.State == STATE_IGNORE_ISR && write_done) {
-            write_done = false;
+        if (CurrTransaction.State == STATE_IGNORE_ISR) {
             CurrTransaction.State = STATE_INIT_REG;  // RESET State machine from IDLE state to INIT reg state
         }
         SERCOM3->SPI.DATA.reg = 0;  // Set the TX buffer to 0. We don't want garbled data :)
@@ -114,6 +112,7 @@ void SERCOM3_2_Handler() {
             break;
         }
         case STATE_WRITE_BYTES:
+            clrflag = SERCOM3->SPI.DATA.reg;
             if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {
                 CurrTransaction.State = STATE_IGNORE_ISR;
             }
@@ -124,7 +123,6 @@ void SERCOM3_2_Handler() {
             // The datasheet states that the RXC interrupt flag can be cleared by reading the databuffer
             // or disabling the receiver. Disabling the receiver takes a lot of time to re-enable.
             // Therefore its more sensible to poll (read) the buffer until the flag is cleared
-            write_done = true;
             clrflag = SERCOM3->SPI.DATA.reg;
             break;
         }
