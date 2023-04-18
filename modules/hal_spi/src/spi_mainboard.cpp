@@ -62,7 +62,6 @@ void SERCOM3_3_Handler() {
     SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously
     if (CurrTransaction.State == STATE_IGNORE_ISR) {
       CurrTransaction.State = STATE_INIT_REG;  // RESET State machine from IDLE state to INIT reg state
-      SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTENCLR_DRE;
     }
     SERCOM3->SPI.DATA.reg = 0;  // Set the TX buffer to 0. We don't want garbled data :)
   }
@@ -120,7 +119,8 @@ void SERCOM3_2_Handler() {
         CurrTransaction.byte_cnt++;
         break;
       }
-      case STATE_WRITE_BYTES:clrflag = SERCOM3->SPI.DATA.reg;
+      case STATE_WRITE_BYTES:
+        clrflag = SERCOM3->SPI.DATA.reg;
         if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size) {
           CurrTransaction.State = STATE_IGNORE_ISR;
           CurrTransaction.reg->data_crc = CRC8.smbus(const_cast<uint8_t *>(CurrTransaction.reg->data),
