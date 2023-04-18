@@ -36,7 +36,8 @@ STATE_INIT_REG,
 STATE_SEQ_NUM,
 STATE_READ_BYTES,
 STATE_WRITE_BYTES,
-STATE_IGNORE_ISR
+STATE_IGNORE_ISR,
+STATE_ACK
 }SPIStateMachine;
 
 inline constexpr
@@ -106,6 +107,7 @@ typedef struct {
     bool WR;
     int seq_num;
     int byte_cnt;
+    volatile uint8_t calc_crc;
 } spi_transaction;
 
 

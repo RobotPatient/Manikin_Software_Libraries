@@ -29,14 +29,16 @@
 #include <spi_mainboard.hpp>
 #include <Arduino.h>
 #include <sam.h>
+#include <FastCRC.h>
 
+FastCRC8 CRC8;
 
 inline constexpr uint8_t kSSLInterruptPriority = 1;
 inline constexpr uint8_t kRXCInterruptPriority = 2;
 
 volatile uint8_t clrflag;
 
-volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0};
+volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0, 0};
 
 uint8_t getRegister(uint8_t reg_addr) {
     if (reg_addr >= 0 && reg_addr <= kBBSETMaxAddr) {
@@ -55,12 +57,12 @@ uint8_t getRegister(uint8_t reg_addr) {
     return kInvalidReg;
 }
 
-
 void SERCOM3_3_Handler() {
     if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL) {
         SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously
         if (CurrTransaction.State == STATE_IGNORE_ISR) {
             CurrTransaction.State = STATE_INIT_REG;  // RESET State machine from IDLE state to INIT reg state
+            SERCOM3->SPI.INTENCLR.reg = SERCOM_SPI_INTENCLR_DRE;
         }
         SERCOM3->SPI.DATA.reg = 0;  // Set the TX buffer to 0. We don't want garbled data :)
     }
@@ -101,22 +103,34 @@ void SERCOM3_2_Handler() {
         }
         case STATE_READ_BYTES:
         {
-            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {
-                CurrTransaction.State = STATE_IGNORE_ISR;
-            }
-            bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == hal::spi::kPermissionsRW);
-            if (reg_has_write_permission) {
-                CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size) {
+                CurrTransaction.State = STATE_ACK;
+                CurrTransaction.reg->data_crc = SERCOM3->SPI.DATA.reg;
+                if(CurrTransaction.calc_crc == CurrTransaction.reg->data_crc){
+                    SERCOM3->SPI.DATA.reg = 0xFF;
+                } else {
+                    SERCOM3->SPI.DATA.reg = 0x00;
+                }
+            } else {
+                bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == hal::spi::kPermissionsRW);
+                if (reg_has_write_permission) {
+                    CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
+                 }
+                 if(CurrTransaction.byte_cnt == CurrTransaction.reg->size-1)
+                    CurrTransaction.calc_crc = CRC8.smbus((uint8_t*)CurrTransaction.reg->data, (uint8_t)CurrTransaction.reg->size);
             }
             CurrTransaction.byte_cnt++;
             break;
         }
         case STATE_WRITE_BYTES:
             clrflag = SERCOM3->SPI.DATA.reg;
-            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size-1) {
+            if (CurrTransaction.byte_cnt >= CurrTransaction.reg->size) {
                 CurrTransaction.State = STATE_IGNORE_ISR;
+                CurrTransaction.reg->data_crc = CRC8.smbus((uint8_t*)CurrTransaction.reg->data, (uint8_t)CurrTransaction.reg->size);
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data_crc;
+            } else {
+                SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
             }
-            SERCOM3->SPI.DATA.reg = CurrTransaction.reg->data[CurrTransaction.byte_cnt++];
             break;
         case STATE_IGNORE_ISR:
         {
@@ -126,6 +140,14 @@ void SERCOM3_2_Handler() {
             clrflag = SERCOM3->SPI.DATA.reg;
             break;
         }
+        case STATE_ACK:
+        {
+        clrflag = SERCOM3->SPI.DATA.reg;
+
+        CurrTransaction.State = STATE_IGNORE_ISR;
+        break;
+        }
+
         }
     }
 }
@@ -138,17 +160,17 @@ namespace hal::spi {
     *  Adding new registers is as simple as adding new entries and editing the macro kMainBoardSPINumOfRegs to desired num of regs
     */
     volatile SpiSlaveData
-    SPIMainboard_reg_data_[kMainBoardSPINumOfRegs] = {{&STATUS, STATUS_REG_SIZE, kPermissionsRO},
-                                                      {&BBSET[0][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                      {&BBSET[1][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                      {&BBSET[2][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                      {&BBSET[3][0], BBSET_REG_SIZE, kPermissionsRW},
-                                                      {&REQWORDS[0][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                      {&REQWORDS[1][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                      {&REQWORDS[2][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                      {&REQWORDS[3][0], REQWORDS_REG_SIZE, kPermissionsRW},
-                                                      {SENSORDATA, SENSORDATA_size, kPermissionsRO},
-                                                      {ACTDATA, ACTDATA_size, kPermissionsRW}};
+    SPIMainboard_reg_data_[kMainBoardSPINumOfRegs] = {{&STATUS, 0, STATUS_REG_SIZE, kPermissionsRO},
+                                                      {&BBSET[0][0], 0, BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[1][0], 0, BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[2][0], 0, BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&BBSET[3][0], 0, BBSET_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[0][0], 0, REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[1][0], 0, REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[2][0], 0, REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {&REQWORDS[3][0], 0, REQWORDS_REG_SIZE, kPermissionsRW},
+                                                      {SENSORDATA, 0, SENSORDATA_size, kPermissionsRO},
+                                                      {ACTDATA, 0, ACTDATA_size, kPermissionsRW}};
 
 
     void SPIMainBoard::begin() {

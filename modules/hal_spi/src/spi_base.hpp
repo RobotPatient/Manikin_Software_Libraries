@@ -36,6 +36,7 @@ inline constexpr uint8_t kPermissionsRO = 1;
 
 typedef struct {
     volatile uint8_t *data;
+    volatile uint8_t data_crc;
     uint8_t size;
     const uint8_t access_permissions;
 } SpiSlaveData;
