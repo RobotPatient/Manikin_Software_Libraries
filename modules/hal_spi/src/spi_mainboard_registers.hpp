@@ -87,17 +87,17 @@ volatile uint8_t *SENSORDATA = NULL;
 volatile uint8_t *ACTDATA = NULL;
 
 inline constexpr
-uint8_t first_word_reg_addr(uint8_t reg) {
+uint8_t first_word_reg_addr(const uint8_t reg) {
     return reg & kFirstWordBitMask;
 }
 
 inline constexpr
-uint8_t first_word_wr_bit(uint8_t reg) {
+uint8_t first_word_wr_bit(const uint8_t reg) {
     return (reg & 0x40);
 }
 
 inline constexpr
-uint8_t first_word_start_bit(uint8_t reg) {
+uint8_t first_word_start_bit(const uint8_t reg) {
     return ~(reg & 0x80);
 }
 

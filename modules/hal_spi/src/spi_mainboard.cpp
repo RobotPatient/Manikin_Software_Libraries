@@ -40,7 +40,7 @@ volatile uint8_t clrflag;
 
 volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0, 0};
 
-uint8_t getRegister(uint8_t reg_addr) {
+uint8_t getRegister(const uint8_t reg_addr) {
     if (reg_addr >= 0 && reg_addr <= kBBSETMaxAddr) {
         CurrTransaction.reg = &hal::spi::SPIMainboard_reg_data_[reg_addr];
         return kValidReg;
