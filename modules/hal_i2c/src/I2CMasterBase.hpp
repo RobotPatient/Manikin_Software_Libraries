@@ -38,6 +38,7 @@ namespace hal::i2c
     protected:
         I2CMasterBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed) : I2CBase(i2c_peripheral, speed) {}
         void ReadFrom(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes);
+        void SendTo(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes);
 
     private:
     };

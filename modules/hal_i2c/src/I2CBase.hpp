@@ -42,7 +42,7 @@
 namespace hal::i2c
 {
   /// @brief error codes for i2c, should be extention of existing error handler enum
-  enum ErrorCode : uint8_t
+  enum ErrorCode
   {
     SUCCESS,
     ZERO_BYTES_WRITTEN,
@@ -77,30 +77,29 @@ namespace hal::i2c
     /// @param speed
     I2CBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed) : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
 
-    void Init();
+    virtual void Init();
+    virtual void Init(void (*receiveEvent)(int), void (*requestEvent)()) = 0;
     virtual ErrorCode ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
+    virtual ErrorCode ReadBytes(uint8_t *buffer, uint8_t num_of_bytes, I2CAddr i2c_addr);
     virtual ErrorCode SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
-    virtual void ChangeAddress(I2CAddr new_i2c_address);
+    virtual ErrorCode SendBytes(uint8_t *buffer, uint8_t num_of_bytes, I2CAddr i2c_addr);
+    void ChangeAddress(I2CAddr new_i2c_address);
 
   protected:
-    void WriteReg(uint16_t reg, uint8_t data);
-    void WriteReg16(uint16_t reg, uint16_t data);
-    uint8_t ReadReg(uint16_t reg);
-    uint16_t ReadReg16(uint16_t reg);
-
     /// @brief Sends error message to error/warning/log ringbuffer so it can later be send to the mainboard and be stored there for later access
     /// @param errorIndex index number of error in the errorTableEndTransmission
     // TODO: refactor this into error handler class/lib
     void HandleError(uint8_t error);
 
     /// @brief helper function to handle end of transmisstion errors
-    /// @param code
+    /// @param code Incoming error number from endTransmission()
     /// @return ErrorCode error
     ErrorCode HandleEndTransmisstionError(uint8_t code);
 
+    I2C_PERIPHERAL_T i2c_peripheral_;
+
   private:
     I2CAddr i2c_addr_ = NO_ADDR;
-    I2C_PERIPHERAL_T i2c_peripheral_;
     I2CSpeed speed_;
   };
 }

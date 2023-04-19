@@ -32,8 +32,12 @@ namespace hal::i2c
 {
     void I2CMasterBase::ReadFrom(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes)
     {
-        ChangeAddress(i2c_addr);
-        ReadBytes(buffer, num_of_bytes);
+        ReadBytes(buffer, num_of_bytes, i2c_addr);
+    }
+
+    void I2CMasterBase::SendTo(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes)
+    {
+        SendBytes(buffer, num_of_bytes, i2c_addr);
     }
 
 }

@@ -37,19 +37,12 @@ namespace hal::i2c
     {
     public:
         I2CSlaveBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr) : I2CBase(i2c_peripheral, speed, i2c_addr) {}
-        void Init() override;
+        void Init(void (*receiveEvent)(int), void (*requestEvent)()) override;
 
     protected:
-        static void receiveEventWrapper(int data);
-        static void requestEventWrapper();
-        virtual void receiveEvent(int data) = 0;
-        virtual void requestEvent() = 0;
-
     private:
-        static I2CSlaveBase *instance_;
     };
 
-    I2CSlaveBase *I2CSlaveBase::instance_ = nullptr;
 }
 
 #endif
