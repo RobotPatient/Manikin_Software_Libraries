@@ -26,20 +26,14 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-#ifndef I2CADDR_HPP
-#define I2CADDR_HPP
-
-#include <stdint.h>
+#include "I2CMasterBase.hpp"
 
 namespace hal::i2c
 {
-    /// @brief List of addresses for the I2C slaves. Add more if needed
-    enum I2CAddr : uint8_t
+    void I2CMasterBase::ReadFrom(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes)
     {
-        NO_ADDR = 0,
-        BREATHING_MODULE = 1,
-        SENSOR_HUB = 2
-    };
-}
+        ChangeAddress(i2c_addr);
+        ReadBytes(buffer, num_of_bytes);
+    }
 
-#endif
+}
