@@ -2,24 +2,10 @@
 
 namespace hal::i2c
 {
-    void I2CSlaveBase::Init()
+    void I2CSlaveBase::Init(void (*receiveEvent)(int), void (*requestEvent)())
     {
-        if (!instance_)
-        {
-            instance_ = this;
-        }
         i2c_peripheral_->begin();
-        i2c_peripheral_->onReceive(receiveEventWrapper);
-        i2c_peripheral_->onRequest(requestEventWrapper);
-    }
-
-    void I2CSlaveBase::receiveEventWrapper(int data)
-    {
-        instance_->receiveEvent(data);
-    }
-
-    void I2CSlaveBase::requestEventWrapper()
-    {
-        instance_->requestEvent();
+        i2c_peripheral_->onReceive(receiveEvent);
+        i2c_peripheral_->onRequest(requestEvent);
     }
 }
