@@ -29,18 +29,30 @@
 #ifndef I2CSLAVEBASE_HPP
 #define I2CSLAVEBASE_HPP
 
-#include "I2CBase.hpp"
+#include "I2CHelper.hpp"
 
 namespace hal::i2c
 {
-    class I2CSlaveBase : protected I2CBase
+    class I2CSlaveBase
     {
-    public:
-        I2CSlaveBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr) : I2CBase(i2c_peripheral, speed, i2c_addr) {}
-        void Init(void (*receiveEvent)(int), void (*requestEvent)()) override;
-
     protected:
+        /// @brief Constructor for Slave mode
+        /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
+        /// @param speed Communication speed in Hz
+        /// @param i2c_addr Address of the slave
+        I2CSlaveBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr)
+            : i2c_peripheral_(i2c_peripheral), speed_(speed), slave_addr_(i2c_addr) {}
+
+        virtual void Init(void (*receiveEvent)(int), void (*requestEvent)());
+
+        /// @brief Changes the address of the slave
+        /// @param new_i2c_address The new address for the slave
+        void ChangeAddress(I2CAddr new_i2c_address);
+
     private:
+        I2C_PERIPHERAL_T i2c_peripheral_;
+        I2CSpeed speed_;
+        I2CAddr slave_addr_ = NO_ADDR;
     };
 
 }
