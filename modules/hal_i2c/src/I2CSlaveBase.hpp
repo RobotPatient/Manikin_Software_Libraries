@@ -53,6 +53,6 @@ private:
     I2CSpeed speed_;
     I2CAddr slave_addr_ = NO_ADDR;
 };
-} // namespace hal::i2c
+}  // namespace hal::i2c
 
 #endif
