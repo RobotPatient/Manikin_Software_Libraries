@@ -66,15 +66,15 @@ namespace hal::i2c
   class I2CBase
   {
   public:
-    /// @brief
-    /// @param i2c_peripheral TwoWire * to the
-    /// @param speed
-    /// @param i2c_addr
+    /// @brief Constructor for Slave mode
+    /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
+    /// @param speed Communication speed in Hz
+    /// @param i2c_addr Address of the slave
     I2CBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr) : i2c_peripheral_(i2c_peripheral_), i2c_addr_(i2c_addr), speed_(speed) {}
 
-    /// @brief
-    /// @param i2c_peripheral
-    /// @param speed
+    /// @brief Constructor for Master mode
+    /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
+    /// @param speed Communication speed in Hz
     I2CBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed) : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
 
     virtual void Init();
