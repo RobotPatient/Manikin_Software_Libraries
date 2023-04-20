@@ -5,6 +5,7 @@
         "srcFilter": "+<*> -<*/test/> -<hal_sensors/*/test>",
         "flags": [
             "-I modules/i2c/src",
+            "-I modules/hal_spi/src",
             "-I modules/hal_gpio/src",
             "-I modules/hal_sensors/sensor_base/src",
             "-I modules/hal_sensors/sensor_compression/src",
