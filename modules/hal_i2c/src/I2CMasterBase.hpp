@@ -47,11 +47,11 @@ private:
     /// @brief helper function to handle end of transmisstion errors
     /// @param code Incoming error number from endTransmission()
     /// @return ErrorCode error
-    ErrorCode HandleEndTransmisstionError(uint8_t code);
+    ErrorCode HandleEndTransmissionError(uint8_t code);
 
     I2C_PERIPHERAL_T i2c_peripheral_;
     I2CSpeed speed_;
 };
-} // namespace hal::i2c
+}  // namespace hal::i2c
 
 #endif

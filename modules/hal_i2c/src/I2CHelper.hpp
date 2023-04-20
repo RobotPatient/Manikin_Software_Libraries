@@ -64,6 +64,6 @@ typedef enum {
     kI2cSpeed_100KHz = 100000,
     kI2cSpeed_400KHz = 400000,
 } I2CSpeed;
-} // namespace hal::i2c
+}  // namespace hal::i2c
 
 #endif

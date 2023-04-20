@@ -53,7 +53,7 @@ ErrorCode I2CMasterBase::SendBytes(I2CAddr i2c_addr, uint8_t* buffer, uint8_t nu
     i2c_peripheral_->beginTransmission(i2c_addr);
     i2c_peripheral_->write(buffer, num_of_bytes);
     error = i2c_peripheral_->endTransmission(true);
-    ErrorCode errorCode = HandleEndTransmisstionError(error);
+    ErrorCode errorCode = HandleEndTransmissionError(error);
     if (errorCode != SUCCESS) {
         // TODO(Thomas): handle error(?)
         return errorCode;
@@ -62,7 +62,7 @@ ErrorCode I2CMasterBase::SendBytes(I2CAddr i2c_addr, uint8_t* buffer, uint8_t nu
     return errorCode;
 }
 
-ErrorCode I2CMasterBase::HandleEndTransmisstionError(uint8_t code) {
+ErrorCode I2CMasterBase::HandleEndTransmissionError(uint8_t code) {
     switch (code) {
     case 0:
         return SUCCESS;
@@ -78,4 +78,4 @@ ErrorCode I2CMasterBase::HandleEndTransmisstionError(uint8_t code) {
         return EOT_ERROR_UNKNOWN;
     }
 }
-} // namespace hal::i2c
+}  // namespace hal::i2c
