@@ -26,24 +26,34 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#ifndef SENSOR_BASE_HPP_
-#define SENSOR_BASE_HPP_
+#ifndef I2C_DRIVER_HPP
+#define I2C_DRIVER_HPP
 
-#include <I2CDriver.hpp>
+#include <I2CHelper.hpp>
 
-typedef struct SensorData {
-  uint16_t buffer[8];
-  uint8_t num_of_bytes;
-} SensorData_t;
+class I2C_driver {
+  public:
+    explicit I2C_driver(I2C_PERIPHERAL_T i2c_peripheral, hal::i2c::I2CSpeed_t speed, uint8_t i2c_addr) 
+    : i2c_peripheral_(i2c_peripheral), slave_target_address_(i2c_addr), speed_(speed) {}
 
-class UniversalSensor {
- public:
-  explicit UniversalSensor(I2C_driver *i2c_handle) {}
-  virtual void Initialize() = 0;
-  virtual SensorData_t GetSensorData() = 0;
-  virtual void Uninitialize() = 0;
- private:
-  I2C_driver* i2c_handle_;
+    explicit I2C_driver(I2C_PERIPHERAL_T i2c_peripheral, hal::i2c::I2CSpeed_t speed) 
+    : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
+
+    void init_i2c_helper();
+    void ChangeAddress(uint8_t new_i2c_address);
+
+    void write8_reg16b(uint16_t reg, uint8_t data);
+    void write16_reg16b(uint16_t reg, uint16_t data);
+
+    uint8_t send_read8_reg16b(uint16_t reg);
+    uint16_t send_read16_reg16(uint16_t reg);
+
+    void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
+    void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
+  private:
+    uint8_t slave_target_address_;
+    I2C_PERIPHERAL_T i2c_peripheral_;
+    hal::i2c::I2CSpeed_t speed_;
 };
 
-#endif  // SENSOR_BASE_H
+#endif  // I2C_DRIVER_HPP
