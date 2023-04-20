@@ -1,0 +1,75 @@
+@startuml I2C
+
+set separator ::
+
+package Manikin_Software_Libraries <<Node>> {
+    class TwoWire {
+        Holds the sercom, sda and sdl
+    }
+
+    package hal_i2c <<frame>> {
+
+    namespace hal::i2c {
+        class I2CBase{
+            #ReadByte()
+            #WriteByte()
+        }
+
+        class I2CBaseMaster{
+            #ReadFrom()
+            #WriteTo()
+        }
+
+        class I2CBaseSlave{
+            #WriteToMaster()
+            #ReadFromMaster()
+        }
+
+        enum I2CAddr {
+            SENSORHUB = 0x01
+            BREATHINGMODULE = 0x02
+        }
+
+        I2CAddr --o I2CBase
+        I2CBase --|> I2CBaseSlave
+        I2CBase --|> I2CBaseMaster
+    }
+    }
+    TwoWire --* hal::i2c::I2CBase
+
+    package i2c_Mainboard <<frame>> {
+    class I2CMainboard {
+        Constains implementation of I2C master
+    }
+    }
+
+    package i2c_sensorhub <<frame>> {
+    class I2CSensorhubSlaveMain {
+        Handles comunication to the MainBoard
+        Constains implementations of I2C for
+        the SensorHub In slavemode
+    }
+
+    class I2CSensorhubMasterSensors {
+        Handles comunication to the sensors
+        +void WriteReg(uint16_t reg, uint8_t data)
+        +void WriteReg16(uint16_t reg, uint16_t data)
+        +uint8_t ReadReg(uint16_t reg)
+        +uint16_t ReadReg16(uint16_t reg)
+    }
+    }
+
+    package i2c_breathingmod <<frame>> {
+    class I2CBreathingModule {
+        Constains implementations of I2C for
+        the BreathingModule In slavemode
+    }
+    }
+}
+
+hal::i2c::I2CBaseMaster --|> I2CMainboard
+hal::i2c::I2CBaseMaster --|> I2CSensorhubMasterSensors
+hal::i2c::I2CBaseSlave --|> I2CSensorhubSlaveMain
+hal::i2c::I2CBaseSlave --|> I2CBreathingModule
+
+@enduml
