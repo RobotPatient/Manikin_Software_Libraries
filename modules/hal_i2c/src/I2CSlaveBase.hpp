@@ -33,7 +33,7 @@
 
 namespace hal::i2c {
 class I2CSlaveBase {
-protected:
+    protected:
     /// @brief Constructor for Slave mode
     /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
     /// @param speed Communication speed in Hz
@@ -48,7 +48,7 @@ protected:
     /// @param new_i2c_address The new address for the slave
     void ChangeAddress(I2CAddr new_i2c_address);
 
-private:
+    private:
     I2C_PERIPHERAL_T i2c_peripheral_;
     I2CSpeed speed_;
     I2CAddr slave_addr_ = NO_ADDR;
