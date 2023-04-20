@@ -52,7 +52,7 @@ class I2CSlaveBase {
  private:
   I2C_PERIPHERAL_T i2c_peripheral_;
   I2CSpeed speed_;
-  I2CAddr slave_addr_ = NO_ADDR;
+  I2CAddr slave_addr_ = kNoAddr;
 };
 }  // namespace hal::i2c
 

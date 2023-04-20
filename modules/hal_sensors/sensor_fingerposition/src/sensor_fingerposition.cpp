@@ -77,22 +77,22 @@ uint16_t FingerPositionSensor::assembleRegister(uint8_t opcode, uint8_t regAddr)
 
 void FingerPositionSensor::writeRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kContinuousWrite, reg_addr);
-  i2c_handle_->WriteReg(reg, data);
+  i2c_handle_->write8_reg16b(reg, data);
 }
 
 void FingerPositionSensor::setRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kSetBit, reg_addr);
-  i2c_handle_->WriteReg(reg, data);
+  i2c_handle_->write8_reg16b(reg, data);
 }
 
 void FingerPositionSensor::clearRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kClearBit, reg_addr);
-  i2c_handle_->WriteReg(reg, data);
+  i2c_handle_->write8_reg16b(reg, data);
 }
 
 uint8_t FingerPositionSensor::getRegister(uint8_t register_addr) {
   uint16_t reg = assembleRegister(kSingleRead, register_addr);
-  return i2c_handle_->ReadReg(reg);
+  return i2c_handle_->send_read8_reg16b(reg);
 }
 
 void FingerPositionSensor::startReadSEQ(void) {
