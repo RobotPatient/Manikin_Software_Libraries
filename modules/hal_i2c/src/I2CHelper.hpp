@@ -39,35 +39,31 @@
 #define I2C_PERIPHERAL_T I2CPeripheralMock *
 #endif
 
-namespace hal::i2c
-{
-    /// @brief List of addresses for the I2C slaves. Add more if needed
-    enum I2CAddr : uint8_t
-    {
-        NO_ADDR = 0,
-        BREATHING_MODULE = 1,
-        SENSOR_HUB = 2
-    };
-    /// @brief error codes for i2c, should be extention of existing error handler enum
-    enum ErrorCode
-    {
-        SUCCESS,
-        ZERO_BYTES_WRITTEN,
-        NOT_ENOUGH_BUFFER_SPACE,
-        EOT_DATA_TOO_LONG,
-        EOT_NACK_ADDRESS,
-        EOT_NACK_DATA,
-        EOT_OTHER_ERROR,
-        EOT_ERROR_UNKNOWN
+namespace hal::i2c {
+/// @brief List of addresses for the I2C slaves. Add more if needed
+enum I2CAddr: uint8_t {
+    NO_ADDR = 0,
+    BREATHING_MODULE = 1,
+    SENSOR_HUB = 2
+};
 
-    };
+/// @brief error codes for i2c, should be extention of existing error handler enum
+enum ErrorCode {
+    SUCCESS,
+    ZERO_BYTES_WRITTEN,
+    NOT_ENOUGH_BUFFER_SPACE,
+    EOT_DATA_TOO_LONG,
+    EOT_NACK_ADDRESS,
+    EOT_NACK_DATA,
+    EOT_OTHER_ERROR,
+    EOT_ERROR_UNKNOWN
+};
 
-    /// @brief Possible speed to use for the I2C protocol
-    typedef enum
-    {
-        kI2cSpeed_100KHz = 100000,
-        kI2cSpeed_400KHz = 400000,
-    } I2CSpeed;
-}
+/// @brief Possible speed to use for the I2C protocol
+typedef enum {
+    kI2cSpeed_100KHz = 100000,
+    kI2cSpeed_400KHz = 400000,
+} I2CSpeed;
+} // namespace hal::i2c
 
 #endif
