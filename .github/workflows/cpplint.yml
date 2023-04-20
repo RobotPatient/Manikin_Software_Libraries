@@ -1,5 +1,6 @@
 name: cpplint
 on:
+  workflow_dispatch: {}
   push:
     branches: [ "stable" ]
   pull_request:
