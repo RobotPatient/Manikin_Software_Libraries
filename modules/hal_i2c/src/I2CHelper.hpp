@@ -41,7 +41,7 @@
 
 namespace hal::i2c {
 /// @brief List of addresses for the I2C slaves. Add more if needed
-enum I2CAddr : uint8_t { NO_ADDR = 0, BREATHING_MODULE = 1, SENSOR_HUB = 2 };
+enum I2CAddr : uint8_t { kNoAddr = 0, kBreathingModule = 1, kSensorHub = 2 };
 
 /// @brief error codes for i2c, should be extention of existing error handler
 /// enum
@@ -57,10 +57,10 @@ enum ErrorCode {
 };
 
 /// @brief Possible speed to use for the I2C protocol
-typedef enum {
+typedef enum I2CSpeed {
   kI2cSpeed_100KHz = 100000,
   kI2cSpeed_400KHz = 400000,
-} I2CSpeed;
+} I2CSpeed_t;
 }  // namespace hal::i2c
 
 #endif
