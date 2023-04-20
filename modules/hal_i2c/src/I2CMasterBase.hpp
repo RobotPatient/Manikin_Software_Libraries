@@ -31,28 +31,27 @@
 
 #include "I2CHelper.hpp"
 
-namespace hal::i2c
-{
-    class I2CMasterBase
-    {
-    protected:
-        /// @brief Constructor for Master mode
-        /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
-        /// @param speed Communication speed in Hz
-        I2CMasterBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed)
-            : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
-        virtual ErrorCode ReadBytes(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes);
-        virtual ErrorCode SendBytes(I2CAddr i2c_addr, uint8_t *buffer, uint8_t num_of_bytes);
+namespace hal::i2c {
+class I2CMasterBase {
+protected:
+    /// @brief Constructor for Master mode
+    /// @param i2c_peripheral Pointer to the peripheral object class, uses TwoWire for deployment or a mock class for testing
+    /// @param speed Communication speed in Hz
+    I2CMasterBase(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed)
+        : i2c_peripheral_(i2c_peripheral), speed_(speed) {
+    }
+    virtual ErrorCode ReadBytes(I2CAddr i2c_addr, uint8_t* buffer, uint8_t num_of_bytes);
+    virtual ErrorCode SendBytes(I2CAddr i2c_addr, uint8_t* buffer, uint8_t num_of_bytes);
 
-    private:
-        /// @brief helper function to handle end of transmisstion errors
-        /// @param code Incoming error number from endTransmission()
-        /// @return ErrorCode error
-        ErrorCode HandleEndTransmisstionError(uint8_t code);
+private:
+    /// @brief helper function to handle end of transmisstion errors
+    /// @param code Incoming error number from endTransmission()
+    /// @return ErrorCode error
+    ErrorCode HandleEndTransmisstionError(uint8_t code);
 
-        I2C_PERIPHERAL_T i2c_peripheral_;
-        I2CSpeed speed_;
-    };
-}
+    I2C_PERIPHERAL_T i2c_peripheral_;
+    I2CSpeed speed_;
+};
+} // namespace hal::i2c
 
 #endif
