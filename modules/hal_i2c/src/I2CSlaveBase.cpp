@@ -7,9 +7,9 @@
  * of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction,
  *
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
- * is furnished to do so,
+ * including without limitation the rights to use, copy, modify, merge, publish,
+ *distribute, sublicense, and/or sell copies of the Software, and to permit
+ *persons to whom the Software is furnished to do so,
  *
  * subject to the following conditions:
  *
@@ -21,21 +21,21 @@
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  *
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ *OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
+ *OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
 #include "I2CSlaveBase.hpp"
 
 namespace hal::i2c {
 void I2CSlaveBase::Init(void (*receiveEvent)(int), void (*requestEvent)()) {
-    i2c_peripheral_->begin();
-    i2c_peripheral_->onReceive(receiveEvent);
-    i2c_peripheral_->onRequest(requestEvent);
+  i2c_peripheral_->begin();
+  i2c_peripheral_->onReceive(receiveEvent);
+  i2c_peripheral_->onRequest(requestEvent);
 }
 
 void I2CSlaveBase::ChangeAddress(I2CAddr new_i2c_address) {
-    slave_addr_ = new_i2c_address;
+  slave_addr_ = new_i2c_address;
 }
 }  // namespace hal::i2c
