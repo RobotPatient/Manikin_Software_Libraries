@@ -10,6 +10,7 @@
             "-I modules/hal_sensors/sensor_compression/src",
             "-I modules/hal_sensors/sensor_differentialpressure/src",
             "-I modules/hal_sensors/sensor_fingerposition/src",
+            "-I modules/hal_gpio/src",
             "-std=gnu++17"
         ]
     },
