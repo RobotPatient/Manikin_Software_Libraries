@@ -2,9 +2,9 @@ name: CMake
 
 on:
   push:
-    branches: [ "stable" ]
+    branches: [ "stable", "main" ]
   pull_request:
-    branches: [ "stable" ]
+    branches: [ "stable", "main" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
