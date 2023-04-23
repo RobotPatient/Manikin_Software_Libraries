@@ -4,6 +4,7 @@ on:
     branches: [ "stable", "main" ]
   pull_request:
     branches: [ "stable", "main" ]
+  workflow_dispatch: {}
 jobs:
   cpplint:
     runs-on: ubuntu-latest
