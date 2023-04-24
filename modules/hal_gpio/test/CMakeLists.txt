@@ -1,11 +1,10 @@
-set(This i2c_wrapper_mock_test)
+set(This hal_gpio_unit_test)
 
 set(Sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2CHelper.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_Driver.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_Driver.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mocks/i2c_peripheral_mock.hpp
-        i2c_wrapper_mock_test.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpio.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpio.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mocks/sam.h
+        hal_gpio_unit_test.cc
         )
 
 # We need this directory, and users of our library will need it too

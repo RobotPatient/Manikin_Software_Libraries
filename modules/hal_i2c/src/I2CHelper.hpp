@@ -41,7 +41,7 @@
 
 namespace hal::i2c {
 /// @brief List of addresses for the I2C slaves. Add more if needed
-enum I2CAddr : uint8_t { kNoAddr = 0, kBreathingModule = 1, kSensorHub = 2 };
+enum I2CAddr : uint8_t {NO_ADDR, kNoAddr = 0, kBreathingModule = 1, kSensorHub = 2 };
 
 /// @brief error codes for i2c, should be extention of existing error handler
 /// enum

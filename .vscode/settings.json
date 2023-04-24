@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "xmemory": "cpp",
+        "ostream": "cpp"
+    }
+}

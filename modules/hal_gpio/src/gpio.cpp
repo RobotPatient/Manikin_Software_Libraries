@@ -93,4 +93,5 @@ namespace hal::gpio {
             return PORT->Group[port_num].PMUX[pin_num].bit.PMUXO;
         }
     }
+
 }  // namespace hal::gpio
