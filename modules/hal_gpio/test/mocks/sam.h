@@ -46,7 +46,8 @@
 #define SAM_H
 #include <stdint.h>
 
-#define PORT_GROUP_NUM 2
+#define PINS_PER_PORT 32
+#define PORT_GROUP_NUM 1
 
 typedef volatile       uint8_t  RoReg8;  /**< Read only  8-bit register (volatile const unsigned int) */
 
