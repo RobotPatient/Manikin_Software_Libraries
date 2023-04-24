@@ -25,6 +25,7 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
+#ifdef __SAMD51__
 #include <spi_mainboard_registers.hpp>
 #include <spi_mainboard.hpp>
 #include <Arduino.h>
@@ -250,3 +251,5 @@ void SPIMainBoard::deinit() {
 }
 
 }  // namespace hal::spi
+#endif
+
