@@ -28,7 +28,7 @@
 #ifndef HAL_EVSYS_HPP
 #define HAL_EVSYS_HPP
 
-namespace hal::evsys {
+namespace hal::exception {
 
 typedef enum {
   UNINITIALIZED,
@@ -36,8 +36,10 @@ typedef enum {
 } ExceptionTypes;
 
 const char ExceptionTypeStrings[2][50] = { "UNINITIALIZED", "OUT_OF_BOUNDS" };
-void init();
-void throwEx(char* TAG, ExceptionTypes exception_type);
+void Init();
+void ThrowException(ExceptionTypes exception_type);
+void ThrowException(char* TAG, ExceptionTypes exception_type);
+void ThrowException(char* TAG, char* Message, ExceptionTypes exception_type);
 }  // namespace hal::evsys
 #endif
 

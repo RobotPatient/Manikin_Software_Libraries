@@ -27,36 +27,58 @@
 ***********************************************************************************************/
 #include <Arduino.h>
 #include <sam.h>
-#include <hal_evsys.hpp>
+#include <hal_exception.hpp>
 
 static uint8_t event_num;
 static char* event_tag;
+static char* event_msg = NULL;
 
 void EVSYS_Handler() {
-  Serial.print("[");
-  Serial.print(event_tag);
-  Serial.print("]: ");
-  Serial.print("Event: ");
-  Serial.println(hal::evsys::ExceptionTypeStrings[event_num]);
+  if (event_tag != NULL) {
+    Serial.print("[");
+    Serial.print(event_tag);
+    Serial.print("]: ");
+  }
+  Serial.print("Exception: ");
+  if (event_msg != NULL) {
+    Serial.print(event_msg);
+    Serial.print(" ");
+  }
+  Serial.println(hal::exception::ExceptionTypeStrings[event_num]);
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
 }
-namespace hal::evsys {
-void init() {
-  GCLK->CLKCTRL.reg |= GCLK_CLKCTRL_CLKEN | 
-                       GCLK_CLKCTRL_GEN_GCLK1 | 
-                       GCLK_CLKCTRL_ID_EVSYS_0;
+
+namespace hal::exception {
+void Init() {
+  GCLK->CLKCTRL.reg |=
+      GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_ID_EVSYS_0;
   PM->APBCMASK.reg |= PM_APBCMASK_EVSYS;
   EVSYS->CTRL.reg = EVSYS_CTRL_GCLKREQ;
-  EVSYS->CHANNEL.reg = EVSYS_CHANNEL_EDGSEL_BOTH_EDGES |
-                       EVSYS_CHANNEL_PATH_RESYNCHRONIZED | 0;
+  EVSYS->CHANNEL.reg =
+      EVSYS_CHANNEL_EDGSEL_BOTH_EDGES | EVSYS_CHANNEL_PATH_RESYNCHRONIZED | 0;
   EVSYS->INTENSET.reg = EVSYS_INTFLAG_EVD0;
   NVIC_EnableIRQ(EVSYS_IRQn);
   NVIC_SetPriority(EVSYS_IRQn, 2);
 }
 
-void throwEx(char* TAG, ExceptionTypes exception_type){
-        event_num = exception_type;
-        event_tag = TAG;
-        EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+void ThrowException(char* TAG, char* Message, ExceptionTypes exception_type) {
+  event_num = exception_type;
+  event_tag = TAG;
+  event_msg = Message;
+  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+}
+
+void ThrowException(char* TAG, ExceptionTypes exception_type) {
+  event_num = exception_type;
+  event_tag = TAG;
+  event_msg = NULL;
+  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+}
+
+void ThrowException(ExceptionTypes exception_type) {
+  event_num = exception_type;
+  event_msg = NULL;
+  event_tag = NULL;
+  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
 }
 }  // namespace hal::evsys
