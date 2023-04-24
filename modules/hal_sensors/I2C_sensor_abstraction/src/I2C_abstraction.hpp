@@ -36,17 +36,17 @@ class I2C_sensor_abstraction : public hal::i2c::I2C_Driver {
     explicit I2C_sensor_abstraction(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr) 
         : I2C_Driver(driver, speed, addr) {}
 
-    void init_i2c_helper();
-    void ChangeAddress(hal::i2c::I2CAddr new_i2c_address);
+    virtual void init_i2c_helper();
+    virtual void ChangeAddress(hal::i2c::I2CAddr new_i2c_address);
 
-    void write8_reg16b(uint16_t reg, uint8_t data);
-    void write16_reg16b(uint16_t reg, uint16_t data);
+    virtual void write8_reg16b(uint16_t reg, uint8_t data);
+    virtual void write16_reg16b(uint16_t reg, uint16_t data);
 
-    uint8_t send_read8_reg16b(uint16_t reg);
-    uint16_t send_read16_reg16(uint16_t reg);
-
-    void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
-    void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
+    virtual uint8_t send_read8_reg16b(uint16_t reg);
+    virtual uint16_t send_read16_reg16(uint16_t reg);
+     
+    virtual void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
+    virtual void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
 };
 
 #endif // I2C_SENSOR_ABSTRACTION_HPP
