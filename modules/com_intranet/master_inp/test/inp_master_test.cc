@@ -1,25 +1,23 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
+#include <i2c_peripheral_mock.hpp>
+#include <i2c_driver.hpp>
 #include <master_i2c.hpp>
+#include <protocol_references.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::Mock;
 
-TEST(INP_Master_test, initialization) {
-  I2CPeripheralMock i2c_per;
-  MasterCommunication master(&i2c_per);
-  EXPECT_CALL(i2c_per, begin());
-  master.init();
-  Mock::VerifyAndClearExpectations(&i2c_per);
-}
-
 TEST(INP_Master_test, write_register) {
   I2CPeripheralMock i2c_per;
-  MasterCommunication master(&i2c_per);
+  hal::i2c::I2C_Driver* mockDriver = new hal::i2c::I2C_Driver(&i2c_per, hal::i2c::kI2cSpeed_100KHz,hal::i2c::I2CAddr::kNoAddr);
+  MasterCommunication master(mockDriver);
+
   SlavesAddress_t dummyHub = HUB_TWO;
-  RegisterAddress_t dummyReg = REG_ADDRESS_1;
+  RegisterAddress_t dummyReg = RegisterAddress_t::REG_ADDRESS_1;
   const uint8_t data = 0x5;
 
   EXPECT_CALL(i2c_per, beginTransmission(dummyHub));
@@ -28,14 +26,16 @@ TEST(INP_Master_test, write_register) {
     EXPECT_CALL(i2c_per, write(dummyReg));
     EXPECT_CALL(i2c_per, write(data));
   }
-  EXPECT_CALL(i2c_per, endTransmission());
+  EXPECT_CALL(i2c_per, endTransmission(true));
   master.write_register(dummyHub, dummyReg, data);
   Mock::VerifyAndClearExpectations(&i2c_per);
 }
 
 TEST(INP_Master_test, read_register) {
   I2CPeripheralMock i2c_per;
-  MasterCommunication master(&i2c_per);
+  hal::i2c::I2C_Driver* mockDriver = new hal::i2c::I2C_Driver(&i2c_per, hal::i2c::kI2cSpeed_100KHz,hal::i2c::I2CAddr::kNoAddr);
+  MasterCommunication master(mockDriver);
+
   SlavesAddress_t dummyHub = HUB_TWO;
   RegisterAddress_t dummyReg = REG_ADDRESS_1;
 
@@ -44,11 +44,11 @@ TEST(INP_Master_test, read_register) {
 
   EXPECT_CALL(i2c_per, beginTransmission(dummyHub));
   EXPECT_CALL(i2c_per, write(dummyReg));
-  EXPECT_CALL(i2c_per, endTransmission());
+  EXPECT_CALL(i2c_per, endTransmission(true));
 
   {
     InSequence seq;
-    EXPECT_CALL(i2c_per, requestFrom(dummyHub, 1));
+    EXPECT_CALL(i2c_per, requestFrom(dummyHub, 1, true));
     EXPECT_CALL(i2c_per, available())
       .WillOnce(testing::Return(1));
     EXPECT_CALL(i2c_per, read())

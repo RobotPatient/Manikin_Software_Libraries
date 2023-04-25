@@ -18,7 +18,7 @@ uint8_t MasterCommunication::read_register(SlavesAddress_t slave, RegisterAddres
 
     uint8_t value = 0;
     i2c_peripheral_->requestFrom(slave, 1);
-    if(i2c_peripheral_->available() > 0) {
+    if(i2c_peripheral_->available() == 1) {
         value = i2c_peripheral_->read();
     }
     return value;
