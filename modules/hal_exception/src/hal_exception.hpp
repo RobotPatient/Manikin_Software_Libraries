@@ -27,19 +27,31 @@
 ***********************************************************************************************/
 #ifndef HAL_EVSYS_HPP
 #define HAL_EVSYS_HPP
+#include <hal_exception_config.hpp>
 
 namespace hal::exception {
+#define ASSERT_WARN(condition)                         \
+  assert_warn((const char *)ASSEMBLE_ASSERT_MSG(__LINE__ , __FILE__, condition, WARN), condition)
 
-typedef enum {
-  UNINITIALIZED,
-  OUT_OF_BOUNDS
-} ExceptionTypes;
+#define ASSERT_RESET(condition)                         \
+  assert_reset((const char *)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, RESET), condition)
 
-const char ExceptionTypeStrings[2][50] = { "UNINITIALIZED", "OUT_OF_BOUNDS" };
+#define ASSERT_CUSTOM(condition, action) \
+  assert_custom_action((const char *)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, action), condition, action)
+
+#define THROW_RESET(message, exception_type)                      \
+  ThrowException((const char *)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, exception_type, RESET), exception_type, hal::exception::HARD_RESET)
+
+#define THROW_WARN(message, exception_type) \
+  ThrowException((const char *)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, exception_type, WARN), exception_type, hal::exception::WARN);
+
 void Init();
-void ThrowException(ExceptionTypes exception_type);
-void ThrowException(char* TAG, ExceptionTypes exception_type);
-void ThrowException(char* TAG, char* Message, ExceptionTypes exception_type);
-}  // namespace hal::evsys
-#endif
+void ThrowException(const char* exception_message,
+                     const ExceptionTypes exception_type, const ExceptionAction exception_action);
+void assert_warn(const char* assert_msg, bool condition);
 
+void assert_reset(const char* assert_msg, bool condition);
+
+void assert_custom_action(const char* assert_msg, bool condition, const ExceptionAction exception_action);
+}  // namespace hal::exception
+#endif
