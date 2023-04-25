@@ -3,10 +3,10 @@
 
 namespace hal::exception {
 #define ASSEMBLE_THROW_MSG(line, tag, message, exception_type, action) \
-  "[" tag  ": " str(line) "]: " "THROW! "  message "; exception: " str(exception_type) " Action: " str(action)
+  "[" tag  ": " str(line) "]: " "THROW! "  message "; exception: " str(exception_type) " Action: " str(action) "\0"
   
 #define ASSEMBLE_ASSERT_MSG(line, tag, condition, action) \
-  "[" tag  ": " str(line) "]: " "ASSERT! : " str(condition) " Action: " str(action)
+  "[" tag  ": " str(line) "]: " "ASSERT! : " str(condition) " Action: " str(action) "\0"
 
 #define str(s) #s
 inline constexpr bool EnableSerialLogger = true;

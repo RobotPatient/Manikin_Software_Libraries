@@ -45,6 +45,7 @@ namespace hal::exception {
 #define THROW_WARN(message, exception_type) \
   ThrowException((const char *)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, exception_type, WARN), exception_type, hal::exception::WARN);
 
+// void Init(hal::log::Logger *logger_obj);
 void Init();
 void ThrowException(const char* exception_message,
                      const ExceptionTypes exception_type, const ExceptionAction exception_action);

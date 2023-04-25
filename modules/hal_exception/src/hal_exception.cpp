@@ -39,6 +39,7 @@ event currEvent;
 
 void EVSYS_Handler() {
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
+  Serial.println("EVSYS_handler");
   switch (currEvent.event_act) {
     case hal::exception::HARD_RESET:
       NVIC_SystemReset();
@@ -72,10 +73,10 @@ void Init() {
 void ThrowException(const char* exception_message,
                     const ExceptionTypes exception_type,
                     const ExceptionAction exception_action) {
-  Serial.println(exception_message);
+  //Serial.println(exception_message);
   event new_event = {exception_type, exception_action, exception_message};
   currEvent = new_event;
-  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+  EVSYS->CHANNEL.reg = EVSYS_CHANNEL_SWEVT | 0;
 }
 
 void assert_warn(const char* assert_msg, bool condition) {
