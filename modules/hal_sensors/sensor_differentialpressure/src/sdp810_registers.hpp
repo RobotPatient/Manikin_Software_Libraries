@@ -29,9 +29,11 @@
 #ifndef SDP810_REGISTERS_HPP_
 #define SDP810_REGISTERS_HPP_
 
+#include <stdint.h>
+
 inline constexpr uint8_t kSdp810BytesToReturn = 2;
 inline constexpr uint8_t kSdp810InitCmdSize = 2;
 inline constexpr uint8_t kContMassFlowAvgMsb = 0x36;
 inline constexpr uint8_t kContMassFlowAvgLsb = 0x03;
 
-#endif // SDP810_REGISTERS_HPP_
+#endif  // SDP810_REGISTERS_HPP_

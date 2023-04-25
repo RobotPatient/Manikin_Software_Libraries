@@ -33,20 +33,21 @@
 
 class I2C_sensor_driver : public hal::i2c::I2C_Driver {
  public:
-    explicit I2C_sensor_driver(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr) 
-        : I2C_Driver(driver, speed, addr) {}
+  explicit I2C_sensor_driver(I2C_PERIPHERAL_T driver,
+                             hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr)
+      : I2C_Driver(driver, speed, addr) {}
 
-    virtual void init_i2c_helper();
-    virtual void ChangeAddress(hal::i2c::I2CAddr new_i2c_address);
+  virtual void init_i2c_helper();
+  virtual void ChangeAddress(hal::i2c::I2CAddr new_i2c_address);
 
-    virtual void write8_reg16b(uint16_t reg, uint8_t data);
-    virtual void write16_reg16b(uint16_t reg, uint16_t data);
+  virtual void write8_reg16b(uint16_t reg, uint8_t data);
+  virtual void write16_reg16b(uint16_t reg, uint16_t data);
 
-    virtual uint8_t send_read8_reg16b(uint16_t reg);
-    virtual uint16_t send_read16_reg16(uint16_t reg);
-     
-    virtual void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
-    virtual void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
+  virtual uint8_t send_read8_reg16b(uint16_t reg);
+  virtual uint16_t send_read16_reg16(uint16_t reg);
+
+  virtual void ReadBytes(uint8_t* buffer, uint8_t num_of_bytes);
+  virtual void SendBytes(uint8_t* buffer, uint8_t num_of_bytes);
 };
 
-#endif // I2C_SENSOR_DRIVER_HPP
+#endif  // I2C_SENSOR_DRIVER_HPP

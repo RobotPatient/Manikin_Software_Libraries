@@ -28,17 +28,18 @@
 
 #include <gmock/gmock.h>
 
-#include <sensor_compression.hpp>
 #include <I2C_sensor_driver.hpp>
-#include <vl6180x_registers.hpp>
 #include <Mock_I2C_sensor_driver.hpp>
+#include <sensor_compression.hpp>
+#include <vl6180x_registers.hpp>
 
-using ::testing::Return;
 using ::testing::InSequence;
 using ::testing::Mock;
+using ::testing::Return;
 
-void InitVL6180xCalls(MockI2C_sensor_driver *i2c_handle_mock) {
-  EXPECT_CALL(*i2c_handle_mock, send_read8_reg16b(kVl6180XSystemFreshOutOfReset))
+void InitVL6180xCalls(MockI2C_sensor_driver* i2c_handle_mock) {
+  EXPECT_CALL(*i2c_handle_mock,
+              send_read8_reg16b(kVl6180XSystemFreshOutOfReset))
       .WillOnce(Return(0x01));
   EXPECT_CALL(*i2c_handle_mock, write8_reg16b(0x0207, 0x01));
   EXPECT_CALL(*i2c_handle_mock, write8_reg16b(0x0208, 0x01));
@@ -72,13 +73,12 @@ void InitVL6180xCalls(MockI2C_sensor_driver *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, write8_reg16b(0x0030, 0x00));
 }
 
-void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_driver *i2c_handle_mock) {
+void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_driver* i2c_handle_mock) {
   // Set GPIO1 high when sample complete
   EXPECT_CALL(*i2c_handle_mock,
               write8_reg16b(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4)));
   // Set GPIO1 high when sample complete
-  EXPECT_CALL(*i2c_handle_mock,
-              write8_reg16b(kVl6180XSystemModeGpio1, 0x10));
+  EXPECT_CALL(*i2c_handle_mock, write8_reg16b(kVl6180XSystemModeGpio1, 0x10));
   // Set Avg sample period
   EXPECT_CALL(*i2c_handle_mock,
               write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30));
@@ -116,14 +116,18 @@ void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_driver *i2c_handle_mock) {
               write16_reg16b(kVl6180XSysalsIntegrationPeriod, 0x64));
   EXPECT_CALL(*i2c_handle_mock,
               write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30));
-  EXPECT_CALL(*i2c_handle_mock, write8_reg16b(kVl6180XSysalsAnalogueGain, 0x40));
-  EXPECT_CALL(*i2c_handle_mock, write8_reg16b(kVl6180XFirmwareResultScaler, 0x01));
+  EXPECT_CALL(*i2c_handle_mock,
+              write8_reg16b(kVl6180XSysalsAnalogueGain, 0x40));
+  EXPECT_CALL(*i2c_handle_mock,
+              write8_reg16b(kVl6180XFirmwareResultScaler, 0x01));
 }
 
 TEST(compressionTest, initCalls) {
-  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz,
+                                        hal::i2c::kNoAddr);
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
-  EXPECT_CALL(i2c_handle_mock, ChangeAddress(static_cast<const hal::i2c::I2CAddr>(kSensorAddr)));
+  EXPECT_CALL(i2c_handle_mock,
+              ChangeAddress(static_cast<const hal::i2c::I2CAddr>(kSensorAddr)));
   {
     InSequence seq;
     InitVL6180xCalls(&i2c_handle_mock);
@@ -134,13 +138,15 @@ TEST(compressionTest, initCalls) {
 }
 
 TEST(compressionTest, GetSensorData) {
-  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz,
+                                        hal::i2c::kNoAddr);
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;
   ExpectedOutput.num_of_bytes = 1;
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, write8_reg16b(kVl6180XSysrangeStart, 0x01));
-  EXPECT_CALL(i2c_handle_mock, write8_reg16b(kVl6180XSystemInterruptClear, 0x07));
+  EXPECT_CALL(i2c_handle_mock,
+              write8_reg16b(kVl6180XSystemInterruptClear, 0x07));
   EXPECT_CALL(i2c_handle_mock, send_read8_reg16b(kVl6180XResultRangeVal))
       .WillOnce(Return(ExpectedOutput.buffer[0]));
   // Do the "Real" call
@@ -150,7 +156,7 @@ TEST(compressionTest, GetSensorData) {
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // ::testing::InitGoogleTest(&argc, argv);
   // if you plan to use GMock, replace the line above with
   ::testing::InitGoogleMock(&argc, argv);

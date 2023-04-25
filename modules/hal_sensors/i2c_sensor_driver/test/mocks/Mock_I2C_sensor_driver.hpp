@@ -34,19 +34,22 @@
 
 #include <I2C_sensor_driver.hpp>
 
-class MockI2C_sensor_driver : public I2C_sensor_driver
-{
-public:
-  MockI2C_sensor_driver(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr)
+class MockI2C_sensor_driver : public I2C_sensor_driver {
+ public:
+  MockI2C_sensor_driver(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed,
+                        hal::i2c::I2CAddr addr)
       : I2C_sensor_driver(driver, speed, addr) {}
   MOCK_METHOD(void, init_i2c_helper, (), (override));
-  MOCK_METHOD(void, ChangeAddress, (hal::i2c::I2CAddr new_i2c_address), (override));
+  MOCK_METHOD(void, ChangeAddress, (hal::i2c::I2CAddr new_i2c_address),
+              (override));
   MOCK_METHOD(void, write8_reg16b, (uint16_t reg, uint8_t data), (override));
   MOCK_METHOD(void, write16_reg16b, (uint16_t reg, uint16_t data), (override));
   MOCK_METHOD(uint8_t, send_read8_reg16b, (uint16_t reg), (override));
   MOCK_METHOD(uint16_t, send_read16_reg16, (uint16_t reg), (override));
-  MOCK_METHOD(void, ReadBytes, (uint8_t * buffer, uint8_t num_of_bytes), (override));
-  MOCK_METHOD(void, SendBytes, (uint8_t * buffer, uint8_t num_of_bytes), (override));
+  MOCK_METHOD(void, ReadBytes, (uint8_t * buffer, uint8_t num_of_bytes),
+              (override));
+  MOCK_METHOD(void, SendBytes, (uint8_t * buffer, uint8_t num_of_bytes),
+              (override));
 };
 
-#endif // SENSOR_ABSTRACTION_MOCK_HPP
+#endif  // SENSOR_ABSTRACTION_MOCK_HPP

@@ -33,8 +33,7 @@
 
 inline constexpr uint8_t kAds7138Addr = 0x10;
 
-enum SensorMapIndex
-{
+enum SensorMapIndex {
   kLower = 5,
   kMidL = 4,
   kMidM = 3,
@@ -45,29 +44,26 @@ enum SensorMapIndex
   kLiH = 1,
 };
 
-class FingerPositionSensor : public UniversalSensor
-{
-public:
-  explicit FingerPositionSensor(I2C_sensor_driver *i2c_handle) : UniversalSensor(i2c_handle)
-  {
+class FingerPositionSensor : public UniversalSensor {
+ public:
+  explicit FingerPositionSensor(I2C_sensor_driver* i2c_handle)
+      : UniversalSensor(i2c_handle) {
     i2c_handle_ = i2c_handle;
   }
 
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
-  ~FingerPositionSensor()
-  {
-    Uninitialize();
-  }
+  ~FingerPositionSensor() { Uninitialize(); }
 
-private:
-  const hal::i2c::I2CAddr kSensorI2CAddress_ = static_cast<const hal::i2c::I2CAddr>(kAds7138Addr);
-  I2C_sensor_driver *i2c_handle_;
+ private:
+  const hal::i2c::I2CAddr kSensorI2CAddress_ =
+      static_cast<const hal::i2c::I2CAddr>(kAds7138Addr);
+  I2C_sensor_driver* i2c_handle_;
   SensorData sensor_data_{};
 
   void initDefaultRead(void);
-  void readADC(uint16_t *dest);
+  void readADC(uint16_t* dest);
   uint16_t assembleRegister(uint8_t opcode, uint8_t reg_addr);
 
   // Low Level I2C communication:
@@ -78,7 +74,7 @@ private:
 
   void startReadSEQ(void);
   void stopReadSEQ(void);
-  void reindexArray(uint16_t *dest, uint16_t *original);
-  void getReading(uint8_t *buf);
+  void reindexArray(uint16_t* dest, uint16_t* original);
+  void getReading(uint8_t* buf);
 };
-#endif // SENSOR_FINGERPOSITION_HPP_
+#endif  // SENSOR_FINGERPOSITION_HPP_

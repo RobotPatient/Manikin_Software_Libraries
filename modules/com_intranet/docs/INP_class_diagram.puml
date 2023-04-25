@@ -31,11 +31,11 @@
 set separator ::
 
 package Manikin_Software_Libraries <<Node>> {
-        package com_intranet <<frame>> {
-    ' Package indicates the working directory. 
+    package com_intranet <<frame>> {
+        ' Package indicates the working directory.
         namespace com::intranet {
             class I2C_driver {
-                All TwoWire functions are wrapped here. 
+                All TwoWire functions are wrapped here.
             }
 
             class hub_registers {

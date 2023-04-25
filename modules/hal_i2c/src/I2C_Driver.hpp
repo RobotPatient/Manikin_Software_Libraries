@@ -41,43 +41,35 @@
   driver implementation.
 */
 
-namespace hal::i2c
-{
+namespace hal::i2c {
 
-  class I2C_Driver
-  {
-  public:
-    I2C_Driver(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr)
-        : i2c_peripheral_(i2c_peripheral), speed_(speed), slave_addr_(i2c_addr) {}
+class I2C_Driver {
+ public:
+  I2C_Driver(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr)
+      : i2c_peripheral_(i2c_peripheral), speed_(speed), slave_addr_(i2c_addr) {}
 
-    void begin();
-    void begin(uint8_t adddress);
-    uint8_t requestFrom(uint8_t address, size_t size, bool stopBit = true);
-    void beginTransmission(uint8_t address);
-    uint8_t endTransmission(bool stopBit = true);
-    void write(uint8_t data);
-    void write(const uint8_t *data, size_t size);
-    size_t available();
-    uint8_t read();
-    void setClock(uint32_t clockFrequency);
-    void onReceive(void (*handler)(int));
-    void onRequest(void (*handler)(int));
+  void begin();
+  void begin(uint8_t adddress);
+  uint8_t requestFrom(uint8_t address, size_t size, bool stopBit = true);
+  void beginTransmission(uint8_t address);
+  uint8_t endTransmission(bool stopBit = true);
+  void write(uint8_t data);
+  void write(const uint8_t* data, size_t size);
+  size_t available();
+  uint8_t read();
+  void setClock(uint32_t clockFrequency);
+  void onReceive(void (*handler)(int));
+  void onRequest(void (*handler)(int));
 
-    I2CAddr get_i2c_addr()
-    {
-      return slave_addr_;
-    }
+  I2CAddr get_i2c_addr() { return slave_addr_; }
 
-    void set_i2c_addr(I2CAddr newAddr)
-    {
-      slave_addr_ = newAddr;
-    }
+  void set_i2c_addr(I2CAddr newAddr) { slave_addr_ = newAddr; }
 
-  private:
-    I2C_PERIPHERAL_T i2c_peripheral_;
-    I2CSpeed speed_;
-    I2CAddr slave_addr_ = NO_ADDR;
-  };
-} // namespace hal::i2c
+ private:
+  I2C_PERIPHERAL_T i2c_peripheral_;
+  I2CSpeed speed_;
+  I2CAddr slave_addr_ = NO_ADDR;
+};
+}  // namespace hal::i2c
 
-#endif // I2C_DRIVER_HPP
+#endif  // I2C_DRIVER_HPP

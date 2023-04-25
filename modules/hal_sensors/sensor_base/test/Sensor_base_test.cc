@@ -29,15 +29,15 @@
 #include <gmock/gmock.h>
 #include <I2C_sensor_driver.hpp>
 
-using ::testing::Return;
+using ::testing::_;
 using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::Mock;
-using ::testing::_;
+using ::testing::Return;
 
 // No tests for sensor base class, because it has no implementation.
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // ::testing::InitGoogleTest(&argc, argv);
   // if you plan to use GMock, replace the line above with
   ::testing::InitGoogleMock(&argc, argv);

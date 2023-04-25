@@ -103,7 +103,7 @@ uint16_t I2C_sensor_driver::send_read16_reg16(uint16_t reg) {
   return data;
 }
 
-void I2C_sensor_driver::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+void I2C_sensor_driver::ReadBytes(uint8_t* buffer, uint8_t num_of_bytes) {
   this->beginTransmission(this->get_i2c_addr());
   this->requestFrom(this->get_i2c_addr(), num_of_bytes, true);
   for (uint8_t i = 0; i < num_of_bytes; i++) {
@@ -112,7 +112,7 @@ void I2C_sensor_driver::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
   this->endTransmission(true);
 }
 
-void I2C_sensor_driver::SendBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+void I2C_sensor_driver::SendBytes(uint8_t* buffer, uint8_t num_of_bytes) {
   this->beginTransmission(this->get_i2c_addr());
   this->write(buffer, num_of_bytes);
   this->endTransmission(true);

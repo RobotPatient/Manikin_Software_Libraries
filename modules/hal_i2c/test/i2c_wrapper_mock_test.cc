@@ -26,18 +26,18 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <i2c_driver.hpp>
 
 // No test cases, because currently it's just a wrapper.
 
-using ::testing::Return;
 using ::testing::InSequence;
 using ::testing::Invoke;
+using ::testing::Return;
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // ::testing::InitGoogleTest(&argc, argv);
   // if you plan to use GMock, replace the line above with
   ::testing::InitGoogleMock(&argc, argv);

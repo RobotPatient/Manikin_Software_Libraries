@@ -36,8 +36,8 @@ inline constexpr uint16_t kVl6180XIdentificationModelRevMajor = 0x0001;
 inline constexpr uint16_t kVl6180XIdentificationModelRevMinor = 0x0002;
 inline constexpr uint16_t kVl6180XIdentificationModuleRevMajor = 0x0003;
 inline constexpr uint16_t kVl6180XIdentificationModuleRevMinor = 0x0004;
-inline constexpr uint16_t kVl6180XIdentificationDate = 0x0006; // 16bit value
-inline constexpr uint16_t kVl6180XIdentificationTime = 0x0008; // 16bit value
+inline constexpr uint16_t kVl6180XIdentificationDate = 0x0006;  // 16bit value
+inline constexpr uint16_t kVl6180XIdentificationTime = 0x0008;  // 16bit value
 
 inline constexpr uint16_t kVl6180XSystemModeGpio1 = 0x0011;
 inline constexpr uint16_t kVl6180XSystemInterruptConfigGpio = 0x0014;
@@ -64,4 +64,4 @@ inline constexpr uint16_t kVl6180XReadoutAveragingSamplePeriod = 0x010A;
 inline constexpr uint16_t kVl6180XFirmwareResultScaler = 0x0120;
 inline constexpr uint16_t kVl6180Xi2CSlaveDeviceAddress = 0x0212;
 
-#endif // SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_
+#endif  // SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_

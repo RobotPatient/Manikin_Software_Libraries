@@ -1,3 +1,31 @@
+/* *******************************************************************************************
+ * Copyright (c) 2023 by RobotPatient Simulators
+ *
+ * Authors: Richard Kroesen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction,
+ *
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+ * is furnished to do so,
+ *
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ *
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ ***********************************************************************************************/
+
 #include <gmock/gmock.h>
 
 #include <I2C_sensor_driver.hpp>
@@ -11,21 +39,22 @@ using ::testing::Return;
 
 uint8_t kTestingBytes[8] = {0x10, 0x40, 0x30, 0x20, 0x10, 0xFF, 0x50, 0x01};
 
-TEST(I2C_sensor_test, initCallsRightMethods)
-{
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, hal::i2c::I2CAddr::NO_ADDR);
+TEST(I2C_sensor_test, initCallsRightMethods) {
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz,
+                             hal::i2c::I2CAddr::NO_ADDR);
   EXPECT_CALL(*peripheralMock, begin());
   abDriver.init_i2c_helper();
 
   delete peripheralMock;
 }
 
-TEST(I2CWrapperTest, write_regCallsRightMethods)
-{
+TEST(I2CWrapperTest, write_regCallsRightMethods) {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0530;
@@ -48,11 +77,11 @@ TEST(I2CWrapperTest, write_regCallsRightMethods)
   testing::Mock::AllowLeak(peripheralMock);
 }
 
-TEST(I2CWrapperTest, write_reg16CallsRightMethods)
-{
+TEST(I2CWrapperTest, write_reg16CallsRightMethods) {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0510;
@@ -78,11 +107,11 @@ TEST(I2CWrapperTest, write_reg16CallsRightMethods)
   testing::Mock::AllowLeak(peripheralMock);
 }
 
-TEST(I2CWrapperTest, read_regCallsRightMethods)
-{
+TEST(I2CWrapperTest, read_regCallsRightMethods) {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x05;
@@ -101,8 +130,7 @@ TEST(I2CWrapperTest, read_regCallsRightMethods)
   EXPECT_CALL(*peripheralMock, endTransmission(false));
   EXPECT_CALL(*peripheralMock,
               requestFrom(dummyAddr, kRequestAmountOfBytes, true));
-  EXPECT_CALL(*peripheralMock, read())
-      .WillRepeatedly(Return(kDataToReturn));
+  EXPECT_CALL(*peripheralMock, read()).WillRepeatedly(Return(kDataToReturn));
   /* The object method which calls to mock methods under the hood*/
   uint8_t data_returned = abDriver.send_read8_reg16b(kReg);
   /* Check if returned value matched the value that mock function returned*/
@@ -111,11 +139,11 @@ TEST(I2CWrapperTest, read_regCallsRightMethods)
   testing::Mock::AllowLeak(peripheralMock);
 }
 
-TEST(I2CWrapperTest, read_reg16CallsRightMethods)
-{
+TEST(I2CWrapperTest, read_reg16CallsRightMethods) {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0520;
@@ -125,7 +153,7 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods)
   const uint8_t kRegLowerByte = (kReg & 0xFF);
   const uint8_t kDataUpperByte = (kDataToReturn >> 8) & 0xFF;
   const uint8_t kDataLowerByte = (kDataToReturn & 0xFF);
-  const uint8_t kRequestAmountOfBytes = 2; // We request 16-bits of data
+  const uint8_t kRequestAmountOfBytes = 2;  // We request 16-bits of data
   /* The expected function calls*/
   EXPECT_CALL(*peripheralMock, beginTransmission(dummyAddr));
   {
@@ -135,10 +163,8 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods)
     EXPECT_CALL(*peripheralMock, endTransmission(false));
     EXPECT_CALL(*peripheralMock,
                 requestFrom(dummyAddr, kRequestAmountOfBytes, true));
-    EXPECT_CALL(*peripheralMock, read())
-        .WillOnce(Return(kDataUpperByte));
-    EXPECT_CALL(*peripheralMock, read())
-        .WillOnce(Return(kDataLowerByte));
+    EXPECT_CALL(*peripheralMock, read()).WillOnce(Return(kDataUpperByte));
+    EXPECT_CALL(*peripheralMock, read()).WillOnce(Return(kDataLowerByte));
   }
   /* The object method which calls to mock methods under the hood*/
   uint16_t data_returned = abDriver.send_read16_reg16(kReg);
@@ -148,11 +174,11 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods)
   testing::Mock::AllowLeak(peripheralMock);
 }
 
-TEST(I2CWrapperTest, sendBytesCallsRightMethods)
-{
+TEST(I2CWrapperTest, sendBytesCallsRightMethods) {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
-  I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2CPeripheralMock* peripheralMock = new I2CPeripheralMock();
+  I2C_sensor_driver abDriver(peripheralMock,
+                             hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint8_t kRequestAmountOfBytes = 8;
@@ -169,15 +195,12 @@ TEST(I2CWrapperTest, sendBytesCallsRightMethods)
   testing::Mock::AllowLeak(peripheralMock);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
   // ::testing::InitGoogleTest(&argc, argv);
   // if you plan to use GMock, replace the line above with
   ::testing::InitGoogleMock(&argc, argv);
 
-  if (RUN_ALL_TESTS())
-  {
-  }
+  if (RUN_ALL_TESTS()) {}
 
   // Always return zero-code and allow PlatformIO to parse results
   return 0;

@@ -39,10 +39,10 @@ package Manikin_Software_Libraries <<Node>> {
 
 
     package hal_i2c <<frame>> {
-    ' Package indicates the working directory. 
+        ' Package indicates the working directory.
         namespace hal::i2c {
             class I2C_driver {
-                All TwoWire functions are wrapped here. 
+                All TwoWire functions are wrapped here.
             }
 
             enum I2CAddr {

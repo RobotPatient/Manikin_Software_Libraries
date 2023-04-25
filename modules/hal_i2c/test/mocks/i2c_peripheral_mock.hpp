@@ -39,17 +39,18 @@ class I2CPeripheralMock {
   MOCK_METHOD1(begin, void(uint8_t address));
   MOCK_METHOD1(beginTransmission, void(uint8_t address));
   MOCK_METHOD1(write, size_t(uint8_t ucData));
-  MOCK_METHOD2(write, size_t(const uint8_t *data, size_t quantity));
+  MOCK_METHOD2(write, size_t(const uint8_t* data, size_t quantity));
   MOCK_METHOD0(endTransmission, void());
   MOCK_METHOD2(requestFrom, uint8_t(uint8_t address, size_t quantity));
-  MOCK_METHOD2(readBytes, size_t(uint8_t * buffer, size_t length));
+  MOCK_METHOD2(readBytes, size_t(uint8_t* buffer, size_t length));
   MOCK_METHOD0(read, int());
   MOCK_METHOD0(available, size_t());
-  MOCK_METHOD3(requestFrom, uint8_t(uint8_t address, size_t quantity, bool stopBit));
+  MOCK_METHOD3(requestFrom,
+               uint8_t(uint8_t address, size_t quantity, bool stopBit));
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
   MOCK_METHOD1(setClock, void(uint32_t clockFrequency));
-  MOCK_METHOD1(onReceive, void(void(*handler)(int)));
-  MOCK_METHOD1(onRequest, void(void(*handler)(int)));
+  MOCK_METHOD1(onReceive, void(void (*handler)(int)));
+  MOCK_METHOD1(onRequest, void(void (*handler)(int)));
 };
 #endif  // __arm__
 #endif  // I2C_PERIPHERAL_MOCK_HPP_
