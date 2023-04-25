@@ -1,4 +1,3 @@
-
 set(This differentialpressure_sensor_mock_test)
 
 set(Sources

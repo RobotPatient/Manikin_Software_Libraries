@@ -27,7 +27,7 @@
 ***********************************************************************************************/
 
 #include <gmock/gmock.h>
-#include <i2c_helper.hpp>
+#include <sensor_abstraction_mock.hpp>
 #include <sensor_fingerposition.hpp>
 #include <ads7138_registers.hpp>
 
@@ -78,20 +78,20 @@ TEST(FingerPositionTest, initCalls) {
   const uint16_t kReg4 = AssembleRegister(kSetBit, kSequenceConfig);
   const uint8_t kData4 = 0x01;
   /* Initialize handles and classes */
-  I2CDriver i2c_mock_handle;
-  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_mock_handle);
+  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_handle_mock);
   /* Setup mock calls */
-  EXPECT_CALL(i2c_mock_handle, ChangeAddress(kAds7138Addr));
+  EXPECT_CALL(i2c_handle_mock, ChangeAddress(static_cast<hal::i2c::I2CAddr>(kAds7138Addr)));
   {
     InSequence Seq;
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg1, kData1));
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg2, kData2));
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg3, kData3));
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg4, kData4));
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg1, kData1));
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg2, kData2));
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg3, kData3));
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg4, kData4));
   }
   /* Run the "real" call */
   finger_pos_sensor.Initialize();
-  Mock::VerifyAndClearExpectations(&i2c_mock_handle);
+  Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
 TEST(FingerPositionTest, GetSensorData) {
@@ -101,16 +101,16 @@ TEST(FingerPositionTest, GetSensorData) {
   const uint16_t kReg2 = AssembleRegister(kClearBit, kSequenceConfig);
   const uint8_t kData2 = 1 << 4;
   // Initialize mocks
-  I2CDriver i2c_mock_handle;
-  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_mock_handle);
+  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_handle_mock);
 
   /* Setup mock calls */
   {
     InSequence seq;
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg1, kData1));
-    EXPECT_CALL(i2c_mock_handle, ReadBytes(_, kReadNumOfBytes)).Times(kNumOfAdcChannels)
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg1, kData1));
+    EXPECT_CALL(i2c_handle_mock, ReadBytes(_, kReadNumOfBytes)).Times(kNumOfAdcChannels)
         .WillRepeatedly(Invoke(CopyArbTestBufferToBuffer));
-    EXPECT_CALL(i2c_mock_handle, WriteReg(kReg2, kData2));
+    EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg2, kData2));
   }
 
   /* Run the "real" call */
@@ -121,7 +121,7 @@ TEST(FingerPositionTest, GetSensorData) {
   for (uint8_t i = 0; i < kNumOfAdcChannels; i++) {
     EXPECT_EQ(arb_test_buffer_reindexed[i], data.buffer[i]);
   }
-  Mock::VerifyAndClearExpectations(&i2c_mock_handle);
+  Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
 int main(int argc, char **argv) {

@@ -39,7 +39,7 @@
 #define SENSOR_COMPRESSION_HPP_
 
 #include <sensor_base.hpp>
-#include <i2c_helper.hpp>
+#include <I2C_abstraction.hpp>
 
 inline constexpr uint8_t kSensorAddr = 0x29;
 
@@ -67,7 +67,7 @@ struct VL6180xIdentification {
 
 class CompressionSensor : public UniversalSensor {
  public:
-  explicit CompressionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
+  explicit CompressionSensor(I2C_sensor_abstraction *i2c_handle) : UniversalSensor(i2c_handle) {
     i2c_handle_ = i2c_handle;
   }
 
@@ -79,9 +79,10 @@ class CompressionSensor : public UniversalSensor {
   }
 
  private:
-  uint8_t sensor_i2c_address_ = kSensorAddr;
+  // Not const, because the devices requires to be changeable.
+  hal::i2c::I2CAddr sensor_i2c_address_ = static_cast<const hal::i2c::I2CAddr>(kSensorAddr);
   SensorData sensor_data_{};
-  I2CDriver *i2c_handle_;
+  I2C_sensor_abstraction *i2c_handle_;
 
 // Low level driver functions:
   uint8_t InitVL6180X(void);
