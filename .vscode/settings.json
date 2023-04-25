@@ -5,7 +5,7 @@
         "ostream": "cpp",
         "array": "cpp",
         "chrono": "cpp",
-        "deque": "cpp",
+        "deque": "cpp",  
         "format": "cpp",
         "forward_list": "cpp",
         "initializer_list": "cpp",
