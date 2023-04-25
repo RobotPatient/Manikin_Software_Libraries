@@ -1,70 +1,88 @@
+' *******************************************************************************************
+' Copyright (c) 2023 by RobotPatient Simulators
+'
+' Authors: Thomas van den Oever and Richard Kroesen
+'
+' Permission is hereby granted, free of charge, to any person obtaining a copy
+' of this software and associated documentation files (the "Software"),
+' to deal in the Software without restriction,
+'
+' including without limitation the rights to use, copy, modify, merge, publish, distribute,
+' sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+' is furnished to do so,
+'
+' subject to the following conditions:
+'
+' The above copyright notice and this permission notice shall be included in
+' all copies or substantial portions of the Software.
+'
+' THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+' IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+' FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+'
+' IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+' DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+' ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+' OTHER DEALINGS IN THE SOFTWARE.
+' *********************************************************************************************/
+
 @startuml I2C
 
 set separator ::
 
 package Manikin_Software_Libraries <<Node>> {
+
     class TwoWire {
+        External library low-level I2C implementation.
         Holds the sercom, sda and sdl
     }
 
+
     package hal_i2c <<frame>> {
+    ' Package indicates the working directory. 
+        namespace hal::i2c {
+            class I2C_driver {
+                All TwoWire functions are wrapped here. 
+            }
 
-    namespace hal::i2c {
-        class I2CBaseMaster{
-            #ReadFrom()
-            #WriteTo()
+            enum I2CAddr {
+                SENSORHUB = 0x01
+                BREATHINGMODULE = 0x02
+            }
+
+            I2CAddr --o I2C_driver
         }
-
-        class I2CBaseSlave{
-            #WriteToMaster()
-            #ReadFromMaster()
-        }
-
-        enum I2CAddr {
-            SENSORHUB = 0x01
-            BREATHINGMODULE = 0x02
-        }
-
-        I2CAddr --o I2CBaseSlave
-        I2CAddr --o I2CBaseMaster
     }
-    }
-    TwoWire --* hal::i2c::I2CBaseSlave
-    TwoWire --* hal::i2c::I2CBaseMaster
 
     package i2c_Mainboard <<frame>> {
-    class I2CMainboard {
-        Constains implementation of I2C master
-    }
-    }
-
-    package i2c_sensorhub <<frame>> {
-    class I2CSensorhubSlaveMain {
-        Handles comunication to the MainBoard
-        Constains implementations of I2C for
-        the SensorHub In slavemode
+        class I2CMainboard {
+            NOT IMPLEMENTED, yet.
+        }
     }
 
-    class I2CSensorhubMasterSensors {
-        Handles comunication to the sensors
-        +void WriteReg(uint16_t reg, uint8_t data)
-        +void WriteReg16(uint16_t reg, uint16_t data)
-        +uint8_t ReadReg(uint16_t reg)
-        +uint16_t ReadReg16(uint16_t reg)
-    }
+    package hal_sensors <<frame>> {
+        class I2C_sensor_driver {
+            Handles comunication to the sensors.
+            +void WriteReg(uint16_t reg, uint8_t data)
+            +void WriteReg16(uint16_t reg, uint16_t data)
+            +uint8_t ReadReg(uint16_t reg)
+            +uint16_t ReadReg16(uint16_t reg)
+        }
     }
 
     package i2c_breathingmod <<frame>> {
-    class I2CBreathingModule {
-        Constains implementations of I2C for
-        the BreathingModule In slavemode
-    }
+        class I2CBreathingModule {
+            NOT IMPLEMENTED, yet.
+            Constains implementations of I2C for
+            the BreathingModule In slavemode
+        }
     }
 }
 
-hal::i2c::I2CBaseMaster --|> I2CMainboard
-hal::i2c::I2CBaseMaster --|> I2CSensorhubMasterSensors
-hal::i2c::I2CBaseSlave --|> I2CSensorhubSlaveMain
-hal::i2c::I2CBaseSlave --|> I2CBreathingModule
+' Classes Relationships.
+TwoWire --* hal::i2c::I2C_driver
+hal::i2c::I2C_driver --|> I2CMainboard
+hal::i2c::I2C_driver --|> I2C_sensor_driver
+hal::i2c::I2C_driver --|> I2CBreathingModule
 
 @enduml
