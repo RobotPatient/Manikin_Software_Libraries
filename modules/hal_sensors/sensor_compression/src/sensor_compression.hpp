@@ -34,28 +34,30 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 #ifndef SENSOR_COMPRESSION_HPP_
 #define SENSOR_COMPRESSION_HPP_
 
 #include <sensor_base.hpp>
-#include <I2C_abstraction.hpp>
+#include <I2C_sensor_driver.hpp>
 
 inline constexpr uint8_t kSensorAddr = 0x29;
 
 // Data sheet shows gain values as binary list
-enum VL6180xAlsGain {
-  kGain_20 = 0,        // Actual ALS Gain of 20
-  kGain_10,                  // Actual ALS Gain of 10.32
-  kGain_5,                   // Actual ALS Gain of 5.21
-  kGain_2_5,                 // Actual ALS Gain of 2.60
-  kGain_1_67,                // Actual ALS Gain of 1.72
-  kGain_1_25,                // Actual ALS Gain of 1.28
-  kGain_1,                   // Actual ALS Gain of 1.01
-  kGain_40,                  // Actual ALS Gain of 40
+enum VL6180xAlsGain
+{
+  kGain_20 = 0, // Actual ALS Gain of 20
+  kGain_10,     // Actual ALS Gain of 10.32
+  kGain_5,      // Actual ALS Gain of 5.21
+  kGain_2_5,    // Actual ALS Gain of 2.60
+  kGain_1_67,   // Actual ALS Gain of 1.72
+  kGain_1_25,   // Actual ALS Gain of 1.28
+  kGain_1,      // Actual ALS Gain of 1.01
+  kGain_40,     // Actual ALS Gain of 40
 };
 
-struct VL6180xIdentification {
+struct VL6180xIdentification
+{
   uint8_t id_model;
   uint8_t id_model_rev_major;
   uint8_t id_model_rev_minor;
@@ -65,26 +67,29 @@ struct VL6180xIdentification {
   uint16_t id_time;
 };
 
-class CompressionSensor : public UniversalSensor {
- public:
-  explicit CompressionSensor(I2C_sensor_abstraction *i2c_handle) : UniversalSensor(i2c_handle) {
+class CompressionSensor : public UniversalSensor
+{
+public:
+  explicit CompressionSensor(I2C_sensor_driver *i2c_handle) : UniversalSensor(i2c_handle)
+  {
     i2c_handle_ = i2c_handle;
   }
 
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
-  ~CompressionSensor() {
+  ~CompressionSensor()
+  {
     Uninitialize();
   }
 
- private:
+private:
   // Not const, because the devices requires to be changeable.
   hal::i2c::I2CAddr sensor_i2c_address_ = static_cast<const hal::i2c::I2CAddr>(kSensorAddr);
   SensorData sensor_data_{};
-  I2C_sensor_abstraction *i2c_handle_;
+  I2C_sensor_driver *i2c_handle_;
 
-// Low level driver functions:
+  // Low level driver functions:
   uint8_t InitVL6180X(void);
   void SetVL6180xDefautSettings(void);
   uint8_t GetDistance(void);
@@ -92,4 +97,4 @@ class CompressionSensor : public UniversalSensor {
   void GetIdentification(struct VL6180xIdentification *dest);
   uint8_t ChangeAddress(uint8_t old_address, uint8_t new_address);
 };
-#endif  // SENSOR_COMPRESSION_HPP_
+#endif // SENSOR_COMPRESSION_HPP_

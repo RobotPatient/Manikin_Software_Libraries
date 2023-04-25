@@ -29,15 +29,15 @@
 #include <gmock/gmock.h>
 
 #include <sensor_compression.hpp>
-#include <I2C_abstraction.hpp>
+#include <I2C_sensor_driver.hpp>
 #include <vl6180x_registers.hpp>
-#include <sensor_abstraction_mock.hpp>
+#include <Mock_I2C_sensor_driver.hpp>
 
 using ::testing::Return;
 using ::testing::InSequence;
 using ::testing::Mock;
 
-void InitVL6180xCalls(MockI2C_sensor_abstraction *i2c_handle_mock) {
+void InitVL6180xCalls(MockI2C_sensor_driver *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, send_read8_reg16b(kVl6180XSystemFreshOutOfReset))
       .WillOnce(Return(0x01));
   EXPECT_CALL(*i2c_handle_mock, write8_reg16b(0x0207, 0x01));
@@ -72,7 +72,7 @@ void InitVL6180xCalls(MockI2C_sensor_abstraction *i2c_handle_mock) {
   EXPECT_CALL(*i2c_handle_mock, write8_reg16b(0x0030, 0x00));
 }
 
-void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_abstraction *i2c_handle_mock) {
+void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_driver *i2c_handle_mock) {
   // Set GPIO1 high when sample complete
   EXPECT_CALL(*i2c_handle_mock,
               write8_reg16b(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4)));
@@ -121,7 +121,7 @@ void SetVL6180xDefaultSettingsCalls(MockI2C_sensor_abstraction *i2c_handle_mock)
 }
 
 TEST(compressionTest, initCalls) {
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
   CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(static_cast<const hal::i2c::I2CAddr>(kSensorAddr)));
   {
@@ -134,7 +134,7 @@ TEST(compressionTest, initCalls) {
 }
 
 TEST(compressionTest, GetSensorData) {
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;
   ExpectedOutput.num_of_bytes = 1;

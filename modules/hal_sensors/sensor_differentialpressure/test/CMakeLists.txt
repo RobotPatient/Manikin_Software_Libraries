@@ -6,9 +6,9 @@ set(Sources
         ${CMAKE_CURRENT_SOURCE_DIR}/../../sensor_base/src/sensor_base.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../I2C_sensor_abstraction/src/I2C_abstraction.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../I2C_sensor_abstraction/src/I2C_abstraction.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../I2C_sensor_abstraction/test/mocks/sensor_abstraction_mock.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c_sensor_driver/src/I2C_sensor_driver.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c_sensor_driver/src/I2C_sensor_driver.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c_sensor_driver/test/mocks/Mock_I2C_sensor_driver.hpp
         differentialpressure_sensor_mock_test.cc
     )
 
@@ -20,11 +20,11 @@ set_property(TARGET ${This} PROPERTY CXX_STANDARD 17)
 
 target_include_directories(${This} PUBLIC
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/
-                                          ${CMAKE_CURRENT_SOURCE_DIR}/../../I2C_sensor_abstraction/src/
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../src/
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/test/mocks/
                                           ${CMAKE_CURRENT_SOURCE_DIR}/../../sensor_base/src/
-                                          ${CMAKE_CURRENT_SOURCE_DIR}/../../I2C_sensor_abstraction/test/mocks/
+                                          ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c_sensor_driver/test/mocks/
+                                          ${CMAKE_CURRENT_SOURCE_DIR}/../../i2c_sensor_driver/src/
                         .)
 add_test(
         NAME ${This}

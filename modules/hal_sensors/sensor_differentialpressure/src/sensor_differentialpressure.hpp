@@ -24,7 +24,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
 #define SENSOR_DIFFERENTIALPRESSURE_HPP_
@@ -34,25 +34,28 @@
 inline constexpr uint8_t kSdp810I2CAddr = 0x25;
 inline constexpr uint8_t kSdp810BufferSize = 9;
 
-class DifferentialPressureSensor : public UniversalSensor {
- public:
-  explicit DifferentialPressureSensor(I2C_sensor_abstraction *I2C_handle) : UniversalSensor(I2C_handle) {
+class DifferentialPressureSensor : public UniversalSensor
+{
+public:
+  explicit DifferentialPressureSensor(I2C_sensor_driver *I2C_handle) : UniversalSensor(I2C_handle)
+  {
     i2c_handle_ = I2C_handle;
   }
 
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
-  ~DifferentialPressureSensor() {
+  ~DifferentialPressureSensor()
+  {
     Uninitialize();
   }
 
- private:
+private:
   const hal::i2c::I2CAddr kSensorI2CAddress_ = static_cast<const hal::i2c::I2CAddr>(kSdp810I2CAddr);
-  I2C_sensor_abstraction *i2c_handle_;
+  I2C_sensor_driver *i2c_handle_;
   SensorData sensor_data_{};
 
-// Low level driver functions:
+  // Low level driver functions:
   int16_t sensor_raw_;
   int16_t conversion_factor_;
   uint8_t sensor_buffer_[kSdp810BufferSize];
@@ -61,4 +64,4 @@ class DifferentialPressureSensor : public UniversalSensor {
   void ReadSdp810();
   int16_t GetRawSDP810();
 };
-#endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_
+#endif // SENSOR_DIFFERENTIALPRESSURE_HPP_

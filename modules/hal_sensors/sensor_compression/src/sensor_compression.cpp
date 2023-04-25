@@ -34,7 +34,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #include <sensor_compression.hpp>
 #include <vl6180x_registers.hpp>
@@ -43,26 +43,29 @@
 #include "Arduino.h"
 #define sleep(ms) delay(ms)
 #elif _WIN32
-#include<windows.h>
+#include <windows.h>
 #define sleep(ms) Sleep(ms)
 #else
-#define sleep(ms) usleep(1000*ms)
-#endif  // __arm__
+#define sleep(ms) usleep(1000 * ms)
+#endif // __arm__
 
-void CompressionSensor::Initialize() {
+void CompressionSensor::Initialize()
+{
   i2c_handle_->ChangeAddress(sensor_i2c_address_);
   InitVL6180X();
   SetVL6180xDefautSettings();
 }
 
-SensorData CompressionSensor::GetSensorData() {
+SensorData CompressionSensor::GetSensorData()
+{
   uint8_t distance = GetDistance();
   sensor_data_.num_of_bytes = 1;
   sensor_data_.buffer[0] = distance;
   return sensor_data_;
 }
 
-uint8_t CompressionSensor::InitVL6180X(void) {
+uint8_t CompressionSensor::InitVL6180X(void)
+{
   uint8_t data = 0;
 
   data = i2c_handle_->send_read8_reg16b(kVl6180XSystemFreshOutOfReset);
@@ -103,12 +106,13 @@ uint8_t CompressionSensor::InitVL6180X(void) {
   return 0;
 }
 
-void CompressionSensor::SetVL6180xDefautSettings(void) {
+void CompressionSensor::SetVL6180xDefautSettings(void)
+{
   // Recommended settings from datasheet
 
   // Set GPIO1 high when sample complete
   i2c_handle_->write8_reg16b(kVl6180XSystemInterruptConfigGpio,
-                        (4 << 3) | (4));
+                             (4 << 3) | (4));
 
   // Set GPIO1 high when sample complete
   i2c_handle_->write8_reg16b(kVl6180XSystemModeGpio1, 0x10);
@@ -143,7 +147,8 @@ void CompressionSensor::SetVL6180xDefautSettings(void) {
 }
 
 // Single shot mode
-uint8_t CompressionSensor::GetDistance(void) {
+uint8_t CompressionSensor::GetDistance(void)
+{
   uint8_t distance = 0;
   i2c_handle_->write8_reg16b(kVl6180XSysrangeStart, 0x01);
   sleep(10);
@@ -152,19 +157,20 @@ uint8_t CompressionSensor::GetDistance(void) {
   return distance;
 }
 
-float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
+float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain)
+{
   i2c_handle_->write8_reg16b(kVl6180XSysalsAnalogueGain, (0x40 | vl6180x_als_gain));
 
   // Start ALS Measurement
   i2c_handle_->write8_reg16b(kVl6180XSysalsStart, 0x01);
 
-  sleep(100);  // give it time...
+  sleep(100); // give it time...
 
   i2c_handle_->write8_reg16b(kVl6180XSystemInterruptClear, 0x07);
 
   // Retrieve the Raw ALS value from the sensor
   unsigned int als_raw = i2c_handle_->send_read16_reg16(kVl6180XResultAlsVal);
-  
+
   // Get Integration Period for calculation
   unsigned int als_integration_period_raw = i2c_handle_->send_read16_reg16(kVl6180XSysalsIntegrationPeriod);
   float als_integration_period = 100.0f / als_integration_period_raw;
@@ -172,23 +178,32 @@ float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
   // Calculate actual LUX from Appnotes
   float als_gain = 0.0;
 
-  switch (vl6180x_als_gain) {
-    case kGain_20: als_gain = 20.0f;
-      break;
-    case kGain_10: als_gain = 10.32f;
-      break;
-    case kGain_5: als_gain = 5.21f;
-      break;
-    case kGain_2_5: als_gain = 2.60f;
-      break;
-    case kGain_1_67: als_gain = 1.72f;
-      break;
-    case kGain_1_25: als_gain = 1.28f;
-      break;
-    case kGain_1: als_gain = 1.01f;
-      break;
-    case kGain_40: als_gain = 40.0f;
-      break;
+  switch (vl6180x_als_gain)
+  {
+  case kGain_20:
+    als_gain = 20.0f;
+    break;
+  case kGain_10:
+    als_gain = 10.32f;
+    break;
+  case kGain_5:
+    als_gain = 5.21f;
+    break;
+  case kGain_2_5:
+    als_gain = 2.60f;
+    break;
+  case kGain_1_67:
+    als_gain = 1.72f;
+    break;
+  case kGain_1_25:
+    als_gain = 1.28f;
+    break;
+  case kGain_1:
+    als_gain = 1.01f;
+    break;
+  case kGain_40:
+    als_gain = 40.0f;
+    break;
   }
 
   // Calculate LUX from formula in AppNotes
@@ -197,7 +212,8 @@ float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
   return als_calculated;
 }
 
-void CompressionSensor::GetIdentification(struct VL6180xIdentification *dest) {
+void CompressionSensor::GetIdentification(struct VL6180xIdentification *dest)
+{
   dest->id_model = i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModelId);
   dest->id_model_rev_major =
       i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModelRevMajor);
@@ -212,7 +228,8 @@ void CompressionSensor::GetIdentification(struct VL6180xIdentification *dest) {
 }
 
 uint8_t CompressionSensor::ChangeAddress(uint8_t old_address,
-                                         uint8_t new_address) {
+                                         uint8_t new_address)
+{
   // NOTICE:  IT APPEARS THAT CHANGING THE ADDRESS IS NOT STORED IN
   //          NON-VOLATILE MEMORY
   //  POWER CYCLING THE DEVICE REVERTS ADDRESS BACK TO 0X29
@@ -227,4 +244,3 @@ uint8_t CompressionSensor::ChangeAddress(uint8_t old_address,
 }
 
 void CompressionSensor::Uninitialize() {}
-

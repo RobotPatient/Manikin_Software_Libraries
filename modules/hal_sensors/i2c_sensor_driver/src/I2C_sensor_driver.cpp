@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Authors: Richard Kroesen
+ * Authors: Richard Kroesen and Victor Hogeweij
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-#include <I2C_abstraction.hpp>
+#include <I2C_sensor_driver.hpp>
 
 constexpr uint8_t GetUpperByte(uint16_t number) {
   return (number >> 8) & 0xff;
@@ -36,15 +36,15 @@ constexpr uint8_t GetLowerByte(uint16_t number) {
   return (number & 0xFF);
 }
 
-void I2C_sensor_abstraction::init_i2c_helper(void) {
+void I2C_sensor_driver::init_i2c_helper(void) {
   hal::i2c::I2C_Driver::begin();
 }
 
-void I2C_sensor_abstraction::ChangeAddress(hal::i2c::I2CAddr new_i2c_address) {
+void I2C_sensor_driver::ChangeAddress(hal::i2c::I2CAddr new_i2c_address) {
   this->set_i2c_addr(new_i2c_address);
 }
 
-void I2C_sensor_abstraction::write8_reg16b(uint16_t reg, uint8_t data) {
+void I2C_sensor_driver::write8_reg16b(uint16_t reg, uint8_t data) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
@@ -55,7 +55,7 @@ void I2C_sensor_abstraction::write8_reg16b(uint16_t reg, uint8_t data) {
   this->endTransmission();
 }
 
-void I2C_sensor_abstraction::write16_reg16b(uint16_t reg, uint16_t data) {
+void I2C_sensor_driver::write16_reg16b(uint16_t reg, uint16_t data) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
@@ -71,7 +71,7 @@ void I2C_sensor_abstraction::write16_reg16b(uint16_t reg, uint16_t data) {
   this->endTransmission(true);
 }
 
-uint8_t I2C_sensor_abstraction::send_read8_reg16b(uint16_t reg) {
+uint8_t I2C_sensor_driver::send_read8_reg16b(uint16_t reg) {
   const uint8_t kRegLowerByte = GetLowerByte(reg);
   const uint8_t kRegUpperByte = GetUpperByte(reg);
 
@@ -84,7 +84,7 @@ uint8_t I2C_sensor_abstraction::send_read8_reg16b(uint16_t reg) {
   return data;
 }
 
-uint16_t I2C_sensor_abstraction::send_read16_reg16(uint16_t reg) {
+uint16_t I2C_sensor_driver::send_read16_reg16(uint16_t reg) {
   uint8_t data_low;
   uint8_t data_high;
   uint16_t data;
@@ -103,7 +103,7 @@ uint16_t I2C_sensor_abstraction::send_read16_reg16(uint16_t reg) {
   return data;
 }
 
-void I2C_sensor_abstraction::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+void I2C_sensor_driver::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
   this->beginTransmission(this->get_i2c_addr());
   this->requestFrom(this->get_i2c_addr(), num_of_bytes, true);
   for (uint8_t i = 0; i < num_of_bytes; i++) {
@@ -112,7 +112,7 @@ void I2C_sensor_abstraction::ReadBytes(uint8_t *buffer, uint8_t num_of_bytes) {
   this->endTransmission(true);
 }
 
-void I2C_sensor_abstraction::SendBytes(uint8_t *buffer, uint8_t num_of_bytes) {
+void I2C_sensor_driver::SendBytes(uint8_t *buffer, uint8_t num_of_bytes) {
   this->beginTransmission(this->get_i2c_addr());
   this->write(buffer, num_of_bytes);
   this->endTransmission(true);

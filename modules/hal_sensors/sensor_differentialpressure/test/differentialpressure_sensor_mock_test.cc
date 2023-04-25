@@ -27,7 +27,7 @@
  ***********************************************************************************************/
 
 #include <gmock/gmock.h>
-#include <sensor_abstraction_mock.hpp>
+#include <Mock_I2C_sensor_driver.hpp>
 #include <i2c_peripheral_mock.hpp>
 
 #include <sensor_differentialpressure.hpp>
@@ -55,7 +55,7 @@ void CopyBufferToTestBuffer(uint8_t *buffer, uint8_t num_of_bytes)
 
 TEST(DifferentialPressureSensorTest, Initialize)
 {
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
 
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(static_cast<const hal::i2c::I2CAddr>(kSdp810I2CAddr)));
   DifferentialPressureSensor DiffPressSensor = DifferentialPressureSensor(&i2c_handle_mock);
@@ -71,7 +71,7 @@ TEST(DifferentialPressureSensorTest, GetSensorData)
 {
   const int kConversionFactor = arb_test_buffer[6] << (kSdp810BufferSize - 1) | arb_test_buffer[7];
   const int kSensorOutput = (arb_test_buffer[0] << (kSdp810BufferSize - 1) | arb_test_buffer[1]) / kConversionFactor;
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
 
   DifferentialPressureSensor DiffPressSensor = DifferentialPressureSensor(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, ReadBytes(_, kSdp810BufferSize)).WillOnce(Invoke(CopyExampleBufferToBuffer));

@@ -1,6 +1,6 @@
 #include <gmock/gmock.h>
 
-#include <I2C_abstraction.hpp>
+#include <I2C_sensor_driver.hpp>
 #include <i2c_peripheral_mock.hpp>
 
 using ::testing::_;
@@ -14,7 +14,7 @@ uint8_t kTestingBytes[8] = {0x10, 0x40, 0x30, 0x20, 0x10, 0xFF, 0x50, 0x01};
 TEST(I2C_sensor_test, initCallsRightMethods)
 {
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, hal::i2c::I2CAddr::NO_ADDR);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, hal::i2c::I2CAddr::NO_ADDR);
   EXPECT_CALL(*peripheralMock, begin());
   abDriver.init_i2c_helper();
 
@@ -25,7 +25,7 @@ TEST(I2CWrapperTest, write_regCallsRightMethods)
 {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0530;
@@ -52,7 +52,7 @@ TEST(I2CWrapperTest, write_reg16CallsRightMethods)
 {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0510;
@@ -82,7 +82,7 @@ TEST(I2CWrapperTest, read_regCallsRightMethods)
 {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x05;
@@ -115,7 +115,7 @@ TEST(I2CWrapperTest, read_reg16CallsRightMethods)
 {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint16_t kReg = 0x0520;
@@ -152,7 +152,7 @@ TEST(I2CWrapperTest, sendBytesCallsRightMethods)
 {
   hal::i2c::I2CAddr dummyAddr = hal::i2c::I2CAddr::kSensorHub;
   I2CPeripheralMock *peripheralMock = new I2CPeripheralMock();
-  I2C_sensor_abstraction abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
+  I2C_sensor_driver abDriver(peripheralMock, hal::i2c::I2CSpeed_t::kI2cSpeed_100KHz, dummyAddr);
 
   /* Parameters used in this test*/
   const uint8_t kRequestAmountOfBytes = 8;

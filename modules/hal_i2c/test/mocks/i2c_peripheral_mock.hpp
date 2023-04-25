@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Authors: Richard Kroesen en Victor Hogeweij
+ * Authors: Richard Kroesen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -24,7 +24,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef I2C_PERIPHERAL_MOCK_HPP_
 #define I2C_PERIPHERAL_MOCK_HPP_

@@ -63,10 +63,14 @@ package Manikin_Software_Libraries <<Node>> {
     package hal_sensors <<frame>> {
         class I2C_sensor_driver {
             Handles comunication to the sensors.
-            +void WriteReg(uint16_t reg, uint8_t data)
-            +void WriteReg16(uint16_t reg, uint16_t data)
-            +uint8_t ReadReg(uint16_t reg)
-            +uint16_t ReadReg16(uint16_t reg)
+            +virtual void init_i2c_helper();
+            +virtual void ChangeAddress(hal::i2c::I2CAddr new_i2c_address);
+            +virtual void write8_reg16b(uint16_t reg, uint8_t data);
+            +virtual void write16_reg16b(uint16_t reg, uint16_t data);
+            +virtual uint8_t send_read8_reg16b(uint16_t reg);
+            +virtual uint16_t send_read16_reg16(uint16_t reg);
+            +virtual void ReadBytes(uint8_t *buffer, uint8_t num_of_bytes);
+            +virtual void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
         }
     }
 

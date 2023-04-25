@@ -1,12 +1,12 @@
 set(This I2C_sensor_abstraction)
 
 set(Sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_abstraction.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_abstraction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_sensor_driver.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/I2C_sensor_driver.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/test/mocks/i2c_peripheral_mock.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/mocks/sensor_abstraction_mock.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/mocks/Mock_I2C_sensor_driver.hpp
         I2C_abstraction_test.cc
         )
 

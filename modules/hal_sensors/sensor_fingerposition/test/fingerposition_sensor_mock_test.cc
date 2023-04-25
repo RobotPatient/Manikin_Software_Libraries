@@ -24,20 +24,21 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #include <gmock/gmock.h>
-#include <sensor_abstraction_mock.hpp>
+#include <Mock_I2C_sensor_driver.hpp>
 #include <sensor_fingerposition.hpp>
 #include <ads7138_registers.hpp>
 
-using ::testing::Return;
+using ::testing::_;
 using ::testing::InSequence;
 using ::testing::Invoke;
 using ::testing::Mock;
-using ::testing::_;
+using ::testing::Return;
 
-constexpr uint16_t ProcessedVal(uint8_t *buffer) {
+constexpr uint16_t ProcessedVal(uint8_t *buffer)
+{
   return (buffer[0] << 4) | (buffer[1] >> 4);
 }
 
@@ -57,17 +58,20 @@ uint16_t arb_test_buffer_reindexed[8] =
 
 int buffer_index = 0;
 
-uint16_t AssembleRegister(uint8_t opcode, uint8_t regAddr) {
+uint16_t AssembleRegister(uint8_t opcode, uint8_t regAddr)
+{
   uint16_t output = regAddr | (opcode << 8);
   return output;
 }
 
-void CopyArbTestBufferToBuffer(uint8_t *buffer, uint8_t num_of_bytes) {
+void CopyArbTestBufferToBuffer(uint8_t *buffer, uint8_t num_of_bytes)
+{
   memcpy(buffer, arb_test_buffer + buffer_index, num_of_bytes);
   buffer_index += 2;
 }
 
-TEST(FingerPositionTest, initCalls) {
+TEST(FingerPositionTest, initCalls)
+{
   /* Generated Parameters*/
   const uint16_t kReg1 = AssembleRegister(kSetBit, kPinConfig);
   const uint8_t kData1 = 0x00;
@@ -78,7 +82,7 @@ TEST(FingerPositionTest, initCalls) {
   const uint16_t kReg4 = AssembleRegister(kSetBit, kSequenceConfig);
   const uint8_t kData4 = 0x01;
   /* Initialize handles and classes */
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
   FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_handle_mock);
   /* Setup mock calls */
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(static_cast<hal::i2c::I2CAddr>(kAds7138Addr)));
@@ -94,22 +98,22 @@ TEST(FingerPositionTest, initCalls) {
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
-TEST(FingerPositionTest, GetSensorData) {
+TEST(FingerPositionTest, GetSensorData)
+{
   /* Initialize handles and classes */
   const uint16_t kReg1 = AssembleRegister(kSetBit, kSequenceConfig);
   const uint8_t kData1 = 1 << 4;
   const uint16_t kReg2 = AssembleRegister(kClearBit, kSequenceConfig);
   const uint8_t kData2 = 1 << 4;
   // Initialize mocks
-  MockI2C_sensor_abstraction i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
+  MockI2C_sensor_driver i2c_handle_mock(nullptr, hal::i2c::kI2cSpeed_100KHz, hal::i2c::kNoAddr);
   FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_handle_mock);
 
   /* Setup mock calls */
   {
     InSequence seq;
     EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg1, kData1));
-    EXPECT_CALL(i2c_handle_mock, ReadBytes(_, kReadNumOfBytes)).Times(kNumOfAdcChannels)
-        .WillRepeatedly(Invoke(CopyArbTestBufferToBuffer));
+    EXPECT_CALL(i2c_handle_mock, ReadBytes(_, kReadNumOfBytes)).Times(kNumOfAdcChannels).WillRepeatedly(Invoke(CopyArbTestBufferToBuffer));
     EXPECT_CALL(i2c_handle_mock, write8_reg16b(kReg2, kData2));
   }
 
@@ -118,18 +122,22 @@ TEST(FingerPositionTest, GetSensorData) {
 
   /* Check the returned data with the preprocessed data */
   EXPECT_EQ(kNumOfSensorDataBytes, data.num_of_bytes);
-  for (uint8_t i = 0; i < kNumOfAdcChannels; i++) {
+  for (uint8_t i = 0; i < kNumOfAdcChannels; i++)
+  {
     EXPECT_EQ(arb_test_buffer_reindexed[i], data.buffer[i]);
   }
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   // ::testing::InitGoogleTest(&argc, argv);
   // if you plan to use GMock, replace the line above with
   ::testing::InitGoogleMock(&argc, argv);
 
-  if (RUN_ALL_TESTS()) {}
+  if (RUN_ALL_TESTS())
+  {
+  }
 
   // Always return zero-code and allow PlatformIO to parse results
   return 0;

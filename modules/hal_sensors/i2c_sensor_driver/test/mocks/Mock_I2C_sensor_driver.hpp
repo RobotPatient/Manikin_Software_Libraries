@@ -32,13 +32,13 @@
 #include <gmock/gmock.h>
 #include <stdint.h>
 
-#include <I2C_abstraction.hpp>
+#include <I2C_sensor_driver.hpp>
 
-class MockI2C_sensor_abstraction : public I2C_sensor_abstraction
+class MockI2C_sensor_driver : public I2C_sensor_driver
 {
 public:
-  MockI2C_sensor_abstraction(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr)
-      : I2C_sensor_abstraction(driver, speed, addr) {}
+  MockI2C_sensor_driver(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr)
+      : I2C_sensor_driver(driver, speed, addr) {}
   MOCK_METHOD(void, init_i2c_helper, (), (override));
   MOCK_METHOD(void, ChangeAddress, (hal::i2c::I2CAddr new_i2c_address), (override));
   MOCK_METHOD(void, write8_reg16b, (uint16_t reg, uint8_t data), (override));

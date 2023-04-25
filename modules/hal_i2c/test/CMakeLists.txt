@@ -1,10 +1,10 @@
 set(This i2c_wrapper_mock_test)
 
 set(Sources
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src/i2c_configs.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/i2c_driver.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/i2c_driver.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/mocks/i2c_peripheral_mock.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src/i2c_configs.hpp
         i2c_wrapper_mock_test.cc
         )
 

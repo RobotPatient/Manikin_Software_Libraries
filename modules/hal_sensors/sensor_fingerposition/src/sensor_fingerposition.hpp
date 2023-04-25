@@ -24,7 +24,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef SENSOR_FINGERPOSITION_HPP_
 #define SENSOR_FINGERPOSITION_HPP_
@@ -33,7 +33,8 @@
 
 inline constexpr uint8_t kAds7138Addr = 0x10;
 
-enum SensorMapIndex {
+enum SensorMapIndex
+{
   kLower = 5,
   kMidL = 4,
   kMidM = 3,
@@ -44,22 +45,25 @@ enum SensorMapIndex {
   kLiH = 1,
 };
 
-class FingerPositionSensor : public UniversalSensor {
- public:
-  explicit FingerPositionSensor(I2C_sensor_abstraction *i2c_handle) : UniversalSensor(i2c_handle) {
+class FingerPositionSensor : public UniversalSensor
+{
+public:
+  explicit FingerPositionSensor(I2C_sensor_driver *i2c_handle) : UniversalSensor(i2c_handle)
+  {
     i2c_handle_ = i2c_handle;
   }
 
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
-  ~FingerPositionSensor() {
+  ~FingerPositionSensor()
+  {
     Uninitialize();
   }
 
- private:
+private:
   const hal::i2c::I2CAddr kSensorI2CAddress_ = static_cast<const hal::i2c::I2CAddr>(kAds7138Addr);
-  I2C_sensor_abstraction *i2c_handle_;
+  I2C_sensor_driver *i2c_handle_;
   SensorData sensor_data_{};
 
   void initDefaultRead(void);
@@ -77,4 +81,4 @@ class FingerPositionSensor : public UniversalSensor {
   void reindexArray(uint16_t *dest, uint16_t *original);
   void getReading(uint8_t *buf);
 };
-#endif  // SENSOR_FINGERPOSITION_HPP_
+#endif // SENSOR_FINGERPOSITION_HPP_

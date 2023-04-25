@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Authors: Richard Kroesen
+ * Authors: Richard Kroesen and Victor Hogeweij
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -26,14 +26,14 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-#ifndef I2C_SENSOR_ABSTRACTION_HPP
-#define I2C_SENSOR_ABSTRACTION_HPP
+#ifndef I2C_SENSOR_DRIVER_HPP
+#define I2C_SENSOR_DRIVER_HPP
 
 #include <I2C_Driver.hpp>
 
-class I2C_sensor_abstraction : public hal::i2c::I2C_Driver {
+class I2C_sensor_driver : public hal::i2c::I2C_Driver {
  public:
-    explicit I2C_sensor_abstraction(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr) 
+    explicit I2C_sensor_driver(I2C_PERIPHERAL_T driver, hal::i2c::I2CSpeed_t speed, hal::i2c::I2CAddr addr) 
         : I2C_Driver(driver, speed, addr) {}
 
     virtual void init_i2c_helper();
@@ -49,4 +49,4 @@ class I2C_sensor_abstraction : public hal::i2c::I2C_Driver {
     virtual void SendBytes(uint8_t *buffer, uint8_t num_of_bytes);
 };
 
-#endif // I2C_SENSOR_ABSTRACTION_HPP
+#endif // I2C_SENSOR_DRIVER_HPP

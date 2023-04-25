@@ -24,7 +24,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef ADS7138_REGISTERS_HPP_
 #define ADS7138_REGISTERS_HPP_
@@ -34,16 +34,18 @@ inline constexpr uint8_t kNumOfAdcChannels = 8;
 
 // 12-bit adc, 16-bit variable is the smallest size that fits this 12-bits.
 // 16-bit is 2-bytes therefore the channels times 2
-inline constexpr const uint8_t kNumOfSensorDataBytes = 2*kNumOfAdcChannels;
+inline constexpr const uint8_t kNumOfSensorDataBytes = 2 * kNumOfAdcChannels;
 
-enum ChipRegisters {
+enum ChipRegisters
+{
   kGeneralConfig = 0x01,
   kPinConfig = 0x5,
   kSequenceConfig = 0x10,
   kAutoSeqSelChannel = 0x12,
 };
 
-enum ChipOpcodes {
+enum ChipOpcodes
+{
   kSingleRead = 0b00010000,
   kSingleWrite = 0b00001000,
   kSetBit = 0b00011000,
@@ -52,6 +54,4 @@ enum ChipOpcodes {
   kContinuousWrite = 0b00101000,
 };
 
-
-
-#endif  // ADS7138_REGISTERS_HPP_
+#endif // ADS7138_REGISTERS_HPP_
