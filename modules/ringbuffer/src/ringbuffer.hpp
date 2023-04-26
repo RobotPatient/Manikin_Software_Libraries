@@ -103,7 +103,11 @@ class RingBufferT {
    * buffer. Only use if a default value is needed
    * @param value The value to fill the buffer with.
    */
-  void fill(const T& value) { std::fill(buffer_, buffer_ + Capacity, value); }
+  void fill(const T& value) {
+    for (size_t i = 0; i < Capacity; i++) {
+      buffer_[i] = value;
+    }
+  }
 
   /**
    * @brief Get the number of items currently in the buffer.
