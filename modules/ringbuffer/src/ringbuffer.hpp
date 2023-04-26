@@ -26,7 +26,8 @@
  *OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-// #include <Arduino.h>
+#ifndef RINGBUFFER_HPP
+#define RINGBUFFER_HPP
 #include <stdio.h>
 
 /**
@@ -122,3 +123,5 @@ class RingBufferT {
   size_t tail_;
   size_t size_;
 };
+
+#endif
