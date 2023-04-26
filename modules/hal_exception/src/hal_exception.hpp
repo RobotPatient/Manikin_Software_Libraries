@@ -51,7 +51,7 @@ namespace hal::exception {
 #define THROW_RESET(message, exception_type)                                  \
   ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \
                                                  exception_type, RESET),      \
-                 exception_type, hal::exception::HARD_RESET)
+                 exception_type, hal::exception::SOFT_RESET)
 
 #define THROW_WARN(message, exception_type)                                   \
   ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \

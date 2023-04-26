@@ -31,6 +31,7 @@ namespace hal::log {
 
 void LogTransport_Serial::init() {
   if(SerialHandle_ != NULL) {
+    // We might as well notify that the logger is initiated!
     SerialHandle_->println("LOGGER INIT!");
   }
 }
@@ -76,16 +77,24 @@ void LogTransport_Serial::readLatestByte(char* buffer) {
 
 void LogTransport_Serial::setcursorpos(const uint64_t pos) {
   if(SerialHandle_ != NULL) {
+    // Aha a magic number, well, its calculated... 
+    // the base string (kVT100..) has size of: 6 characters
+    // x can't be more than 2 characters with current setting (80 columns)
+    // y can be anything.. But here its limited to one million :)
+    // The rest is slack 
     char writebuffer[20];
+    //Initialize the xpos and ypos to 0, to prevent undefined behaviour
     uint8_t xpos = 0;
     uint8_t ypos = 0;
-    if(pos > 80){
-        ypos = pos / 80;
-        xpos = pos-(ypos*80);
+    if(pos > kSERIAL_LINE_COUNT){
+        ypos = pos / kSERIAL_LINE_COUNT;
+        xpos = pos-(ypos*kSERIAL_LINE_COUNT);
     } else {
         xpos = pos;
     }
-    sprintf(writebuffer, "\033[%d;%dH",xpos,ypos);
+    // Set serial console position using VT100 codes
+    const char* kVT100SetCursorPos = "\033[%d;%dH";
+    sprintf(writebuffer, kVT100SetCursorPos, xpos,ypos);
     SerialHandle_->print(writebuffer); // set cursor to 0,0
   }
 }

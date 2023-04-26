@@ -32,23 +32,15 @@
 static hal::log::Logger* log_obj = NULL;
 #endif
 
-typedef struct {
-  volatile uint8_t event_num;
-  volatile uint8_t event_act;
-  const char* event_log_msg;
-} event;
+inline constexpr uint8_t EVENTSYS_IRQ_PRIO = 5;
+inline constexpr uint8_t EVENTSYS_CHANNEL = 0;
 
-event currEvent;
-
+// The reasoning behind the ISR:
+// The ISR has low IRQ priority...
+// This way peripherals like the SERCOMS can finish their transactions, before reset.
 void EVSYS_Handler() {
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
-  switch (currEvent.event_act) {
-    case hal::exception::HARD_RESET:
-      NVIC_SystemReset();
-      break;
-    case hal::exception::WARN:
-      break;
-  }
+  NVIC_SystemReset();
 }
 
 namespace hal::exception {
@@ -60,17 +52,21 @@ void Log(const char* msg) {
   }
 }
 
+void TriggerResetUsingISR() {
+  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | EVENTSYS_CHANNEL;
+}
+
 void Init() {
   GCLK->CLKCTRL.reg |=
       GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_ID_EVSYS_0;
   PM->APBCMASK.reg |= PM_APBCMASK_EVSYS;
   EVSYS->CTRL.reg = EVSYS_CTRL_GCLKREQ;
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
-  EVSYS->CHANNEL.reg =
-      EVSYS_CHANNEL_EDGSEL_BOTH_EDGES | EVSYS_CHANNEL_PATH_RESYNCHRONIZED | 0;
+  EVSYS->CHANNEL.reg = EVSYS_CHANNEL_EDGSEL_BOTH_EDGES |
+                       EVSYS_CHANNEL_PATH_RESYNCHRONIZED | EVENTSYS_CHANNEL;
   EVSYS->INTENSET.reg = EVSYS_INTFLAG_EVD0;
   NVIC_EnableIRQ(EVSYS_IRQn);
-  NVIC_SetPriority(EVSYS_IRQn, 2);
+  NVIC_SetPriority(EVSYS_IRQn, EVENTSYS_IRQ_PRIO);
 }
 
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
@@ -85,36 +81,37 @@ void ThrowException(const char* exception_message,
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
   Log(exception_message);
 #endif
-  event new_event = {exception_type, exception_action, exception_message};
-  currEvent = new_event;
-  EVSYS->CHANNEL.reg = EVSYS_CHANNEL_SWEVT | 0;
+  if (exception_action == SOFT_RESET) {
+    TriggerResetUsingISR();
+  }
 }
 
 void assert_warn(const char* assert_msg, bool condition) {
   if (!condition) {
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
     Log(assert_msg);
-    event new_event = {CONDITION_UNMET, WARN, assert_msg};
-    currEvent = new_event;
-    EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+#endif
   }
 }
 
 void assert_reset(const char* assert_msg, bool condition) {
   if (!condition) {
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
     Log(assert_msg);
-    event new_event = {CONDITION_UNMET, HARD_RESET, assert_msg};
-    currEvent = new_event;
-    EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+#endif
+    TriggerResetUsingISR();
   }
 }
 
 void assert_custom_action(const char* assert_msg, bool condition,
                           ExceptionAction exception_action) {
   if (!condition) {
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
     Log(assert_msg);
-    event new_event = {CONDITION_UNMET, exception_action, assert_msg};
-    currEvent = new_event;
-    EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
+#endif
+    if (exception_action == SOFT_RESET) {
+      TriggerResetUsingISR();
+    }
   }
 }
 

@@ -20,6 +20,12 @@
     [
         {
             "name":"googletest"
+        },
+        {
+            "name":"Adafruit_SPIFlash"
+        },
+        {
+            "name":"SdFat - Adafruit Fork"
         }
     ]
 }

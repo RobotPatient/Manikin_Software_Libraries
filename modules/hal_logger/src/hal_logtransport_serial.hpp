@@ -32,6 +32,8 @@
 
 namespace hal::log {
 
+inline constexpr uint8_t kSERIAL_LINE_COUNT = 80; // Standard amount of characters per column for serial.
+
 class LogTransport_Serial : public LogTransport_base {
  public:
   LogTransport_Serial(LogTransportSettings* communicationSettings)

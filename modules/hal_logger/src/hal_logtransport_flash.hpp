@@ -28,7 +28,10 @@
 #ifndef HAL_LOGTRANSPORT_FLASH_HPP
 #define HAL_LOGTRANSPORT_FLASH_HPP
 #include <hal_logtransport_base.hpp>
+
 namespace hal::log {
+// The amount of characters reserved for the filepath
+inline constexpr uint8_t kMaxFilePathSize = 100;
 
 class LogTransport_flash : public LogTransport_base {
  public:
@@ -38,7 +41,9 @@ class LogTransport_flash : public LogTransport_base {
       fatfs_ = communicationSettings->CommHandle.FlashHandle.FatHandle;
       const char* FilePath =
           communicationSettings->CommHandle.FlashHandle.FilePath;
-      memset(FilePath_, '\0', 100);
+      // We unfornately need to memset our filepath buffer.
+      // Because if we do not memset, our filepath will get garbled characters at the end :/
+      memset(FilePath_, '\0', kMaxFilePathSize); 
       memcpy(FilePath_, FilePath, strlen(FilePath));
     }
   }
@@ -58,7 +63,7 @@ class LogTransport_flash : public LogTransport_base {
   ~LogTransport_flash() { FileHandle_.close(); }
 
  private:
-  char FilePath_[100];
+  char FilePath_[kMaxFilePathSize];
   File32 FileHandle_;
   FatVolume* fatfs_;
 };
