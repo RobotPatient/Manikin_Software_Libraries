@@ -28,31 +28,48 @@
 #ifndef HAL_EVSYS_HPP
 #define HAL_EVSYS_HPP
 #include <hal_exception_config.hpp>
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
+#include <hal_log.hpp>
+#endif
 
 namespace hal::exception {
-#define ASSERT_WARN(condition)                         \
-  assert_warn((const char *)ASSEMBLE_ASSERT_MSG(__LINE__ , __FILE__, condition, WARN), condition)
+#define ASSERT_WARN(condition)                                               \
+  assert_warn(                                                               \
+      (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, WARN), \
+      condition)
 
-#define ASSERT_RESET(condition)                         \
-  assert_reset((const char *)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, RESET), condition)
+#define ASSERT_RESET(condition)                                               \
+  assert_reset(                                                               \
+      (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, RESET), \
+      condition)
 
-#define ASSERT_CUSTOM(condition, action) \
-  assert_custom_action((const char *)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, action), condition, action)
+#define ASSERT_CUSTOM(condition, action)                                       \
+  assert_custom_action(                                                        \
+      (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, action), \
+      condition, action)
 
-#define THROW_RESET(message, exception_type)                      \
-  ThrowException((const char *)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, exception_type, RESET), exception_type, hal::exception::HARD_RESET)
+#define THROW_RESET(message, exception_type)                                  \
+  ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \
+                                                 exception_type, RESET),      \
+                 exception_type, hal::exception::HARD_RESET)
 
-#define THROW_WARN(message, exception_type) \
-  ThrowException((const char *)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, exception_type, WARN), exception_type, hal::exception::WARN);
+#define THROW_WARN(message, exception_type)                                   \
+  ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \
+                                                 exception_type, WARN),       \
+                 exception_type, hal::exception::WARN);
 
-// void Init(hal::log::Logger *logger_obj);
 void Init();
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
+void attachLogger(hal::log::Logger* logger_obj);
+#endif
 void ThrowException(const char* exception_message,
-                     const ExceptionTypes exception_type, const ExceptionAction exception_action);
+                    const ExceptionTypes exception_type,
+                    const ExceptionAction exception_action);
 void assert_warn(const char* assert_msg, bool condition);
 
 void assert_reset(const char* assert_msg, bool condition);
 
-void assert_custom_action(const char* assert_msg, bool condition, const ExceptionAction exception_action);
+void assert_custom_action(const char* assert_msg, bool condition,
+                          const ExceptionAction exception_action);
 }  // namespace hal::exception
 #endif

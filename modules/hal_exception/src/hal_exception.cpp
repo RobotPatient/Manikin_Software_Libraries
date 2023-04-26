@@ -25,9 +25,12 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-#include <Arduino.h>
 #include <sam.h>
 #include <hal_exception.hpp>
+
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
+static hal::log::Logger* log_obj = NULL;
+#endif
 
 typedef struct {
   volatile uint8_t event_num;
@@ -39,23 +42,23 @@ event currEvent;
 
 void EVSYS_Handler() {
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
-  Serial.println("EVSYS_handler");
   switch (currEvent.event_act) {
     case hal::exception::HARD_RESET:
       NVIC_SystemReset();
       break;
     case hal::exception::WARN:
-      if (currEvent.event_log_msg != NULL){
-        if constexpr(hal::exception::EnableSerialLogger)
-          Serial.println(currEvent.event_log_msg);
-        if constexpr(hal::exception::EnableFlashLogger)
-          ;
-      }
       break;
   }
 }
 
 namespace hal::exception {
+
+void Log(const char* msg) {
+  if (log_obj != NULL) {
+    log_obj->printstr(msg);
+    log_obj->flush();
+  }
+}
 
 void Init() {
   GCLK->CLKCTRL.reg |=
@@ -67,13 +70,21 @@ void Init() {
       EVSYS_CHANNEL_EDGSEL_BOTH_EDGES | EVSYS_CHANNEL_PATH_RESYNCHRONIZED | 0;
   EVSYS->INTENSET.reg = EVSYS_INTFLAG_EVD0;
   NVIC_EnableIRQ(EVSYS_IRQn);
-  NVIC_SetPriority(EVSYS_IRQn, 1);
+  NVIC_SetPriority(EVSYS_IRQn, 2);
 }
+
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
+void attachLogger(hal::log::Logger* Logger_obj) {
+  log_obj = Logger_obj;
+}
+#endif
 
 void ThrowException(const char* exception_message,
                     const ExceptionTypes exception_type,
                     const ExceptionAction exception_action) {
-  //Serial.println(exception_message);
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
+  Log(exception_message);
+#endif
   event new_event = {exception_type, exception_action, exception_message};
   currEvent = new_event;
   EVSYS->CHANNEL.reg = EVSYS_CHANNEL_SWEVT | 0;
@@ -81,6 +92,7 @@ void ThrowException(const char* exception_message,
 
 void assert_warn(const char* assert_msg, bool condition) {
   if (!condition) {
+    Log(assert_msg);
     event new_event = {CONDITION_UNMET, WARN, assert_msg};
     currEvent = new_event;
     EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
@@ -89,6 +101,7 @@ void assert_warn(const char* assert_msg, bool condition) {
 
 void assert_reset(const char* assert_msg, bool condition) {
   if (!condition) {
+    Log(assert_msg);
     event new_event = {CONDITION_UNMET, HARD_RESET, assert_msg};
     currEvent = new_event;
     EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;
@@ -98,6 +111,7 @@ void assert_reset(const char* assert_msg, bool condition) {
 void assert_custom_action(const char* assert_msg, bool condition,
                           ExceptionAction exception_action) {
   if (!condition) {
+    Log(assert_msg);
     event new_event = {CONDITION_UNMET, exception_action, assert_msg};
     currEvent = new_event;
     EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | 0;

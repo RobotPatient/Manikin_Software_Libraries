@@ -25,51 +25,39 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-#ifndef HAL_LOGTRANSPORT_BASE_HPP
-#define HAL_LOGTRANSPORT_BASE_HPP
+#ifndef HAL_LOG_TRANSPORT_SERIAL_HPP
+#define HAL_LOG_TRANSPORT_SERIAL_HPP
+#include <hal_logtransport_base.hpp>
 #include <Arduino.h>
-#include <SdFat.h>
 
 namespace hal::log {
 
-typedef struct {
-  char* FilePath;
-  FatVolume* FatHandle;
-} FlashHandleType;
-
-typedef union {
-  Serial_* SerialHandle;
-  FlashHandleType FlashHandle;
-} communicationHandles;
-
-typedef union {
-  Serial_* SerialHandle;
-  File32* FlashHandle;
-} CommunicationReturnHandles;
-
-enum class communicationMethod { None, Serial, Flash };
-
-typedef struct {
-  communicationHandles CommHandle;
-  communicationMethod CommMethod;
-} LogTransportSettings;
-
-class LogTransport_base {
+class LogTransport_Serial : public LogTransport_base {
  public:
-  LogTransport_base(LogTransportSettings* communicationSettings) {}
-  virtual void init() = 0;
-  virtual void writestr(const char* str) = 0;
-  virtual void writebyte(const uint8_t byte) = 0;
-  virtual void pushbackbyte(const uint8_t byte) = 0;
-  virtual void pushbackstr(const char* str) = 0;
-  virtual void readLatestBytes(char* buffer, const uint8_t num_of_bytes) = 0;
-  virtual void readLatestByte(char* buffer) = 0;
-  virtual void setcursorpos(const uint64_t pos) = 0;
-  virtual void readbyte(char* buffer) = 0;
-  virtual void readbytes(char* buffer, uint8_t num_of_bytes) = 0;
-  virtual void flush() = 0;
-  virtual void close() = 0;
-  virtual CommunicationReturnHandles getnativehandle() = 0;
+  LogTransport_Serial(LogTransportSettings* communicationSettings)
+      : LogTransport_base(communicationSettings) {
+    if (communicationSettings->CommMethod == communicationMethod::Serial) {
+        SerialHandle_ = communicationSettings->CommHandle.SerialHandle;
+    }
+  }
+  void init();
+  void writestr(const char* str);
+  void writebyte(const uint8_t byte);
+  void pushbackbyte(const uint8_t byte);
+  void pushbackstr(const char* str);
+  void readLatestBytes(char* buffer, const uint8_t num_of_bytes);
+  void readLatestByte(char* buffer);
+  void setcursorpos(const uint64_t pos);
+  void readbyte(char* buffer);
+  void readbytes(char* buffer, uint8_t num_of_bytes);
+  void flush();
+  void close();
+  CommunicationReturnHandles getnativehandle();
+  ~LogTransport_Serial() { SerialHandle_->end(); }
+
+ private:
+ Serial_* SerialHandle_;
 };
-}  // namespace hal::log
+
+}
 #endif
