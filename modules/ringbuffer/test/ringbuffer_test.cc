@@ -81,14 +81,57 @@ TEST(RINGBUFFER, BACK) {
   EXPECT_EQ(buff.back(), 4);
 }
 
-TEST(RINGBUFFER, FLOAT) {
-  RingBufferT<float, SIZE> buff;
-  buff.push(1.5f);
-  buff.push(4.235f);
-  buff.push(5.3f);
+TEST(RINGBUFFER, READ) {
+  RingBufferT<int, SIZE> buff;
+  buff.push(1);
+  buff.push(2);
+  buff.push(3);
+  buff.push(4);
+  buff.push(5);
+  EXPECT_EQ(buff.read(), 1);
+  EXPECT_EQ(buff.read(), 2);
+  EXPECT_EQ(buff.read(), 3);
   buff.pop();
-  EXPECT_EQ(buff.front(), 4.235f);
-  EXPECT_EQ(buff.back(), 5.3f);
+  buff.push(6);
+  buff.resetRead();
+  EXPECT_EQ(buff.read(), 2);
+  EXPECT_EQ(buff.read(), 3);
+  EXPECT_EQ(buff.read(), 4);
+  EXPECT_EQ(buff.read(), 5);
+  EXPECT_EQ(buff.read(), 6);
+}
+
+TEST(RINGBUFFER, READ_WRAP_AROUND) {
+  RingBufferT<int, SIZE> buff;
+  buff.push(1);
+  buff.push(2);
+  buff.push(3);
+  buff.push(4);
+  buff.pop();
+  buff.resetRead();
+  EXPECT_EQ(buff.read(), 2);
+  EXPECT_EQ(buff.read(), 3);
+  EXPECT_EQ(buff.read(), 4);
+  EXPECT_EQ(buff.read(), 2);
+  EXPECT_EQ(buff.read(), 3);
+}
+
+TEST(RINGBUFFER, STRUCT) {
+  struct testStruct {
+    int a;
+    float b;
+  };
+  struct testStruct thisTestStruct = {1, 1.5f};
+  RingBufferT<testStruct, SIZE> buff;
+  buff.push(thisTestStruct);
+  thisTestStruct.a = 2;
+  buff.push(thisTestStruct);
+  thisTestStruct.a = 3;
+  buff.push(thisTestStruct);
+  EXPECT_EQ(buff.front().a, 1);
+  buff.pop();
+  EXPECT_EQ(buff.front().b, 1.5f);
+  EXPECT_EQ(buff.back().a, 3);
 }
 
 int main(int argc, char** argv) {
