@@ -31,8 +31,8 @@ namespace hal::log {
 
 void LogTransport_flash::init() {
   bool File_has_no_write_and_or_read_permission = !(FileHandle_.isReadable()) || !(FileHandle_.isWritable());
-  if(FileHandle_ && !File_has_no_write_and_or_read_permission) return;
-  if(FileHandle_ && File_has_no_write_and_or_read_permission){
+  if (FileHandle_ && !File_has_no_write_and_or_read_permission) return;
+  if (FileHandle_ && File_has_no_write_and_or_read_permission) {
     FileHandle_.close();
   }
   FileHandle_.close();

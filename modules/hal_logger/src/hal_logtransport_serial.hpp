@@ -27,19 +27,19 @@
 ***********************************************************************************************/
 #ifndef HAL_LOG_TRANSPORT_SERIAL_HPP
 #define HAL_LOG_TRANSPORT_SERIAL_HPP
-#include <hal_logtransport_base.hpp>
 #include <Arduino.h>
+#include <hal_logtransport_base.hpp>
 
 namespace hal::log {
 
-inline constexpr uint8_t kSERIAL_LINE_COUNT = 80; // Standard amount of characters per column for serial.
+inline constexpr uint8_t kSERIAL_LINE_COUNT = 80;  // Standard amount of characters per column for serial.
 
 class LogTransport_Serial : public LogTransport_base {
  public:
-  LogTransport_Serial(LogTransportSettings* communicationSettings)
+  explicit LogTransport_Serial(LogTransportSettings* communicationSettings)
       : LogTransport_base(communicationSettings) {
     if (communicationSettings->CommMethod == communicationMethod::Serial) {
-        SerialHandle_ = communicationSettings->CommHandle.SerialHandle;
+      SerialHandle_ = communicationSettings->CommHandle.SerialHandle;
     }
   }
   void init();
@@ -58,8 +58,16 @@ class LogTransport_Serial : public LogTransport_base {
   ~LogTransport_Serial() { SerialHandle_->end(); }
 
  private:
- Serial_* SerialHandle_;
+  Serial_* SerialHandle_;
+  /* Array used in setcursorpos
+ * Aha a magic number, well, its calculated...
+ * the base string (kVT100..) has size of: 6 characters
+ * x can't be more than 2 characters with current setting (80 columns)
+ * y can be anything.. But here its limited to one million :)
+ * The rest is slack
+ */
+  char WriteBuffer_[20];
 };
 
-}
+}  // namespace hal::log
 #endif

@@ -57,7 +57,7 @@ typedef struct {
 
 class LogTransport_base {
  public:
-  LogTransport_base(LogTransportSettings* communicationSettings) {}
+  explicit LogTransport_base(LogTransportSettings* communicationSettings) {}
  /**
   * @brief Init the logging medium
   */

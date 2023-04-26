@@ -33,7 +33,7 @@ namespace hal::log {
 
 class Logger {
  public:
-  Logger(LogTransport_base* logtransport) {
+  explicit Logger(LogTransport_base* logtransport) {
     logtransport_ = logtransport;
     // We might as well initialize the medium...
     logtransport_->init();

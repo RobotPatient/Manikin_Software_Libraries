@@ -35,7 +35,7 @@ inline constexpr uint8_t kMaxFilePathSize = 100;
 
 class LogTransport_flash : public LogTransport_base {
  public:
-  LogTransport_flash(LogTransportSettings* communicationSettings)
+  explicit LogTransport_flash(LogTransportSettings* communicationSettings)
       : LogTransport_base(communicationSettings) {
     if (communicationSettings->CommMethod == communicationMethod::Flash) {
       fatfs_ = communicationSettings->CommHandle.FlashHandle.FatHandle;
@@ -43,7 +43,7 @@ class LogTransport_flash : public LogTransport_base {
           communicationSettings->CommHandle.FlashHandle.FilePath;
       // We unfornately need to memset our filepath buffer.
       // Because if we do not memset, our filepath will get garbled characters at the end :/
-      memset(FilePath_, '\0', kMaxFilePathSize); 
+      memset(FilePath_, '\0', kMaxFilePathSize);
       memcpy(FilePath_, FilePath, strlen(FilePath));
     }
   }
