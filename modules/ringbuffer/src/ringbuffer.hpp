@@ -26,7 +26,7 @@
  *OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
- // #include <Arduino.h>
+// #include <Arduino.h>
 #include <stdio.h>
 
 /**
@@ -36,7 +36,7 @@
  */
 template <typename T, size_t Capacity>
 class RingBufferT {
-public:
+ public:
   /**
    * @brief Default constructor.
    */
@@ -51,15 +51,13 @@ public:
       // Buffer is full, overwrite oldest item
       buffer_[head_] = item;
       head_ = (head_ + 1) % Capacity;
-    }
-    else {
+    } else {
       // Buffer has space, add item to tail
       buffer_[tail_] = item;
       tail_ = (tail_ + 1) % Capacity;
       size_++;
     }
   }
-
 
   T& front() {
     if (size_ == 0) {
@@ -100,8 +98,8 @@ public:
   T operator[](const unsigned int index) const { return buffer_[index]; }
 
   /**
-   * @brief Fill the buffer with a given value. This does NOT change size of the buffer.
-   * Only use if a default value is needed
+   * @brief Fill the buffer with a given value. This does NOT change size of the
+   * buffer. Only use if a default value is needed
    * @param value The value to fill the buffer with.
    */
   void fill(const T& value) { std::fill(buffer_, buffer_ + Capacity, value); }
@@ -112,14 +110,13 @@ public:
    */
   size_t size() const { return size_; }
 
-
   /**
    * @brief Check if the buffer is empty.
    * @return true if the buffer is empty, false otherwise.
    */
   bool empty() const { return size_ == 0; }
 
-private:
+ private:
   T buffer_[Capacity];
   size_t head_;
   size_t tail_;

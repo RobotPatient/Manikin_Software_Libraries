@@ -70,7 +70,6 @@ TEST(RINGBUFFER, FRONT) {
   EXPECT_EQ(buff.front(), 1);
   buff.pop();
   EXPECT_EQ(buff.front(), 2);
-
 }
 
 TEST(RINGBUFFER, BACK) {
