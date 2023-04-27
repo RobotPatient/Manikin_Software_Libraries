@@ -53,11 +53,11 @@ enum class communicationMethod { None, Serial, Flash };
 typedef struct {
   communicationHandles CommHandle;
   communicationMethod CommMethod;
-} LogTransportSettings;
+} LoggerSettings;
 
-class LogTransport_base {
+class Logger {
  public:
-  explicit LogTransport_base(LogTransportSettings* communicationSettings) {}
+  explicit Logger(LoggerSettings* communicationSettings) {}
  /**
   * @brief Init the logging medium
   */

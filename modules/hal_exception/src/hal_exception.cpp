@@ -47,7 +47,7 @@ namespace hal::exception {
 
 void Log(const char* msg) {
   if (log_obj != NULL) {
-    log_obj->printstr(msg);
+    log_obj->pushbackstr(msg);
     log_obj->flush();
   }
 }

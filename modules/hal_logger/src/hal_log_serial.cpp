@@ -25,59 +25,59 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-#include <hal_logtransport_serial.hpp>
+#include <hal_log_serial.hpp>
 
 namespace hal::log {
 
 
 
-void LogTransport_Serial::init() {
+void SerialLogger::init() {
   if (SerialHandle_ != NULL) {
     // We might as well notify that the logger is initiated!
     SerialHandle_->println("LOGGER INIT!");
   }
 }
 
-void LogTransport_Serial::writestr(const char* str) {
+void SerialLogger::writestr(const char* str) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->println(str);
     SerialHandle_->flush();
   }
 }
 
-void LogTransport_Serial::writebyte(const uint8_t byte) {
+void SerialLogger::writebyte(const uint8_t byte) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->write(byte);
     SerialHandle_->flush();
   }
 }
 
-void LogTransport_Serial::pushbackbyte(const uint8_t byte) {
+void SerialLogger::pushbackbyte(const uint8_t byte) {
   if (SerialHandle_ != NULL) {
     writebyte(byte);
   }
 }
 
-void LogTransport_Serial::pushbackstr(const char* str) {
+void SerialLogger::pushbackstr(const char* str) {
   if (SerialHandle_ != NULL) {
     writestr(str);
   }
 }
 
-void LogTransport_Serial::readLatestBytes(char* buffer,
+void SerialLogger::readLatestBytes(char* buffer,
                                          const uint8_t num_of_bytes) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->readBytes(buffer, num_of_bytes);
   }
 }
 
-void LogTransport_Serial::readLatestByte(char* buffer) {
+void SerialLogger::readLatestByte(char* buffer) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->readBytes(buffer, 1);
   }
 }
 
-void LogTransport_Serial::setcursorpos(const uint64_t pos) {
+void SerialLogger::setcursorpos(const uint64_t pos) {
   if (SerialHandle_ != NULL) {
     memset(WriteBuffer_, '\0', sizeof(WriteBuffer_));
     // Initialize the xpos and ypos to 0, to prevent undefined behaviour
@@ -96,31 +96,31 @@ void LogTransport_Serial::setcursorpos(const uint64_t pos) {
   }
 }
 
-void LogTransport_Serial::readbyte(char* buffer) {
+void SerialLogger::readbyte(char* buffer) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->readBytes(buffer, 1);
   }
 }
 
-void LogTransport_Serial::readbytes(char* buffer, uint8_t num_of_bytes) {
+void SerialLogger::readbytes(char* buffer, uint8_t num_of_bytes) {
   if (SerialHandle_ != NULL) {
     SerialHandle_->readBytes(buffer, num_of_bytes);
   }
 }
 
-void LogTransport_Serial::flush() {
+void SerialLogger::flush() {
   if (SerialHandle_ != NULL) {
     SerialHandle_->flush();
   }
 }
 
-void LogTransport_Serial::close() {
+void SerialLogger::close() {
   if (SerialHandle_ != NULL) {
     SerialHandle_->end();
   }
 }
 
-CommunicationReturnHandles LogTransport_Serial::getnativehandle() {
+CommunicationReturnHandles SerialLogger::getnativehandle() {
   CommunicationReturnHandles handle;
   handle.SerialHandle = SerialHandle_;
   return handle;

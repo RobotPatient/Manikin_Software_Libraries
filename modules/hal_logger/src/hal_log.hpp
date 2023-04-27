@@ -1,4 +1,3 @@
-#ifndef HAL_LOG_HPP
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
@@ -26,51 +25,9 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
+#ifndef HAL_LOG_HPP
 #define HAL_LOG_HPP
-#include <hal_logtransport_base.hpp>
-
-namespace hal::log {
-
-class Logger {
- public:
-  explicit Logger(LogTransport_base* logtransport) {
-    logtransport_ = logtransport;
-    // We might as well initialize the medium...
-    logtransport_->init();
-  }
-  /**
-   * @brief Print or push_back(for memory devices) string to logging medium
-   *        
-   * @param str The string to be printed/pushed, 
-   *            THIS STRING MUST BE TERMINATED WITH '\0'
-   */
-  void printstr(const char* str);
-
-  /**
-   * @brief Print or push_back(for memory devices) byte to logging medium
-   *        
-   * @param byte The byte to be printed/pushed.
-   * 
-   */
-  void printbyte(const uint8_t byte);
-
-  /**
-   * @brief Flush the internal buffers of the logging medium
-   *        This is important when resetting the target right after printing.
-   *        Otherwise the message might not be completely written to the logging medium.
-   */
-
-  void flush();
-  /**
-   * @brief Destroy the logging medium object. 
-   *        This will flush the buffers
-   *        and close the connection to the logging medium.
-   */
-
-  void destroy();
-
- private:
-  LogTransport_base* logtransport_;
-};
-}  // namespace hal::log
+#include <hal_log_base.hpp>
+#include <hal_log_flash.hpp>
+#include <hal_log_serial.hpp>
 #endif

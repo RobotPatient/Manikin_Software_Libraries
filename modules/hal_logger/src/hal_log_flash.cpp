@@ -25,11 +25,11 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-#include <hal_logtransport_flash.hpp>
+#include <hal_log_flash.hpp>
 
 namespace hal::log {
 
-void LogTransport_flash::init() {
+void FlashLogger::init() {
   bool File_has_no_write_and_or_read_permission = !(FileHandle_.isReadable()) || !(FileHandle_.isWritable());
   if (FileHandle_ && !File_has_no_write_and_or_read_permission) return;
   if (FileHandle_ && File_has_no_write_and_or_read_permission) {
@@ -42,21 +42,21 @@ void LogTransport_flash::init() {
   }
 }
 
-void LogTransport_flash::writestr(const char* str) {
+void FlashLogger::writestr(const char* str) {
   if (FileHandle_) {
     FileHandle_.write(str);
     FileHandle_.sync();
   }
 }
 
-void LogTransport_flash::writebyte(const uint8_t byte) {
+void FlashLogger::writebyte(const uint8_t byte) {
   if (FileHandle_) {
     FileHandle_.write(byte);
     FileHandle_.sync();
   }
 }
 
-void LogTransport_flash::pushbackbyte(const uint8_t byte) {
+void FlashLogger::pushbackbyte(const uint8_t byte) {
   if (FileHandle_) {
     FileHandle_.seekEnd();
     FileHandle_.write(byte);
@@ -64,7 +64,7 @@ void LogTransport_flash::pushbackbyte(const uint8_t byte) {
   }
 }
 
-void LogTransport_flash::pushbackstr(const char* str) {
+void FlashLogger::pushbackstr(const char* str) {
   if (FileHandle_) {
     FileHandle_.seekEnd();
     FileHandle_.write(str);
@@ -72,7 +72,7 @@ void LogTransport_flash::pushbackstr(const char* str) {
   }
 }
 
-void LogTransport_flash::readLatestBytes(char* buffer,
+void FlashLogger::readLatestBytes(char* buffer,
                                          const uint8_t num_of_bytes) {
   if (FileHandle_) {
     fspos_t pos;
@@ -88,7 +88,7 @@ void LogTransport_flash::readLatestBytes(char* buffer,
   }
 }
 
-void LogTransport_flash::readLatestByte(char* buffer) {
+void FlashLogger::readLatestByte(char* buffer) {
   if (FileHandle_) {
     fspos_t pos;
     FileHandle_.fgetpos(&pos);
@@ -100,37 +100,37 @@ void LogTransport_flash::readLatestByte(char* buffer) {
   }
 }
 
-void LogTransport_flash::setcursorpos(const uint64_t pos) {
+void FlashLogger::setcursorpos(const uint64_t pos) {
   if (FileHandle_) {
     FileHandle_.seekSet(pos);
   }
 }
 
-void LogTransport_flash::readbyte(char* buffer) {
+void FlashLogger::readbyte(char* buffer) {
   if (FileHandle_) {
     FileHandle_.readBytes(buffer, 1);
   }
 }
 
-void LogTransport_flash::readbytes(char* buffer, uint8_t num_of_bytes) {
+void FlashLogger::readbytes(char* buffer, uint8_t num_of_bytes) {
   if (FileHandle_) {
     FileHandle_.readBytes(buffer, num_of_bytes);
   }
 }
 
-void LogTransport_flash::flush() {
+void FlashLogger::flush() {
   if (FileHandle_) {
     FileHandle_.flush();
   }
 }
 
-void LogTransport_flash::close() {
+void FlashLogger::close() {
   if (FileHandle_) {
     FileHandle_.close();
   }
 }
 
-CommunicationReturnHandles LogTransport_flash::getnativehandle() {
+CommunicationReturnHandles FlashLogger::getnativehandle() {
   CommunicationReturnHandles handle;
   handle.FlashHandle = &FileHandle_;
   return handle;

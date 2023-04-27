@@ -25,21 +25,26 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-#ifndef HAL_LOG_TRANSPORT_SERIAL_HPP
-#define HAL_LOG_TRANSPORT_SERIAL_HPP
-#include <Arduino.h>
-#include <hal_logtransport_base.hpp>
+#ifndef HAL_LOGTRANSPORT_FLASH_HPP
+#define HAL_LOGTRANSPORT_FLASH_HPP
+#include <hal_log_base.hpp>
 
 namespace hal::log {
+// The amount of characters reserved for the filepath
+inline constexpr uint8_t kMaxFilePathSize = 100;
 
-inline constexpr uint8_t kSERIAL_LINE_COUNT = 80;  // Standard amount of characters per column for serial.
-
-class LogTransport_Serial : public LogTransport_base {
+class FlashLogger : public Logger {
  public:
-  explicit LogTransport_Serial(LogTransportSettings* communicationSettings)
-      : LogTransport_base(communicationSettings) {
-    if (communicationSettings->CommMethod == communicationMethod::Serial) {
-      SerialHandle_ = communicationSettings->CommHandle.SerialHandle;
+  explicit FlashLogger(LoggerSettings* communicationSettings)
+      : Logger(communicationSettings) {
+    if (communicationSettings->CommMethod == communicationMethod::Flash) {
+      fatfs_ = communicationSettings->CommHandle.FlashHandle.FatHandle;
+      const char* FilePath =
+          communicationSettings->CommHandle.FlashHandle.FilePath;
+      // We unfornately need to memset our filepath buffer.
+      // Because if we do not memset, our filepath will get garbled characters at the end :/
+      memset(FilePath_, '\0', kMaxFilePathSize);
+      memcpy(FilePath_, FilePath, strlen(FilePath));
     }
   }
   void init();
@@ -55,19 +60,12 @@ class LogTransport_Serial : public LogTransport_base {
   void flush();
   void close();
   CommunicationReturnHandles getnativehandle();
-  ~LogTransport_Serial() { SerialHandle_->end(); }
+  ~FlashLogger() { FileHandle_.close(); }
 
  private:
-  Serial_* SerialHandle_;
-  /* Array used in setcursorpos
- * Aha a magic number, well, its calculated...
- * the base string (kVT100..) has size of: 6 characters
- * x can't be more than 2 characters with current setting (80 columns)
- * y can be anything.. But here its limited to one million :)
- * The rest is slack
- */
-  char WriteBuffer_[20];
+  char FilePath_[kMaxFilePathSize];
+  File32 FileHandle_;
+  FatVolume* fatfs_;
 };
-
 }  // namespace hal::log
 #endif
