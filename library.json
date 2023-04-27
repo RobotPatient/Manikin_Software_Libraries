@@ -19,9 +19,6 @@
     "dependencies":
     [
         {
-            "name":"googletest"
-        },
-        {
             "name":"Adafruit_SPIFlash"
         },
         {
