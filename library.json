@@ -15,10 +15,6 @@
         ]
     },
     "dependencies":
-    [
-        {
-            "name":"googletest"
-        }
-    ]
+    []
 }
 
