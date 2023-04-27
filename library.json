@@ -11,6 +11,8 @@
             "-I modules/hal_sensors/sensor_differentialpressure/src",
             "-I modules/hal_sensors/sensor_fingerposition/src",
             "-I modules/hal_gpio/src",
+            "-I modules/hal_logger/src",
+            "-I modules/hal_exception/src",
             "-std=gnu++17"
         ]
     },
@@ -18,6 +20,12 @@
     [
         {
             "name":"googletest"
+        },
+        {
+            "name":"Adafruit_SPIFlash"
+        },
+        {
+            "name":"SdFat - Adafruit Fork"
         }
     ]
 }
