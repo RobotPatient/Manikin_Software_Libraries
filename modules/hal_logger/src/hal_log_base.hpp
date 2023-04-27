@@ -33,7 +33,7 @@
 namespace hal::log {
 
 typedef struct {
-  char* FilePath;
+  const char* FilePath;
   FatVolume* FatHandle;
 } FlashHandle_t;
 
