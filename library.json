@@ -13,6 +13,7 @@
             "-I modules/hal_gpio/src",
             "-I modules/hal_logger/src",
             "-I modules/hal_exception/src",
+            "-I modules/usb_service_protocol/src",
             "-std=gnu++17"
         ]
     },
