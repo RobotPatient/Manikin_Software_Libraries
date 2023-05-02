@@ -8,7 +8,7 @@ inline constexpr uint8_t CMDSize = 10;
 typedef struct {
 char CMD[CMDSize];
 uint8_t NumOfArgs;
-int (*CMD_CB)(char **args, int num_of_args);
+const char* (*CMD_CB)(char **args, int num_of_args);
 }ServiceRegisters;
 
 void init(ServiceRegisters *regs, uint8_t num_of_registers);

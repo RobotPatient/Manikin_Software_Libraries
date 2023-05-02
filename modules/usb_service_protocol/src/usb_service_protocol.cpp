@@ -26,27 +26,25 @@ char* GETARG(char* input) {
   return input + 1;
 }
 
-uint8_t ValidateCMD(char* buffer) {
-  uint8_t command_recognized = 0;
+const char* EvaluateCMD(char* buffer) {
   uint8_t argNum;
   static char* args[10];
   args[0] = GETARG(buffer);
   for (uint8_t i = 0; i < NumRegisters; i++) {
     if (strcmp(registers[i].CMD, buffer) == 0) {
       argNum = 0;
-      command_recognized = 1;
       if (args[0] != NULL) {
         args[1] = GETARG(args[0]);
         Serial.println("There are more args!");
         Serial.printf("num_of_args: %d \r\n", argNum);
         Serial.printf("Arg0: %s, Arg1: %s \r\n", args[0], args[1]);
       }
-      registers[i].CMD_CB(args, argNum);
+      return registers[i].CMD_CB(args, argNum);
 
       break;
     }
   }
-  return command_recognized;
+  return "!E Command unrecognized!";
 }
 
 /* Task to be created. */
@@ -72,9 +70,7 @@ void POLL_READ(void* pvParameters) {
           Serial.print('\n');
           buffer[read_index++] = Character;
           Serial.printf("%c", Character);
-          if(!ValidateCMD(buffer)) {
-            Serial.print("!E Command unrecognized!");
-          }
+          Serial.print(EvaluateCMD(buffer));
           Serial.print('\n');
           Serial.printf("%c", Character);
           Serial.print(TERMINAL_ENTRY_CHARACTER);
