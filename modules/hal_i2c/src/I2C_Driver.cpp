@@ -78,4 +78,4 @@ void I2C_Driver::onRequest(void (*handler)(int)) {
   i2c_peripheral_->onRequest(handler);
 }
 
-}  // namespace hal::i2c
+} // namespace hal::i2c
