@@ -14,8 +14,6 @@ set(Sources
     inp_master_test.cc
 )
 
-# We need this directory, and users of our library will need it too
-
 add_executable(${This} ${Sources})
 target_link_libraries(${This}  gtest_main gmock_main)
 set_property(TARGET ${This} PROPERTY CXX_STANDARD 17)

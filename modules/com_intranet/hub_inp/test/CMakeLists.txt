@@ -8,8 +8,8 @@ set(Sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../../configs_inp/src/inp_register.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../configs_inp/src/inp_register.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../configs_inp/src/protocol_references.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/I2C_Driver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/i2c_driver.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/i2c_driver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../hal_i2c/src/i2c_configs.hpp
     inp_hub_test.cc
 )
