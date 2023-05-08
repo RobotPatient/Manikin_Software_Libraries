@@ -72,4 +72,4 @@ class I2C_Driver {
 };
 }  // namespace hal::i2c
 
-#endif // I2C_DRIVER_HPP
+#endif  // I2C_DRIVER_HPP
