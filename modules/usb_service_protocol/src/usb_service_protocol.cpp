@@ -2,64 +2,93 @@
 #include <usb_service_protocol.hpp>
 
 namespace usb_service_protocol {
+ServiceRegisters* registers = NULL;
+uint8_t NumRegisters = 0;
+
 inline constexpr char VT100_MOVE_CHARACTER_BACK_1_POS[] = "\33[2D";
 inline constexpr char TERMINAL_ENTRY_CHARACTER = '>';
 inline constexpr uint8_t BACKSPACE_ASCII_CODE = 127;
 inline constexpr uint8_t CARRIAGE_RETURN_CHARACTER = '\r';
+inline constexpr uint8_t STR_TERMINATION_CHARACTER = '\0';
+inline constexpr uint8_t SPACE_CHARACTER = ' ';
 inline constexpr int NO_NEW_CHARACTER = -1;
 inline constexpr char COMMAND_OK[] = "!OK ";
 inline constexpr char COMMAND_ERR[] = "!ERR ";
-uint8_t read_index = 0;
+inline constexpr uint8_t READ_BUFFER_SIZE = 100;
+inline constexpr uint8_t MAX_AMOUNT_OF_ARGUMENTS = 10;
 
-ServiceRegisters* registers = NULL;
-uint8_t NumRegisters = 0;
+typedef struct {
+  char* argsBuffer[MAX_AMOUNT_OF_ARGUMENTS];
+  uint8_t argNum;
+} ParsedArgs;
 
 char* GETARG(char* input) {
-  if (input == NULL)
-    return NULL;
+  if (input == NULL) return NULL;
+  // Loop over the passed in string, 
+  // till space-, termination- or carriage-return character encountered
   do {
     input++;
-  } while (*input != ' ' && *input != '\0' && *input != '\r');
-  if (*input == '\0')
-    return NULL;
-  *input = '\0';
+  } while (*input != SPACE_CHARACTER && 
+           *input != STR_TERMINATION_CHARACTER &&
+           *input != CARRIAGE_RETURN_CHARACTER);
+  // Termination char means end of the string
+  if (*input == '\0')  return NULL;
+  // The reason for inserting the STR termination char
+  // Is to force other c functions like printf to stop reading the
+  // string at the place where the space was..
+  // This way we get a nice formatted string of which we only have to
+  // save the pointers of the places in the string where arguments are saved :)
+  *input = STR_TERMINATION_CHARACTER;
+  // This is the pointer to a new possible argument, not the one we found..
   return input + 1;
 }
 
-const char* EvaluateCMD(char* buffer) {
-  uint8_t argNum;
-  static char* args[10];
-  args[0] = GETARG(buffer);
+ParsedArgs PARSEARG(char* buffer) {
+  ParsedArgs Args;
+  Args.argNum = 0;
+  Args.argsBuffer[0] = GETARG(buffer);
+  if (Args.argsBuffer[0] != NULL) {
+    for (uint8_t i = 1; i < MAX_AMOUNT_OF_ARGUMENTS; i++) {
+      Args.argsBuffer[i] = GETARG(Args.argsBuffer[i - 1]);
+      if (Args.argsBuffer[i] == NULL)
+        break;
+      else
+        Args.argNum++;
+    }
+  }
+  return Args;
+}
+
+const char* RUNCMD(char* buffer) {
+  ParsedArgs args = PARSEARG(buffer);
   for (uint8_t i = 0; i < NumRegisters; i++) {
     if (strcmp(registers[i].CMD, buffer) == 0) {
-      argNum = 0;
-      if (args[0] != NULL) {
-        args[1] = GETARG(args[0]);
-        Serial.println("There are more args!");
-        Serial.printf("num_of_args: %d \r\n", argNum);
-        Serial.printf("Arg0: %s, Arg1: %s \r\n", args[0], args[1]);
-      }
-      return registers[i].CMD_CB(args, argNum);
-
+      if (args.argNum > registers[i].NumOfArgs)
+        return "!E Too many arguments!";
+      else if (args.argNum < registers[i].NumOfArgs)
+        return "!E Too few arguments!";
+      else
+        return registers[i].CMD_CB(args.argsBuffer, args.argNum);
       break;
     }
   }
   return "!E Command unrecognized!";
 }
 
-/* Task to be created. */
 void POLL_READ(void* pvParameters) {
-  char buffer[100];
-  memset(buffer, '\0', 100);
+  uint8_t read_index = 0;
+  char buffer[READ_BUFFER_SIZE];
+  memset(buffer, '\0', READ_BUFFER_SIZE);
   Serial.print(TERMINAL_ENTRY_CHARACTER);
   for (;;) {
     int Character = Serial.read();
     if (Character != NO_NEW_CHARACTER) {
       switch (Character) {
-        case NO_NEW_CHARACTER:
+        case NO_NEW_CHARACTER: {
           break;
+        }
         case BACKSPACE_ASCII_CODE: {
-          buffer[read_index] = '\0';
+          buffer[read_index] = STR_TERMINATION_CHARACTER;
           if (read_index != 0) {
             Serial.printf("%c", Character);
             read_index--;
@@ -70,11 +99,11 @@ void POLL_READ(void* pvParameters) {
           Serial.print('\n');
           buffer[read_index++] = Character;
           Serial.printf("%c", Character);
-          Serial.print(EvaluateCMD(buffer));
+          Serial.print(RUNCMD(buffer));
           Serial.print('\n');
           Serial.printf("%c", Character);
           Serial.print(TERMINAL_ENTRY_CHARACTER);
-          memset(buffer, '\0', 100);
+          memset(buffer, STR_TERMINATION_CHARACTER, READ_BUFFER_SIZE);
           read_index = 0;
           break;
         }
