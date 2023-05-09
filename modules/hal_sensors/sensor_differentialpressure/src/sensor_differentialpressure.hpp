@@ -29,6 +29,7 @@
 #ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
 #define SENSOR_DIFFERENTIALPRESSURE_HPP_
 
+#include <i2c_driver.hpp>
 #include <sensor_base.hpp>
 
 inline constexpr uint8_t kSdp810I2CAddr = 0x25;
@@ -36,7 +37,7 @@ inline constexpr uint8_t kSdp810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
-  explicit DifferentialPressureSensor(I2C_sensor_driver* I2C_handle)
+  explicit DifferentialPressureSensor(hal::i2c::I2C_Driver* I2C_handle)
       : UniversalSensor(I2C_handle) {
     i2c_handle_ = I2C_handle;
   }
@@ -49,7 +50,7 @@ class DifferentialPressureSensor : public UniversalSensor {
  private:
   const hal::i2c::I2CAddr kSensorI2CAddress_ =
       static_cast<const hal::i2c::I2CAddr>(kSdp810I2CAddr);
-  I2C_sensor_driver* i2c_handle_;
+  hal::i2c::I2C_Driver* i2c_handle_;
   SensorData sensor_data_{};
 
   // Low level driver functions:
@@ -60,5 +61,9 @@ class DifferentialPressureSensor : public UniversalSensor {
   void BeginSDP810();
   void ReadSdp810();
   int16_t GetRawSDP810();
+
+  const void ReadBytes(uint8_t* buffer, const uint8_t num_of_bytes);
+  const void SendBytes(const uint8_t* buffer, const uint8_t num_of_bytes);
+  const void ChangeAddress(const hal::i2c::I2CAddr new_i2c_address);
 };
 #endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_

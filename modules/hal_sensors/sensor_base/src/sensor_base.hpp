@@ -29,7 +29,7 @@
 #ifndef SENSOR_BASE_HPP_
 #define SENSOR_BASE_HPP_
 
-#include <I2C_sensor_driver.hpp>
+#include <i2c_driver.hpp>
 
 typedef struct SensorData {
   uint16_t buffer[8];
@@ -38,14 +38,14 @@ typedef struct SensorData {
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(I2C_sensor_driver* i2c_handle)
+  explicit UniversalSensor(hal::i2c::I2C_Driver* i2c_handle)
       : i2c_handle_(i2c_handle) {}
   virtual void Initialize() = 0;
   virtual SensorData_t GetSensorData() = 0;
   virtual void Uninitialize() = 0;
 
  private:
-  I2C_sensor_driver* i2c_handle_;
+  hal::i2c::I2C_Driver* i2c_handle_;
 };
 
 #endif  // SENSOR_BASE_H

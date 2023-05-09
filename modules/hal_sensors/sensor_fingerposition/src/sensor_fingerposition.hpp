@@ -29,6 +29,7 @@
 #ifndef SENSOR_FINGERPOSITION_HPP_
 #define SENSOR_FINGERPOSITION_HPP_
 
+#include <i2c_driver.hpp>
 #include <sensor_base.hpp>
 
 inline constexpr uint8_t kAds7138Addr = 0x10;
@@ -46,7 +47,7 @@ enum SensorMapIndex {
 
 class FingerPositionSensor : public UniversalSensor {
  public:
-  explicit FingerPositionSensor(I2C_sensor_driver* i2c_handle)
+  explicit FingerPositionSensor(hal::i2c::I2C_Driver* i2c_handle)
       : UniversalSensor(i2c_handle) {
     i2c_handle_ = i2c_handle;
   }
@@ -59,7 +60,7 @@ class FingerPositionSensor : public UniversalSensor {
  private:
   const hal::i2c::I2CAddr kSensorI2CAddress_ =
       static_cast<const hal::i2c::I2CAddr>(kAds7138Addr);
-  I2C_sensor_driver* i2c_handle_;
+  hal::i2c::I2C_Driver* i2c_handle_;
   SensorData sensor_data_{};
 
   void initDefaultRead(void);
@@ -76,5 +77,10 @@ class FingerPositionSensor : public UniversalSensor {
   void stopReadSEQ(void);
   void reindexArray(uint16_t* dest, uint16_t* original);
   void getReading(uint8_t* buf);
+
+  const void write8_reg16b(const uint16_t reg, const uint8_t data);
+  const uint8_t send_read8_reg16b(const uint16_t reg);
+  const void ReadBytes(uint8_t* buffer, const uint8_t num_of_bytes);
+  const void ChangeAddress(const hal::i2c::I2CAddr new_i2c_address);
 };
 #endif  // SENSOR_FINGERPOSITION_HPP_

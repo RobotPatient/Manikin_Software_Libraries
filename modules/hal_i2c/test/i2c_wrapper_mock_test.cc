@@ -24,17 +24,18 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
- ***********************************************************************************************/
+***********************************************************************************************/
 
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-using ::testing::_;
+#include <i2c_driver.hpp>
+
+// No test cases, because currently it's just a wrapper.
+
 using ::testing::InSequence;
 using ::testing::Invoke;
-using ::testing::Mock;
 using ::testing::Return;
-
-// No tests for sensor base class, because it has no implementation.
 
 int main(int argc, char** argv) {
   // ::testing::InitGoogleTest(&argc, argv);

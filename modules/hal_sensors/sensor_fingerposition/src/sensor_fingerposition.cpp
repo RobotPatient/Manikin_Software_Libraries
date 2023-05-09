@@ -40,7 +40,7 @@
 #endif  // __arm__
 
 void FingerPositionSensor::Initialize() {
-  i2c_handle_->ChangeAddress(kSensorI2CAddress_);
+  this->ChangeAddress(kSensorI2CAddress_);
   initDefaultRead();
 }
 
@@ -82,22 +82,22 @@ uint16_t FingerPositionSensor::assembleRegister(uint8_t opcode,
 
 void FingerPositionSensor::writeRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kContinuousWrite, reg_addr);
-  i2c_handle_->write8_reg16b(reg, data);
+  this->write8_reg16b(reg, data);
 }
 
 void FingerPositionSensor::setRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kSetBit, reg_addr);
-  i2c_handle_->write8_reg16b(reg, data);
+  this->write8_reg16b(reg, data);
 }
 
 void FingerPositionSensor::clearRegister(uint8_t reg_addr, uint8_t data) {
   uint16_t reg = assembleRegister(kClearBit, reg_addr);
-  i2c_handle_->write8_reg16b(reg, data);
+  this->write8_reg16b(reg, data);
 }
 
 uint8_t FingerPositionSensor::getRegister(uint8_t register_addr) {
   uint16_t reg = assembleRegister(kSingleRead, register_addr);
-  return i2c_handle_->send_read8_reg16b(reg);
+  return this->send_read8_reg16b(reg);
 }
 
 void FingerPositionSensor::startReadSEQ(void) {
@@ -120,7 +120,55 @@ void FingerPositionSensor::reindexArray(uint16_t* dest, uint16_t* original) {
 }
 
 void FingerPositionSensor::getReading(uint8_t* buf) {
-  i2c_handle_->ReadBytes(buf, kReadNumOfBytes);
+  this->ReadBytes(buf, kReadNumOfBytes);
 }
 
 void FingerPositionSensor::Uninitialize() {}
+
+constexpr uint8_t GetUpperByte(uint16_t number) {
+  return (number >> 8) & 0xff;
+}
+
+constexpr uint8_t GetLowerByte(uint16_t number) {
+  return (number & 0xFF);
+}
+
+const void FingerPositionSensor::ReadBytes(uint8_t* buffer,
+                                           const uint8_t num_of_bytes) {
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->requestFrom(i2c_handle_->get_i2c_addr(), num_of_bytes, true);
+  for (uint8_t i = 0; i < num_of_bytes; i++) {
+    buffer[i] = i2c_handle_->read();
+  }
+  i2c_handle_->endTransmission(true);
+}
+
+const uint8_t FingerPositionSensor::send_read8_reg16b(const uint16_t reg) {
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(GetUpperByte(kRegUpperByte));
+  i2c_handle_->write(GetLowerByte(kRegLowerByte));
+  i2c_handle_->endTransmission(false);
+  i2c_handle_->requestFrom(i2c_handle_->get_i2c_addr(), 1, true);
+  uint8_t data = i2c_handle_->read();
+  return data;
+}
+
+const void FingerPositionSensor::write8_reg16b(const uint16_t reg,
+                                               const uint8_t data) {
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(kRegUpperByte);
+  i2c_handle_->write(kRegLowerByte);
+  i2c_handle_->write(data);
+  i2c_handle_->endTransmission();
+}
+
+const void FingerPositionSensor::ChangeAddress(
+    const hal::i2c::I2CAddr new_i2c_address) {
+  i2c_handle_->set_i2c_addr(new_i2c_address);
+}

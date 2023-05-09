@@ -50,7 +50,7 @@
 #endif  // __arm__
 
 void CompressionSensor::Initialize() {
-  i2c_handle_->ChangeAddress(sensor_i2c_address_);
+  this->ChangeAddress(sensor_i2c_address_);
   InitVL6180X();
   SetVL6180xDefautSettings();
 }
@@ -65,41 +65,41 @@ SensorData CompressionSensor::GetSensorData() {
 uint8_t CompressionSensor::InitVL6180X(void) {
   uint8_t data = 0;
 
-  data = i2c_handle_->send_read8_reg16b(kVl6180XSystemFreshOutOfReset);
+  data = this->send_read8_reg16b(kVl6180XSystemFreshOutOfReset);
 
   if (data != 1)
     return kVl6180XFailureReset;
 
-  i2c_handle_->write8_reg16b(0x0207, 0x01);
-  i2c_handle_->write8_reg16b(0x0208, 0x01);
-  i2c_handle_->write8_reg16b(0x0096, 0x00);
-  i2c_handle_->write8_reg16b(0x0097, 0xfd);
-  i2c_handle_->write8_reg16b(0x00e3, 0x00);
-  i2c_handle_->write8_reg16b(0x00e4, 0x04);
-  i2c_handle_->write8_reg16b(0x00e5, 0x02);
-  i2c_handle_->write8_reg16b(0x00e6, 0x01);
-  i2c_handle_->write8_reg16b(0x00e7, 0x03);
-  i2c_handle_->write8_reg16b(0x00f5, 0x02);
-  i2c_handle_->write8_reg16b(0x00d9, 0x05);
-  i2c_handle_->write8_reg16b(0x00db, 0xce);
-  i2c_handle_->write8_reg16b(0x00dc, 0x03);
-  i2c_handle_->write8_reg16b(0x00dd, 0xf8);
-  i2c_handle_->write8_reg16b(0x009f, 0x00);
-  i2c_handle_->write8_reg16b(0x00a3, 0x3c);
-  i2c_handle_->write8_reg16b(0x00b7, 0x00);
-  i2c_handle_->write8_reg16b(0x00bb, 0x3c);
-  i2c_handle_->write8_reg16b(0x00b2, 0x09);
-  i2c_handle_->write8_reg16b(0x00ca, 0x09);
-  i2c_handle_->write8_reg16b(0x0198, 0x01);
-  i2c_handle_->write8_reg16b(0x01b0, 0x17);
-  i2c_handle_->write8_reg16b(0x01ad, 0x00);
-  i2c_handle_->write8_reg16b(0x00ff, 0x05);
-  i2c_handle_->write8_reg16b(0x0100, 0x05);
-  i2c_handle_->write8_reg16b(0x0199, 0x05);
-  i2c_handle_->write8_reg16b(0x01a6, 0x1b);
-  i2c_handle_->write8_reg16b(0x01ac, 0x3e);
-  i2c_handle_->write8_reg16b(0x01a7, 0x1f);
-  i2c_handle_->write8_reg16b(0x0030, 0x00);
+  this->write8_reg16b(0x0207, 0x01);
+  this->write8_reg16b(0x0208, 0x01);
+  this->write8_reg16b(0x0096, 0x00);
+  this->write8_reg16b(0x0097, 0xfd);
+  this->write8_reg16b(0x00e3, 0x00);
+  this->write8_reg16b(0x00e4, 0x04);
+  this->write8_reg16b(0x00e5, 0x02);
+  this->write8_reg16b(0x00e6, 0x01);
+  this->write8_reg16b(0x00e7, 0x03);
+  this->write8_reg16b(0x00f5, 0x02);
+  this->write8_reg16b(0x00d9, 0x05);
+  this->write8_reg16b(0x00db, 0xce);
+  this->write8_reg16b(0x00dc, 0x03);
+  this->write8_reg16b(0x00dd, 0xf8);
+  this->write8_reg16b(0x009f, 0x00);
+  this->write8_reg16b(0x00a3, 0x3c);
+  this->write8_reg16b(0x00b7, 0x00);
+  this->write8_reg16b(0x00bb, 0x3c);
+  this->write8_reg16b(0x00b2, 0x09);
+  this->write8_reg16b(0x00ca, 0x09);
+  this->write8_reg16b(0x0198, 0x01);
+  this->write8_reg16b(0x01b0, 0x17);
+  this->write8_reg16b(0x01ad, 0x00);
+  this->write8_reg16b(0x00ff, 0x05);
+  this->write8_reg16b(0x0100, 0x05);
+  this->write8_reg16b(0x0199, 0x05);
+  this->write8_reg16b(0x01a6, 0x1b);
+  this->write8_reg16b(0x01ac, 0x3e);
+  this->write8_reg16b(0x01a7, 0x1f);
+  this->write8_reg16b(0x0030, 0x00);
   return 0;
 }
 
@@ -107,67 +107,67 @@ void CompressionSensor::SetVL6180xDefautSettings(void) {
   // Recommended settings from datasheet
 
   // Set GPIO1 high when sample complete
-  i2c_handle_->write8_reg16b(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4));
+  this->write8_reg16b(kVl6180XSystemInterruptConfigGpio, (4 << 3) | (4));
 
   // Set GPIO1 high when sample complete
-  i2c_handle_->write8_reg16b(kVl6180XSystemModeGpio1, 0x10);
+  this->write8_reg16b(kVl6180XSystemModeGpio1, 0x10);
 
   // Set Avg sample period
-  i2c_handle_->write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30);
+  this->write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30);
   // Set the ALS gain
-  i2c_handle_->write8_reg16b(kVl6180XSysalsAnalogueGain, 0x46);
+  this->write8_reg16b(kVl6180XSysalsAnalogueGain, 0x46);
   // Set auto calibration period
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeVhvRepeatRate, 0xFF);
+  this->write8_reg16b(kVl6180XSysrangeVhvRepeatRate, 0xFF);
   // Set ALS integration time to 100ms
-  i2c_handle_->write8_reg16b(kVl6180XSysalsIntegrationPeriod, 0x63);
+  this->write8_reg16b(kVl6180XSysalsIntegrationPeriod, 0x63);
   // perform a single temperature calibration
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeVhvRecalibrate, 0x01);
+  this->write8_reg16b(kVl6180XSysrangeVhvRecalibrate, 0x01);
 
   // Optional settings from datasheet:
   // Set default ranging inter-measurement period to 100ms
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeIntermeasurementPeriod, 0x09);
+  this->write8_reg16b(kVl6180XSysrangeIntermeasurementPeriod, 0x09);
   // Set default ALS inter-measurement period to 100ms
-  i2c_handle_->write8_reg16b(kVl6180XSysalsIntermeasurementPeriod, 0x0A);
+  this->write8_reg16b(kVl6180XSysalsIntermeasurementPeriod, 0x0A);
   // Configures interrupt on ‘New Sample Ready threshold event’
-  i2c_handle_->write8_reg16b(kVl6180XSystemInterruptConfigGpio, 0x24);
+  this->write8_reg16b(kVl6180XSystemInterruptConfigGpio, 0x24);
 
   // Additional settings defaults from community
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeMaxConvergenceTime, 0x32);
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeRangeCheckEnables, 0x10 | 0x01);
-  i2c_handle_->write16_reg16b(kVl6180XSysrangeEarlyConvergenceEstimate, 0x7B);
-  i2c_handle_->write16_reg16b(kVl6180XSysalsIntegrationPeriod, 0x64);
-  i2c_handle_->write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30);
-  i2c_handle_->write8_reg16b(kVl6180XSysalsAnalogueGain, 0x40);
-  i2c_handle_->write8_reg16b(kVl6180XFirmwareResultScaler, 0x01);
+  this->write8_reg16b(kVl6180XSysrangeMaxConvergenceTime, 0x32);
+  this->write8_reg16b(kVl6180XSysrangeRangeCheckEnables, 0x10 | 0x01);
+  this->write16_reg16b(kVl6180XSysrangeEarlyConvergenceEstimate, 0x7B);
+  this->write16_reg16b(kVl6180XSysalsIntegrationPeriod, 0x64);
+  this->write8_reg16b(kVl6180XReadoutAveragingSamplePeriod, 0x30);
+  this->write8_reg16b(kVl6180XSysalsAnalogueGain, 0x40);
+  this->write8_reg16b(kVl6180XFirmwareResultScaler, 0x01);
 }
 
 // Single shot mode
 uint8_t CompressionSensor::GetDistance(void) {
   uint8_t distance = 0;
-  i2c_handle_->write8_reg16b(kVl6180XSysrangeStart, 0x01);
+  this->write8_reg16b(kVl6180XSysrangeStart, 0x01);
   sleep(10);
-  i2c_handle_->write8_reg16b(kVl6180XSystemInterruptClear, 0x07);
-  distance = i2c_handle_->send_read8_reg16b(kVl6180XResultRangeVal);
+  this->write8_reg16b(kVl6180XSystemInterruptClear, 0x07);
+  distance = this->send_read8_reg16b(kVl6180XResultRangeVal);
   return distance;
 }
 
 float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
-  i2c_handle_->write8_reg16b(kVl6180XSysalsAnalogueGain,
+  this->write8_reg16b(kVl6180XSysalsAnalogueGain,
                              (0x40 | vl6180x_als_gain));
 
   // Start ALS Measurement
-  i2c_handle_->write8_reg16b(kVl6180XSysalsStart, 0x01);
+  this->write8_reg16b(kVl6180XSysalsStart, 0x01);
 
   sleep(100);  // give it time...
 
-  i2c_handle_->write8_reg16b(kVl6180XSystemInterruptClear, 0x07);
+  this->write8_reg16b(kVl6180XSystemInterruptClear, 0x07);
 
   // Retrieve the Raw ALS value from the sensor
-  unsigned int als_raw = i2c_handle_->send_read16_reg16(kVl6180XResultAlsVal);
+  unsigned int als_raw = this->send_read16_reg16(kVl6180XResultAlsVal);
 
   // Get Integration Period for calculation
   unsigned int als_integration_period_raw =
-      i2c_handle_->send_read16_reg16(kVl6180XSysalsIntegrationPeriod);
+      this->send_read16_reg16(kVl6180XSysalsIntegrationPeriod);
   float als_integration_period = 100.0f / als_integration_period_raw;
 
   // Calculate actual LUX from Appnotes
@@ -208,17 +208,17 @@ float CompressionSensor::GetAmbientLight(VL6180xAlsGain vl6180x_als_gain) {
 
 void CompressionSensor::GetIdentification(struct VL6180xIdentification* dest) {
   dest->id_model =
-      i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModelId);
+      this->send_read8_reg16b(kVl6180XIdentificationModelId);
   dest->id_model_rev_major =
-      i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModelRevMajor);
+      this->send_read8_reg16b(kVl6180XIdentificationModelRevMajor);
   dest->id_model_rev_minor =
-      i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModelRevMinor);
+      this->send_read8_reg16b(kVl6180XIdentificationModelRevMinor);
   dest->id_module_rev_major =
-      i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModuleRevMajor);
+      this->send_read8_reg16b(kVl6180XIdentificationModuleRevMajor);
   dest->id_module_rev_minor =
-      i2c_handle_->send_read8_reg16b(kVl6180XIdentificationModuleRevMinor);
-  dest->id_date = i2c_handle_->send_read16_reg16(kVl6180XIdentificationDate);
-  dest->id_time = i2c_handle_->send_read16_reg16(kVl6180XIdentificationTime);
+      this->send_read8_reg16b(kVl6180XIdentificationModuleRevMinor);
+  dest->id_date = this->send_read16_reg16(kVl6180XIdentificationDate);
+  dest->id_time = this->send_read16_reg16(kVl6180XIdentificationTime);
 }
 
 uint8_t CompressionSensor::ChangeAddress(uint8_t old_address,
@@ -231,9 +231,80 @@ uint8_t CompressionSensor::ChangeAddress(uint8_t old_address,
   if (new_address > 127)
     return old_address;
 
-  i2c_handle_->write8_reg16b(kVl6180Xi2CSlaveDeviceAddress, new_address);
+  this->write8_reg16b(kVl6180Xi2CSlaveDeviceAddress, new_address);
   sensor_i2c_address_ = static_cast<const hal::i2c::I2CAddr>(new_address);
-  return i2c_handle_->send_read8_reg16b(kVl6180Xi2CSlaveDeviceAddress);
+  return this->send_read8_reg16b(kVl6180Xi2CSlaveDeviceAddress);
 }
 
 void CompressionSensor::Uninitialize() {}
+
+constexpr uint8_t GetUpperByte(uint16_t number) {
+  return (number >> 8) & 0xff;
+}
+
+constexpr uint8_t GetLowerByte(uint16_t number) {
+  return (number & 0xFF);
+}
+
+const void CompressionSensor::write8_reg16b(const uint16_t reg, const uint8_t data) {
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(kRegUpperByte);
+  i2c_handle_->write(kRegLowerByte);
+  i2c_handle_->write(data);
+  i2c_handle_->endTransmission();
+}
+
+const void CompressionSensor::write16_reg16b(const uint16_t reg, const uint16_t data) {
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(kRegUpperByte);
+  i2c_handle_->write(kRegLowerByte);
+
+  uint8_t temp;
+  temp = GetUpperByte(data);
+  i2c_handle_->write(temp);
+  temp = GetLowerByte(data);
+  i2c_handle_->write(temp);
+  i2c_handle_->endTransmission(true);
+}
+
+const uint8_t CompressionSensor::send_read8_reg16b(const uint16_t reg) {
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(GetUpperByte(kRegUpperByte));
+  i2c_handle_->write(GetLowerByte(kRegLowerByte));
+  i2c_handle_->endTransmission(false);
+  i2c_handle_->requestFrom(i2c_handle_->get_i2c_addr(), 1, true);
+  uint8_t data = i2c_handle_->read();
+  return data;
+}
+
+const uint16_t CompressionSensor::send_read16_reg16(const uint16_t reg) {
+  uint8_t data_low;
+  uint8_t data_high;
+  uint16_t data;
+
+  const uint8_t kRegLowerByte = GetLowerByte(reg);
+  const uint8_t kRegUpperByte = GetUpperByte(reg);
+
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(kRegUpperByte);
+  i2c_handle_->write(kRegLowerByte);
+  i2c_handle_->endTransmission(false);
+  i2c_handle_->requestFrom(i2c_handle_->get_i2c_addr(), 2, true);
+  data_high = i2c_handle_->read();
+  data_low = i2c_handle_->read();
+  data = (data_high << 8) | data_low;
+  return data;
+}
+
+const void CompressionSensor::ChangeAddress(const hal::i2c::I2CAddr new_i2c_address) {
+  i2c_handle_->set_i2c_addr(new_i2c_address);
+}

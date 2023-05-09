@@ -26,7 +26,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-#include <I2C_Driver.hpp>
+#include <i2c_driver.hpp>
 
 namespace hal::i2c {
 

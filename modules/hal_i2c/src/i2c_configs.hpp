@@ -48,19 +48,6 @@ enum I2CAddr : uint8_t {
   kSensorHub = 2
 };
 
-/// @brief error codes for i2c, should be extention of existing error handler
-/// enum
-enum ErrorCode {
-  SUCCESS,
-  ZERO_BYTES_WRITTEN,
-  NOT_ENOUGH_BUFFER_SPACE,
-  EOT_DATA_TOO_LONG,
-  EOT_NACK_ADDRESS,
-  EOT_NACK_DATA,
-  EOT_OTHER_ERROR,
-  EOT_ERROR_UNKNOWN
-};
-
 /// @brief Possible speed to use for the I2C protocol
 typedef enum I2CSpeed {
   kI2cSpeed_100KHz = 100000,
