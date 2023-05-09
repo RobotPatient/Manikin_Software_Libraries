@@ -30,7 +30,6 @@
 
 #include <sensor_compression.hpp>
 #include <vl6180x_registers.hpp>
-#include <i2c_peripheral_mock.hpp>
 
 using ::testing::InSequence;
 using ::testing::Mock;
