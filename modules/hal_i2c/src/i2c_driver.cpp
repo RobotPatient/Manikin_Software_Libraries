@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Authors: Richard Kroesen en Victor Hogeweij
+ * Authors: Richard Kroesen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -26,32 +26,56 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
-#ifndef ADS7138_REGISTERS_HPP_
-#define ADS7138_REGISTERS_HPP_
+#include <i2c_driver.hpp>
 
-#include <stdint.h>
+namespace hal::i2c {
 
-inline constexpr uint8_t kReadNumOfBytes = 2;
-inline constexpr uint8_t kNumOfAdcChannels = 8;
+void I2C_Driver::begin() {
+  i2c_peripheral_->begin();
+}
 
-// 12-bit adc, 16-bit variable is the smallest size that fits this 12-bits.
-// 16-bit is 2-bytes therefore the channels times 2
-inline constexpr const uint8_t kNumOfSensorDataBytes = 2 * kNumOfAdcChannels;
+void I2C_Driver::begin(uint8_t adddress) {
+  i2c_peripheral_->begin(adddress);
+}
 
-enum ChipRegisters {
-  kGeneralConfig = 0x01,
-  kPinConfig = 0x5,
-  kSequenceConfig = 0x10,
-  kAutoSeqSelChannel = 0x12,
-};
+uint8_t I2C_Driver::requestFrom(uint8_t address, size_t size, bool stopBit) {
+  return i2c_peripheral_->requestFrom(address, size, stopBit);
+}
 
-enum ChipOpcodes {
-  kSingleRead = 0b00010000,
-  kSingleWrite = 0b00001000,
-  kSetBit = 0b00011000,
-  kClearBit = 0b00100000,
-  kContinuousRead = 0b00110000,
-  kContinuousWrite = 0b00101000,
-};
+void I2C_Driver::beginTransmission(uint8_t address) {
+  i2c_peripheral_->beginTransmission(address);
+}
 
-#endif  // ADS7138_REGISTERS_HPP_
+uint8_t I2C_Driver::endTransmission(bool stopBit) {
+  return i2c_peripheral_->endTransmission(stopBit);
+}
+
+void I2C_Driver::write(uint8_t data) {
+  i2c_peripheral_->write(data);
+}
+
+void I2C_Driver::write(const uint8_t* data, size_t size) {
+  i2c_peripheral_->write(data, size);
+}
+
+size_t I2C_Driver::available() {
+  return i2c_peripheral_->available();
+}
+
+uint8_t I2C_Driver::read() {
+  return i2c_peripheral_->read();
+}
+
+void I2C_Driver::setClock(uint32_t clockFrequency) {
+  i2c_peripheral_->setClock(clockFrequency);
+}
+
+void I2C_Driver::onReceive(void (*handler)(int)) {
+  i2c_peripheral_->onReceive(handler);
+}
+
+void I2C_Driver::onRequest(void (*handler)(int)) {
+  i2c_peripheral_->onRequest(handler);
+}
+
+}  // namespace hal::i2c

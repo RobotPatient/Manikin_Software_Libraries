@@ -24,10 +24,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef SDP810_REGISTERS_HPP_
 #define SDP810_REGISTERS_HPP_
+
+#include <stdint.h>
 
 inline constexpr uint8_t kSdp810BytesToReturn = 2;
 inline constexpr uint8_t kSdp810InitCmdSize = 2;

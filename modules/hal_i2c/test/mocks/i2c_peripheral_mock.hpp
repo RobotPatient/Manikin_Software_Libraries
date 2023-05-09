@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Authors: Richard Kroesen en Victor Hogeweij
+ * Authors: Richard Kroesen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -24,32 +24,33 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
-#ifndef I2C_HELPER_HPP_
-#define I2C_HELPER_HPP_
-
-#include <gmock/gmock.h>
+#ifndef I2C_PERIPHERAL_MOCK_HPP_
+#define I2C_PERIPHERAL_MOCK_HPP_
+#ifndef __arm__
 #include <stdint.h>
-#include <i2c_peripheral_mock.hpp>
+#include <string.h>
+#include "gmock/gmock.h"  // Brings in Google Mock.
 
-#define I2C_PERIPHERAL_T I2CPeripheralMock*
-
-typedef enum {
-  kI2cSpeed_100KHz = 100000, kI2cSpeed_400KHz = 400000,
-} I2CSpeed;
-
-class I2CDriver {
+class I2CPeripheralMock {
  public:
-  MOCK_METHOD(void, Init, ());
-  MOCK_METHOD(void, WriteReg, (uint16_t reg, uint8_t data));
-  MOCK_METHOD(void, WriteReg16, (uint16_t reg, uint16_t data));
-  MOCK_METHOD(uint8_t, ReadReg, (uint16_t reg));
-  MOCK_METHOD(uint16_t, ReadReg16, (uint16_t reg));
-  MOCK_METHOD(void, ReadBytes, (uint8_t * buffer, uint8_t num_of_bytes));
-  MOCK_METHOD(void, SendBytes, (uint8_t * buffer, uint8_t num_of_bytes));
-  MOCK_METHOD(void, ChangeAddress, (uint8_t new_i2c_address));
-  MOCK_METHOD(void, constructor_called, (I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, uint8_t i2c_addr));
+  MOCK_METHOD0(begin, void());
+  MOCK_METHOD1(begin, void(uint8_t address));
+  MOCK_METHOD1(beginTransmission, void(uint8_t address));
+  MOCK_METHOD1(write, size_t(uint8_t ucData));
+  MOCK_METHOD2(write, size_t(const uint8_t* data, size_t quantity));
+  MOCK_METHOD0(endTransmission, void());
+  MOCK_METHOD2(requestFrom, uint8_t(uint8_t address, size_t quantity));
+  MOCK_METHOD2(readBytes, size_t(uint8_t* buffer, size_t length));
+  MOCK_METHOD0(read, int());
+  MOCK_METHOD0(available, size_t());
+  MOCK_METHOD3(requestFrom,
+               uint8_t(uint8_t address, size_t quantity, bool stopBit));
+  MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
+  MOCK_METHOD1(setClock, void(uint32_t clockFrequency));
+  MOCK_METHOD1(onReceive, void(void (*handler)(int)));
+  MOCK_METHOD1(onRequest, void(void (*handler)(int)));
 };
-
-#endif  // I2C_HELPER_HPP_
+#endif  // __arm__
+#endif  // I2C_PERIPHERAL_MOCK_HPP_

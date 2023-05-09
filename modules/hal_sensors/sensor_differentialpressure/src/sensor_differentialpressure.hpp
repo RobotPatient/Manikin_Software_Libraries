@@ -24,11 +24,12 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef SENSOR_DIFFERENTIALPRESSURE_HPP_
 #define SENSOR_DIFFERENTIALPRESSURE_HPP_
 
+#include <i2c_driver.hpp>
 #include <sensor_base.hpp>
 
 inline constexpr uint8_t kSdp810I2CAddr = 0x25;
@@ -36,23 +37,23 @@ inline constexpr uint8_t kSdp810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
-  explicit DifferentialPressureSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
+  explicit DifferentialPressureSensor(hal::i2c::I2C_Driver* I2C_handle)
+      : UniversalSensor(I2C_handle) {
     i2c_handle_ = I2C_handle;
   }
 
   void Initialize() override;
   SensorData GetSensorData() override;
   void Uninitialize() override;
-  ~DifferentialPressureSensor() {
-    Uninitialize();
-  }
+  ~DifferentialPressureSensor() { Uninitialize(); }
 
  private:
-  const uint8_t kSensorI2CAddress_ = kSdp810I2CAddr;
-  I2CDriver *i2c_handle_;
+  const hal::i2c::I2CAddr kSensorI2CAddress_ =
+      static_cast<const hal::i2c::I2CAddr>(kSdp810I2CAddr);
+  hal::i2c::I2C_Driver* i2c_handle_;
   SensorData sensor_data_{};
 
-// Low level driver functions:
+  // Low level driver functions:
   int16_t sensor_raw_;
   int16_t conversion_factor_;
   uint8_t sensor_buffer_[kSdp810BufferSize];
@@ -60,5 +61,9 @@ class DifferentialPressureSensor : public UniversalSensor {
   void BeginSDP810();
   void ReadSdp810();
   int16_t GetRawSDP810();
+
+  const void ReadBytes(uint8_t* buffer, const uint8_t num_of_bytes);
+  const void SendBytes(const uint8_t* buffer, const uint8_t num_of_bytes);
+  const void ChangeAddress(const hal::i2c::I2CAddr new_i2c_address);
 };
 #endif  // SENSOR_DIFFERENTIALPRESSURE_HPP_

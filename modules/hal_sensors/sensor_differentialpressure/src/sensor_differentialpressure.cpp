@@ -24,13 +24,13 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
-#include <sensor_differentialpressure.hpp>
 #include <sdp810_registers.hpp>
+#include <sensor_differentialpressure.hpp>
 
 void DifferentialPressureSensor::Initialize() {
-  i2c_handle_->ChangeAddress(kSensorI2CAddress_);
+  this->ChangeAddress(kSensorI2CAddress_);
   BeginSDP810();
 }
 
@@ -44,16 +44,39 @@ SensorData DifferentialPressureSensor::GetSensorData() {
 void DifferentialPressureSensor::BeginSDP810() {
   uint8_t init_message[kSdp810InitCmdSize] = {kContMassFlowAvgMsb,
                                               kContMassFlowAvgLsb};
-  i2c_handle_->SendBytes(init_message, kSdp810InitCmdSize);
+  this->SendBytes(init_message, kSdp810InitCmdSize);
 }
 
 void DifferentialPressureSensor::ReadSdp810() {
-  i2c_handle_->ReadBytes(sensor_buffer_, kSdp810BufferSize);
+  this->ReadBytes(sensor_buffer_, kSdp810BufferSize);
 
-  conversion_factor_ = (sensor_buffer_[6] << (kSdp810BufferSize - 1) | sensor_buffer_[7]);
-  sensor_raw_ = (sensor_buffer_[0] << (kSdp810BufferSize - 1) | sensor_buffer_[1]);
+  conversion_factor_ =
+      (sensor_buffer_[6] << (kSdp810BufferSize - 1) | sensor_buffer_[7]);
+  sensor_raw_ =
+      (sensor_buffer_[0] << (kSdp810BufferSize - 1) | sensor_buffer_[1]);
   sensor_raw_ = (sensor_raw_ / conversion_factor_);
 }
 
 void DifferentialPressureSensor::Uninitialize() {}
 
+const void DifferentialPressureSensor::ReadBytes(uint8_t* buffer,
+                                                 const uint8_t num_of_bytes) {
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->requestFrom(i2c_handle_->get_i2c_addr(), num_of_bytes, true);
+  for (uint8_t i = 0; i < num_of_bytes; i++) {
+    buffer[i] = i2c_handle_->read();
+  }
+  i2c_handle_->endTransmission(true);
+}
+
+const void DifferentialPressureSensor::SendBytes(const uint8_t* buffer,
+                                                 const uint8_t num_of_bytes) {
+  i2c_handle_->beginTransmission(i2c_handle_->get_i2c_addr());
+  i2c_handle_->write(buffer, num_of_bytes);
+  i2c_handle_->endTransmission(true);
+}
+
+const void DifferentialPressureSensor::ChangeAddress(
+    const hal::i2c::I2CAddr new_i2c_address) {
+  i2c_handle_->set_i2c_addr(new_i2c_address);
+}

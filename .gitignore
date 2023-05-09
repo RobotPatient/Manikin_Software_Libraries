@@ -33,3 +33,7 @@
 build/
 .idea/
 cmake-build-debug/
+
+# VS code 
+.vscode/
+.clang-format

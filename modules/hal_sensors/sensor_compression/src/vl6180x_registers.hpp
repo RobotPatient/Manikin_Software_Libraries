@@ -24,7 +24,7 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-***********************************************************************************************/
+ ***********************************************************************************************/
 
 #ifndef SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_
 #define SENSOR_COMPRESSION_VL6180X_REGISTERS_HPP_
