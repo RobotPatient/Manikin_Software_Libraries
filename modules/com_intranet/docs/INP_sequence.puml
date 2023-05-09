@@ -1,0 +1,10 @@
+@startuml "Sequence Example"
+participant Mainboard as MB
+actor       Hub       as HUB
+entity      Sensors   as SENS
+
+MB -> HUB : Read register(reg_addr)
+HUB <-> SENS : Registers updates.
+HUB -> MB : Register value response.
+
+@enduml
