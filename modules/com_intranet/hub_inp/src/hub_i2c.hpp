@@ -45,7 +45,7 @@ class HubCommunication {
   static hal::i2c::I2C_Driver* i2c_peripheral_;
   static HubRegisters hubRegs_;
   static void receiveEvent(int rxBytes);
-  static void requestEvent(int rxBytes);
+  static void requestEvent(void);
 };
 
 #endif  // HUB_I2C_HPP

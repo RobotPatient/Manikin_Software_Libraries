@@ -59,7 +59,7 @@ class I2C_Driver {
   uint8_t read();
   void setClock(uint32_t clockFrequency);
   void onReceive(void (*handler)(int));
-  void onRequest(void (*handler)(int));
+  void onRequest(void (*handler)(void));
 
   I2CAddr get_i2c_addr() { return slave_addr_; }
 

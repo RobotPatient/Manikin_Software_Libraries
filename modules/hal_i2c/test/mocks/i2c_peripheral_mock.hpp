@@ -50,7 +50,7 @@ class I2CPeripheralMock {
   MOCK_METHOD1(endTransmission, uint8_t(bool stopBit));
   MOCK_METHOD1(setClock, void(uint32_t clockFrequency));
   MOCK_METHOD1(onReceive, void(void (*handler)(int)));
-  MOCK_METHOD1(onRequest, void(void (*handler)(int)));
+  MOCK_METHOD1(onRequest, void(void (*handler)(void)));
 };
 #endif  // __arm__
 #endif  // I2C_PERIPHERAL_MOCK_HPP_

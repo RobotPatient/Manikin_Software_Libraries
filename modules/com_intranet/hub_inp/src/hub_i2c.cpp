@@ -50,7 +50,7 @@ void HubCommunication::receiveEvent(int rxBytes) {
   }
 }
 
-void HubCommunication::requestEvent(int rxBytes) {
+void HubCommunication::requestEvent(void) {
   uint8_t registerAddress = i2c_peripheral_->read();
   uint8_t val = HubCommunication::hubRegs_.read_register(
       static_cast<RegisterAddress_t>(registerAddress));

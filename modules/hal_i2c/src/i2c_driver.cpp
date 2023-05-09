@@ -74,7 +74,7 @@ void I2C_Driver::onReceive(void (*handler)(int)) {
   i2c_peripheral_->onReceive(handler);
 }
 
-void I2C_Driver::onRequest(void (*handler)(int)) {
+void I2C_Driver::onRequest(void (*handler)(void)) {
   i2c_peripheral_->onRequest(handler);
 }
 
