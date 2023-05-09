@@ -40,12 +40,14 @@
 #endif
 
 namespace hal::i2c {
-/// @brief List of addresses for the I2C slaves. Add more if needed
+/// @brief List of addresses for the I2C slaves.
 enum I2CAddr : uint8_t {
-  NO_ADDR,
   kNoAddr = 0,
-  kBreathingModule = 1,
-  kSensorHub = 2
+  kSensorHubOne,
+  kSensorHubTwo,
+  kSensorHubThree,
+  kBreathingModule,
+  kActuatorHub,
 };
 
 /// @brief Possible speed to use for the I2C protocol

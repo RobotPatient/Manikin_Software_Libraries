@@ -28,10 +28,10 @@
 
 #include <hub_i2c.hpp>
 
-HubRegisters HubCommunication::hubRegs_(3);
+HubRegisters HubCommunication::hubRegs_(REGISTERS_AMOUNT);
 hal::i2c::I2C_Driver* HubCommunication::i2c_peripheral_ = nullptr;
 
-void HubCommunication::init(SlavesAddress_t slave) {
+void HubCommunication::init(hal::i2c::I2CAddr slave) {
   i2c_peripheral_->begin(slave);
   i2c_peripheral_->onReceive(receiveEvent);
   i2c_peripheral_->onRequest(requestEvent);

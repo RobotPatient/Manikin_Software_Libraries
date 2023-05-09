@@ -33,12 +33,14 @@
 #include <hub_registers.hpp>
 #include <i2c_driver.hpp>
 
+#define REGISTERS_AMOUNT 3
+
 class HubCommunication {
  public:
   HubCommunication() {}
   ~HubCommunication() {}
 
-  void init(SlavesAddress_t slave);
+  void init(hal::i2c::I2CAddr slave);
   static void setI2CPeripheral(hal::i2c::I2C_Driver* i2c_peripheral);
 
  private:

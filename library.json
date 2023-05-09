@@ -6,6 +6,8 @@
         "flags": [
             "-I modules/hal_i2c/src",
             "-I modules/hal_spi/src",
+            "-I modules/com_intranet/hub_inp/src",
+            "-I modules/com_intranet/configs_inp/src",
             "-I modules/hal_sensors/sensor_base/src",
             "-I modules/hal_sensors/sensor_compression/src",
             "-I modules/hal_sensors/sensor_differentialpressure/src",

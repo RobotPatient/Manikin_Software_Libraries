@@ -36,9 +36,6 @@ typedef enum RegisterAddress {
   STATUS_REG,
 } RegisterAddress_t;
 
-/// @brief Hubs start at 0x30.
-typedef enum SlavesAddress { HUB_ONE = 0x30, HUB_TWO } SlavesAddress_t;
-
 typedef enum AccessTypes { READ_ONLY, WRITE_ONLY, READ_WRITE } AccessTypes_t;
 
 #endif  // PROTOCOL_REFERENCES_HPP

@@ -31,6 +31,7 @@
 
 #include <hub_i2c.hpp>
 #include <i2c_driver.hpp>
+#include <i2c_configs.hpp>
 #include <i2c_peripheral_mock.hpp>
 
 using ::testing::InSequence;
@@ -44,7 +45,7 @@ TEST(INP_Hub_test, initialization) {
       &i2c_per, hal::i2c::kI2cSpeed_100KHz, hal::i2c::I2CAddr::kNoAddr);
   HubCommunication hub;
   HubCommunication::setI2CPeripheral(mockDriver);
-  SlavesAddress_t dummySlaveAddr = HUB_ONE;
+  hal::i2c::I2CAddr dummySlaveAddr = hal::i2c::kSensorHubOne;
 
   EXPECT_CALL(i2c_per, begin(dummySlaveAddr));
   EXPECT_CALL(i2c_per, onReceive(testing::_));
