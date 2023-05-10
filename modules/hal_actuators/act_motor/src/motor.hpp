@@ -26,14 +26,24 @@
  *OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
 
+#ifndef MOTOR_HPP
+#define MOTOR_HPP
+
+// #include <gpio.hpp>
+
 namespace actuator {
 
 class Motor {
  public:
-  Motor();
+  Motor(uint8_t motorPin) : motorPin_(motorPin) {}
   ~Motor();
 
+  void startRotate(uint16_t pwm);
+  void stopRotate();
+
  private:
+  uint8_t motorPin_;
 };
 
 }  // namespace actuator
+#endif
