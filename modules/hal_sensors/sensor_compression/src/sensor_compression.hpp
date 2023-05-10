@@ -67,11 +67,7 @@ struct VL6180xIdentification {
 
 class CompressionSensor : public UniversalSensor {
  public:
-  explicit CompressionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
-    i2c_handle_ = i2c_handle;
-  }
-  explicit CompressionSensor() : UniversalSensor() {}
-
+  CompressionSensor() : UniversalSensor() {}
   void Initialize(I2CDriver* handle) override;
   const uint8_t GetSensorType() override {
     return SensorType_;

@@ -40,8 +40,7 @@ typedef struct SensorData {
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(){}
-  explicit UniversalSensor(I2CDriver *i2c_handle) {}
+  UniversalSensor() {}
   virtual void Initialize(I2CDriver* handle) = 0;
   virtual SensorData_t GetSensorData() = 0;
   virtual const uint8_t GetSensorType() = 0;
