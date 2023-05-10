@@ -33,15 +33,15 @@ void DifferentialPressureSensor::Initialize(I2CDriver* handle) {
   i2c_handle_ = handle;
   i2c_handle_->ChangeAddress(kSensorI2CAddress_);
   BeginSDP810();
-  sensor_data_.SampleNum = 0;
+  sensor_data_.sample_num = 0;
 }
 
 SensorData DifferentialPressureSensor::GetSensorData() {
   ReadSdp810();
   sensor_data_.num_of_bytes = kSdp810BytesToReturn;
   sensor_data_.buffer[0] = sensor_raw_;
-  sensor_data_.SampleNum++;
-  sensor_data_.SensorID = 0x02;
+  sensor_data_.sample_num++;
+  sensor_data_.sensor_id = 0x02;
   return sensor_data_;
 }
 

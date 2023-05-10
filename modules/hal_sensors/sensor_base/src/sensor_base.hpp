@@ -32,8 +32,8 @@
 #include <i2c_helper.hpp>
 
 typedef struct SensorData {
-  uint16_t SampleNum;
-  uint8_t SensorID;
+  uint16_t sample_num;
+  uint8_t sensor_id;
   uint16_t buffer[8];
   uint8_t num_of_bytes;
 } SensorData_t;
