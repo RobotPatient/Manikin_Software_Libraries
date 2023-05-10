@@ -70,8 +70,12 @@ class CompressionSensor : public UniversalSensor {
   explicit CompressionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
     i2c_handle_ = i2c_handle;
   }
+  explicit CompressionSensor() : UniversalSensor() {}
 
-  void Initialize() override;
+  void Initialize(I2CDriver* handle) override;
+  const uint8_t GetSensorType() override {
+    return SensorType_;
+  }
   SensorData GetSensorData() override;
   void Uninitialize() override;
   ~CompressionSensor() {
@@ -79,6 +83,7 @@ class CompressionSensor : public UniversalSensor {
   }
 
  private:
+  const uint8_t SensorType_ = 0x01;
   uint8_t sensor_i2c_address_ = kSensorAddr;
   SensorData sensor_data_{};
   I2CDriver *i2c_handle_;

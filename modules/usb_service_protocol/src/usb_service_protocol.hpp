@@ -1,4 +1,5 @@
-#ifndef USB_SERVICE_PROTOCOL
+#ifndef USB_SERVICE_PROTOCOL_HPP
+#define USB_SERVICE_PROTOCOL_HPP
 #include <FreeRTOS.h>
 #include <task.h>
 namespace usb_service_protocol {
@@ -8,6 +9,7 @@ inline constexpr uint8_t CMDSize = 10;
 typedef struct {
 char CMD[CMDSize];
 uint8_t NumOfArgs;
+bool StreamCMD;
 const char* (*CMD_CB)(char **args, int num_of_args);
 }ServiceRegisters;
 

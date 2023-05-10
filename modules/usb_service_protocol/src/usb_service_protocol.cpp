@@ -5,6 +5,7 @@ namespace usb_service_protocol {
 ServiceRegisters* registers = NULL;
 uint8_t NumRegisters = 0;
 
+ServiceRegisters LastRegister;
 inline constexpr char VT100_MOVE_CHARACTER_BACK_1_POS[] = "\33[2D";
 inline constexpr char TERMINAL_ENTRY_CHARACTER = '>';
 inline constexpr uint8_t BACKSPACE_ASCII_CODE = 127;
@@ -67,8 +68,10 @@ const char* RUNCMD(char* buffer) {
         return "!E Too many arguments!";
       else if (args.argNum < registers[i].NumOfArgs)
         return "!E Too few arguments!";
-      else
+      else{
+        LastRegister = registers[i];
         return registers[i].CMD_CB(args.argsBuffer, args.argNum);
+      }
       break;
     }
   }
@@ -99,11 +102,15 @@ void POLL_READ(void* pvParameters) {
           Serial.print('\n');
           buffer[read_index++] = Character;
           Serial.printf("%c", Character);
+          if(LastRegister.StreamCMD) {
+            LastRegister.StreamCMD = false;
+          } else {
           Serial.print(RUNCMD(buffer));
           Serial.print('\n');
           Serial.printf("%c", Character);
+          }
           Serial.print(TERMINAL_ENTRY_CHARACTER);
-          memset(buffer, STR_TERMINATION_CHARACTER, READ_BUFFER_SIZE);
+          memset(buffer, STR_TERMINATION_CHARACTER, read_index+1);
           read_index = 0;
           break;
         }
@@ -113,6 +120,8 @@ void POLL_READ(void* pvParameters) {
           break;
         }
       }
+    } else if (LastRegister.StreamCMD){
+      Serial.println(LastRegister.CMD_CB(NULL, 0));
     }
   }
 }
@@ -137,7 +146,6 @@ StaticTask_t xTaskBuffer;
 StackType_t xStack[STACK_SIZE];
 
 void set_polling_task(TaskHandle_t* task_handle) {
-  BaseType_t xReturned;
   /* Create the task without using any dynamic memory allocation. */
   *task_handle = xTaskCreateStatic(
       POLL_READ,               /* Function that implements the task. */
@@ -148,9 +156,6 @@ void set_polling_task(TaskHandle_t* task_handle) {
       xStack,                  /* Array to use as the task's stack. */
       &xTaskBuffer);           /* Variable to hold the task's data structure. */
 
-  if (xReturned == pdPASS) {
-    Serial.println("Task created succesfully!");
-  }
 }
 
 }  // namespace usb_service_protocol

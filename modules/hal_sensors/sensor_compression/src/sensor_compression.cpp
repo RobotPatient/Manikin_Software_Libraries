@@ -49,16 +49,21 @@
 #define sleep(ms) usleep(1000*ms)
 #endif  // __arm__
 
-void CompressionSensor::Initialize() {
+
+void CompressionSensor::Initialize(I2CDriver* handle) {
+  i2c_handle_ = handle;
   i2c_handle_->ChangeAddress(sensor_i2c_address_);
   InitVL6180X();
   SetVL6180xDefautSettings();
+  sensor_data_.SampleNum = 0;
 }
 
 SensorData CompressionSensor::GetSensorData() {
   uint8_t distance = GetDistance();
   sensor_data_.num_of_bytes = 1;
   sensor_data_.buffer[0] = distance;
+  sensor_data_.SampleNum++;
+  sensor_data_.SensorID = 0x01;
   return sensor_data_;
 }
 
