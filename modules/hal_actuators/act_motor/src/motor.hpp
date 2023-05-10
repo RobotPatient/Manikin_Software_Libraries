@@ -29,19 +29,25 @@
 #ifndef MOTOR_HPP
 #define MOTOR_HPP
 
-// #include <gpio.hpp>
+#include <gpio.hpp>
 
 namespace actuator {
 
 class Motor {
  public:
-  Motor(uint8_t motorPin) : motorPin_(motorPin) {}
+  Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin)
+      : motorPort_(motorPort), motorPin_(motorPin) {
+    SetGPIOPinDirection(motorPort_, motorPin_, hal::gpio::kGPIODirOutput);
+    SetGPIOPinDriveStrength(motorPort_, motorPin_,
+                            hal::gpio::kGPIONormalDriveStrength);
+  }
   ~Motor();
 
   void startRotate(uint16_t pwm);
   void stopRotate();
 
  private:
+  hal::gpio::GPIOPort motorPort_;
   uint8_t motorPin_;
 };
 
