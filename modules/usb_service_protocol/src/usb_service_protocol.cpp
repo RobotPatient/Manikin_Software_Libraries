@@ -6,7 +6,6 @@ USBServiceProtocolRegisters* serviceProtocolRegisters = NULL;
 uint8_t NumRegisters = 0;
 
 USBServiceProtocolRegisters* LastRegister;
-inline constexpr char kVt100MoveCharacterBack1Pos[] = "\33[2D";
 inline constexpr char kTerminalEntryCharacter = '>';
 inline constexpr char kNewLineCharacter = '\n';
 inline constexpr uint8_t kBackspaceAsciiCode = 127;
@@ -16,7 +15,6 @@ inline constexpr uint8_t kSpaceCharacter = ' ';
 inline constexpr int kNoNewCharacter = -1;
 inline constexpr char kPrintOnNextLine[] = "\r\n";
 inline constexpr uint8_t kReadBufferSize = 100;
-static char read_buffer[kReadBufferSize];
 static uint8_t read_index = 0;
 /* Dimensions of the buffer that the task being created will use as its stack.
     NOTE:  This is the number of words the stack will hold, not the number of
@@ -37,6 +35,9 @@ typedef struct {
   uint8_t argNum;
 } ParsedArgs;
 
+/* This function replaces spaces in the input string with terminated \0 character
+ * It returns a pointer to the place where it has terminated+1 (new substring)
+ * or NULL (if no space was found or end of string!). */
 constexpr char* Getarg(char* input) {
   if (input == NULL)
     return NULL;
@@ -78,11 +79,16 @@ ParsedArgs Parsearg(char* buffer) {
   return Args;
 }
 
+/* This function takes the readbuffer and parses its entered command and arguments from it
+ * The arguments are parsed first then the command.. 
+ * Parsing the arguments terminates the readbuffer at the first argument place 
+ * (if arguments entered, spaces will be replaced with \0), making reading the command easier
+ * Then a linear search is done to lookup the command in the register descriptions array (ServiceProtocolRegisters).
+ * If the command name matches the command argument number is evaluated and the cb is executed! */
 const char* Runcmd(char* buffer) {
   ParsedArgs args = Parsearg(buffer);
   for (uint8_t command_index = 0; command_index < NumRegisters; command_index++) {
-    const bool command_found =
-        (strcmp(serviceProtocolRegisters[command_index].cmd_, buffer) == 0);
+    const bool command_found = (strcmp(serviceProtocolRegisters[command_index].cmd_, buffer) == 0);
     if (command_found) {
       const bool too_many_arguments =
           args.argNum > serviceProtocolRegisters[command_index].num_of_args_;
@@ -102,7 +108,18 @@ const char* Runcmd(char* buffer) {
   return "!E Command unrecognized!";
 }
 
-inline void ParseInput(int character, const bool last_command_was_stream_cmd) {
+/* ParseInput takes the character, read_buffer and stream command parameters from the ReadTask
+ * and decides on basis of the character coming in: 
+ * - To run the input command from the readbuffer (Carriage return character)
+ * - Remove character from the readbuffer (Backspace character)
+ * - Add character to readbuffer (any other character)
+ * 
+ * Edge case: Previous command is stream command.. When stream command is interrupted
+ * an enter has to be entered in the serial console while running. 
+ * But if the carriage return is parsed like normal, it would run an empty command.
+ * Resulting in an command unrecognized error!
+ * Thats why an extra if statement is added... To catch this specific condition*/
+inline void ParseInput(char* read_buffer, int character,  const bool last_command_was_stream_cmd) {
   switch (character) {
     case kBackspaceAsciiCode: {
       read_buffer[read_index] = kStrTerminationCharacter;
@@ -138,16 +155,26 @@ inline void ParseInput(int character, const bool last_command_was_stream_cmd) {
   }
 }
 
+/* This task is launched and will continuously monitor
+ * the serial console for incoming characters.
+ * Or run the previous command if the command is stream command.
+ * (Stream commands are commands that run continuously until enter key pressed)*/
 void ReadTask(void* pvParameters) {
+  static char read_buffer[kReadBufferSize];
   int character = kNoNewCharacter;
+  // Buffers are never terminated when uninitialized.
+  // Therefore it needs to be memset. 
+  // If not memset our parsing functions will not work!
+  // Because it also will contain random data
   memset(read_buffer, kStrTerminationCharacter, kReadBufferSize);
+  // This gives our lovely '>' character at the beginning of terminal
   Serial.write(kTerminalEntryCharacter);
   for (;;) {
     character = Serial.read();
     const bool last_command_was_stream_cmd = LastRegister->stream_cmd_;
     const bool new_character = character != kNoNewCharacter;
     if (new_character) {
-      ParseInput(character, last_command_was_stream_cmd);
+      ParseInput(read_buffer, character, last_command_was_stream_cmd);
     } else if (last_command_was_stream_cmd) {
       const char* stream_cmd_output = LastRegister->cmd_cb(NULL, 0);
       Serial.write(stream_cmd_output);
