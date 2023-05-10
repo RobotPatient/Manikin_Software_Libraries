@@ -83,7 +83,7 @@ constexpr char* Getarg(char* input) {
   // till space-, termination- or carriage-return character encountered
   do {
     input++;
-  } while (*input != kSpaceCharacter && 
+  } while (*input != kSpaceCharacter &&
            *input != kStrTerminationCharacter &&
            *input != kCarriageReturnCharacter);
   // Termination char means end of the string
@@ -132,11 +132,11 @@ const char* Runcmd(char* buffer) {
           args.argNum > serviceProtocolRegisters[command_index].num_of_args_;
       const bool too_few_arguments =
           (args.argNum < serviceProtocolRegisters[command_index].num_of_args_);
-      if (too_many_arguments)
+      if (too_many_arguments) {
         return "!E Too many arguments!";
-      else if (too_few_arguments)
+      } else if (too_few_arguments) {
         return "!E Too few arguments!";
-      else {
+      } else {
         LastRegister = &serviceProtocolRegisters[command_index];
         return serviceProtocolRegisters[command_index].cmd_cb(args.argsBuffer, args.argNum);
       }
@@ -201,7 +201,7 @@ void ReadTask(void* pvParameters) {
   static char read_buffer[kReadBufferSize];
   int character = kNoNewCharacter;
   // Buffers are never terminated when uninitialized.
-  // Therefore it needs to be memset. 
+  // Therefore it needs to be memset.
   // If not memset our parsing functions will not work!
   // Because it also will contain random data
   memset(read_buffer, kStrTerminationCharacter, kReadBufferSize);
@@ -228,18 +228,17 @@ void Init(USBServiceProtocolRegisters* registers, uint8_t num_of_registers) {
 
 void SetPollingTask(TaskHandle_t* task_handle) {
   const bool USBServiceProtocolIsInitialized = (serviceProtocolRegisters != NULL && NumRegisters > 0);
-  if(USBServiceProtocolIsInitialized){
+  if (USBServiceProtocolIsInitialized) {
   /* Create the task without using any dynamic memory allocation. */
   *task_handle = xTaskCreateStatic(
       ReadTask,           /* Function that implements the task. */
       "USBProtoReadTask", /* Text name for the task. */
       kReadTaskStackSize, /* Number of indexes in the xStack array. */
-      (void*)1,           /* Parameter passed into the task. */
+      reinterpret_cast<void*>(1),           /* Parameter passed into the task. */
       (kReadTaskPriority |
        portPRIVILEGE_BIT), /* Priority at which the task is created. */
       ReadTaskStack,       /* Array to use as the task's stack. */
       &staticReadTask);    /* Variable to hold the task's data structure. */
 }
 }
-
 }  // namespace usb_service_protocol
