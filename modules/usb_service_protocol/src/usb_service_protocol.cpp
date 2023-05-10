@@ -2,19 +2,18 @@
 #include <usb_service_protocol.hpp>
 
 namespace usb_service_protocol {
-USBServiceProtocolRegisters* serviceProtocolRegisters = NULL;
-uint8_t NumRegisters = 0;
-
-USBServiceProtocolRegisters* LastRegister;
+/* Defines (kinda but instead of macro's inline constexpr) */
+inline constexpr uint8_t kReadBufferSize = 100;
 inline constexpr char kTerminalEntryCharacter = '>';
 inline constexpr char kNewLineCharacter = '\n';
-inline constexpr uint8_t kBackspaceAsciiCode = 127;
 inline constexpr uint8_t kCarriageReturnCharacter = '\r';
 inline constexpr uint8_t kStrTerminationCharacter = '\0';
 inline constexpr uint8_t kSpaceCharacter = ' ';
+inline constexpr uint8_t kBackspaceAsciiCode = 127;
 inline constexpr int kNoNewCharacter = -1;
 inline constexpr char kPrintOnNextLine[] = "\r\n";
-inline constexpr uint8_t kReadBufferSize = 100;
+
+/* Read index is used to keep track of the amount of elements in the read buffer */
 static uint8_t read_index = 0;
 /* Dimensions of the buffer that the task being created will use as its stack.
     NOTE:  This is the number of words the stack will hold, not the number of
@@ -34,6 +33,18 @@ typedef struct {
   char* argsBuffer[kUSBProtoMaxAmountOfArguments];
   uint8_t argNum;
 } ParsedArgs;
+
+
+/* Internal register definitions.
+ * These will be set by the init function
+ */
+USBServiceProtocolRegisters* serviceProtocolRegisters = NULL;
+uint8_t NumRegisters = 0;
+
+/* This variable is used to save the last command..
+ * It is needed to remember if previous register was stream cmd
+ */
+USBServiceProtocolRegisters* LastRegister;
 
 /* This function replaces spaces in the input string with terminated \0 character
  * It returns a pointer to the place where it has terminated+1 (new substring)
@@ -84,7 +95,7 @@ ParsedArgs Parsearg(char* buffer) {
  * Parsing the arguments terminates the readbuffer at the first argument place 
  * (if arguments entered, spaces will be replaced with \0), making reading the command easier
  * Then a linear search is done to lookup the command in the register descriptions array (ServiceProtocolRegisters).
- * If the command name matches the command argument number is evaluated and the cb is executed! */
+ * If the command name matches the command argument, the number of arguments is evaluated and the cb function is executed! */
 const char* Runcmd(char* buffer) {
   ParsedArgs args = Parsearg(buffer);
   for (uint8_t command_index = 0; command_index < NumRegisters; command_index++) {
@@ -189,6 +200,8 @@ void Init(USBServiceProtocolRegisters* registers, uint8_t num_of_registers) {
 }
 
 void SetPollingTask(TaskHandle_t* task_handle) {
+  const bool USBServiceProtocolIsInitialized = (serviceProtocolRegisters != NULL && NumRegisters > 0);
+  if(USBServiceProtocolIsInitialized){
   /* Create the task without using any dynamic memory allocation. */
   *task_handle = xTaskCreateStatic(
       ReadTask,           /* Function that implements the task. */
@@ -199,6 +212,7 @@ void SetPollingTask(TaskHandle_t* task_handle) {
        portPRIVILEGE_BIT), /* Priority at which the task is created. */
       ReadTaskStack,       /* Array to use as the task's stack. */
       &staticReadTask);    /* Variable to hold the task's data structure. */
+}
 }
 
 }  // namespace usb_service_protocol

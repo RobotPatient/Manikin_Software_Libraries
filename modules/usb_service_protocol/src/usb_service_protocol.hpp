@@ -34,6 +34,7 @@ void Init(USBServiceProtocolRegisters* registers, uint8_t num_of_registers);
 /**
  * @brief Set background polling task for the USB service module.
  *        The task set will be monitoring the console character by character.
+ *        Warning! Module needs to be initialized first!
  * 
  * @param task_handle Pointer to external task_handle to attach background task to
  */
