@@ -45,8 +45,10 @@ namespace hal::i2c {
 
 class I2C_Driver {
  public:
-  I2C_Driver(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr)
+  explicit I2C_Driver(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed, I2CAddr i2c_addr)
       : i2c_peripheral_(i2c_peripheral), speed_(speed), slave_addr_(i2c_addr) {}
+  explicit I2C_Driver(I2C_PERIPHERAL_T i2c_peripheral, I2CSpeed speed)
+      : i2c_peripheral_(i2c_peripheral), speed_(speed) {}
 
   void begin();
   void begin(uint8_t adddress);
