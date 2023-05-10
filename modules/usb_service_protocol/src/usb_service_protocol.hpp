@@ -4,17 +4,17 @@
 #include <task.h>
 namespace usb_service_protocol {
 
-inline constexpr uint8_t CMDSize = 10;
+inline constexpr uint8_t kUSBProtoMaxAmountOfArguments = 10;
 
 typedef struct {
-char CMD[CMDSize];
-uint8_t NumOfArgs;
-bool StreamCMD;
-const char* (*CMD_CB)(char **args, int num_of_args);
-}ServiceRegisters;
+char cmd_[kUSBProtoMaxAmountOfArguments];
+uint8_t num_of_args_;
+bool stream_cmd_;
+const char* (*cmd_cb)(char **args, int num_of_args);
+} USBServiceProtocolRegisters;
 
-void init(ServiceRegisters *regs, uint8_t num_of_registers);
-void set_polling_task(TaskHandle_t *task_handle);
+void Init(USBServiceProtocolRegisters * registers, uint8_t num_of_registers);
+void SetPollingTask(TaskHandle_t *task_handle);
 
 }
 
