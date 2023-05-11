@@ -28,11 +28,21 @@
 #include <sam.h>
 #include <hal_exception.hpp>
 
+namespace hal::exception {
+
+/**
+ * @brief Private copy of pointer to logging medium instance
+ * @note Logger module has to be enabled in hal_exception_config.hpp for this to function
+ */
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 static hal::log::Logger* log_obj = NULL;
 #endif
 
-namespace hal::exception {
+/**
+ * @brief Logs message to logging medium
+ * 
+ * @param msg The message to log
+ */
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 void Log(const char* msg) {
   if (log_obj != NULL) {
@@ -55,7 +65,7 @@ void ThrowException(const char* exception_message,
   Log(exception_message);
 #endif
   if (exception_action == SOFT_RESET) {
-    NVIC_SystemReset();
+    NVIC_SystemReset();  // Reset the MCU
   }
 }
 

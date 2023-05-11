@@ -45,6 +45,7 @@ namespace hal::exception {
 #define str(s) #s
 
 // Macro to enable/disable the LOGGER module support
+// Comment this macro to disable logging functionality in the exception module
 #define EXCEPTION_MODULE_ENABLE_LOGGER
 
 // The supported Exceptiontypes
