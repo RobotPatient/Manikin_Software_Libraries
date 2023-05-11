@@ -29,19 +29,9 @@
 #ifndef SPI_MAINBOARD_HPP
 #define SPI_MAINBOARD_HPP
 
-#include <stdint.h>
+#include <spi_mainboard_registers.hpp>
 
 namespace hal::spi {
-
-inline constexpr uint8_t kPermissionsRW = 0;
-inline constexpr uint8_t kPermissionsRO = 1;
-
-typedef struct {
-    volatile uint8_t *data;
-    volatile uint8_t data_crc;
-    uint8_t size;
-    const uint8_t access_permissions;
-} SpiSlaveData;
 
 /* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
 inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;

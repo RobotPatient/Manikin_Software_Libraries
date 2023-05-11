@@ -37,10 +37,10 @@ namespace hal::exception {
 // a lot more memory since every assert or throw string will be placed in flash.. around ~70 bytes per statement
 #define ASSEMBLE_THROW_MSG(line, tag, message, exception_type, action) \
   "!E " "[" tag  ": " str(line) "]: " "THROW! "  message \
-  "; exception: " str(exception_type) " Action: " str(action) "\n\0"
+  "; exception: " str(exception_type) " Action: " str(action) "\0"
 // Same case for assert message. Though this one might be shorter depending on the usage :)
 #define ASSEMBLE_ASSERT_MSG(line, tag, condition, action) \
-  "!E " "[" tag  ": " str(line) "]: " "ASSERT! : " str(condition) " Action: " str(action) "\n\0"
+  "!E " "[" tag  ": " str(line) "]: " "ASSERT! : " str(condition) " Action: " str(action) "\0"
 // Macro to stringify things like variable names
 #define str(s) #s
 

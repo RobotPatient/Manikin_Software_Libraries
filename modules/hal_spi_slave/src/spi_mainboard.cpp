@@ -26,7 +26,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 #ifdef __SAMD51__
-#include <spi_mainboard_registers.hpp>
 #include <spi_mainboard.hpp>
 #include <Arduino.h>
 #include <sam.h>
@@ -108,8 +107,7 @@ void SERCOM3_2_Handler() {
             SERCOM3->SPI.DATA.reg = 0x00;
           }
         } else {
-          bool reg_has_write_permission = (CurrTransaction.reg->access_permissions ==
-              hal::spi::kPermissionsRW);
+          bool reg_has_write_permission = (CurrTransaction.reg->access_permissions == kPermissionsRW);
           if (reg_has_write_permission) {
             CurrTransaction.reg->data[CurrTransaction.byte_cnt] = SERCOM3->SPI.DATA.reg;
           }

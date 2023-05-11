@@ -27,9 +27,18 @@
 ***********************************************************************************************/
 #ifndef SPI_MAINBOARD_REGISTER_HPP
 #define SPI_MAINBOARD_REGISTER_HPP
-#include <spi_mainboard.hpp>
 #include <stdint.h>
 #include <stddef.h>
+
+inline constexpr uint8_t kPermissionsRW = 0;
+inline constexpr uint8_t kPermissionsRO = 1;
+
+typedef struct {
+    volatile uint8_t *data;
+    volatile uint8_t data_crc;
+    uint8_t size;
+    const uint8_t access_permissions;
+} SpiSlaveData;
 
 typedef enum {
 STATE_INIT_REG,
@@ -102,7 +111,7 @@ uint8_t first_word_start_bit(const uint8_t reg) {
 }
 
 typedef struct {
-    volatile hal::spi::SpiSlaveData *reg;
+    volatile SpiSlaveData *reg;
     SPIStateMachine State;
     bool WR;
     int seq_num;

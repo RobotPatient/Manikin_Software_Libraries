@@ -34,31 +34,30 @@
 
 namespace hal::exception {
 #define ASSERT_WARN(condition)                                               \
-  assert_warn(                                                               \
+  hal::exception::assert_warn(                                               \
       (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, WARN), \
       condition)
 
 #define ASSERT_RESET(condition)                                               \
-  assert_reset(                                                               \
+  hal::exception::assert_reset(                                               \
       (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, RESET), \
       condition)
 
 #define ASSERT_CUSTOM(condition, action)                                       \
-  assert_custom_action(                                                        \
+  hal::exception::assert_custom_action(                                        \
       (const char*)ASSEMBLE_ASSERT_MSG(__LINE__, __FILE__, condition, action), \
       condition, action)
 
 #define THROW_RESET(message, exception_type)                                  \
-  ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \
-                                                 exception_type, RESET),      \
-                 exception_type, hal::exception::SOFT_RESET)
+  hal::exception::ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__,    \
+                              __FILE__, message, exception_type, RESET),      \
+                              exception_type, hal::exception::SOFT_RESET)
 
 #define THROW_WARN(message, exception_type)                                   \
-  ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__, __FILE__, message, \
-                                                 exception_type, WARN),       \
-                 exception_type, hal::exception::WARN);
+  hal::exception::ThrowException((const char*)ASSEMBLE_THROW_MSG(__LINE__,    \
+                                 __FILE__, message, exception_type, WARN),    \
+                                 exception_type, hal::exception::WARN);
 
-void Init();
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 void attachLogger(hal::log::Logger* logger_obj);
 #endif
