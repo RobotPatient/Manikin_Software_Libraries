@@ -31,8 +31,9 @@
 #include <task.h>
 namespace usb_service_protocol {
 
-/* The max amount of arguments a command can take...
- * The default value is 10. */
+/**
+ * @brief The max amount of arguments a command can take...
+ * @note The default value is 10. */
 inline constexpr uint8_t kUSBProtoMaxAmountOfArguments = 10;
 
 /**
