@@ -53,11 +53,11 @@ class DifferentialPressureSensor : public UniversalSensor {
   I2CDriver *i2c_handle_;
   SensorData sensor_data_{};
 
-// Low level driver functions:
   int16_t sensor_raw_;
   int16_t conversion_factor_;
   uint8_t sensor_buffer_[kSdp810BufferSize];
 
+// Low level driver functions:
   void BeginSDP810();
   void ReadSdp810();
   int16_t GetRawSDP810();

@@ -49,11 +49,20 @@ inline constexpr uint8_t kACTDATA_REG = 0x0A;
 /* The array with the SPI slave registers */
 extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
 
+/**
+ * @brief This class can be used to create a SPI slave module
+ * 
+ */
 class SPIMainBoard {
  public:
   SPIMainBoard() {}
-
+  /**
+   * @brief Begin inits the internal ISR and starts the SPI slave module
+   */
   void begin();
+  /**
+   * @brief Deinit the SPI slave module
+   */
   void deinit();
 };
 }  // namespace hal::spi
