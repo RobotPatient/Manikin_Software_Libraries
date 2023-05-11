@@ -38,10 +38,18 @@ inline constexpr uint8_t EVENTSYS_CHANNEL = 0;
 // The reasoning behind the ISR:
 // The ISR has low IRQ priority...
 // This way peripherals like the SERCOMS can finish their transactions, before reset.
+#ifdef SAMD21G18A
 void EVSYS_Handler() {
   EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
   NVIC_SystemReset();
 }
+#elif SAMD51J20A
+void EVSYS_0_HANDLER() {
+  EVSYS->INTPEND.reg |= EVSYS_INTPEND_EVD;
+  NVIC_SystemReset();
+}
+#endif
+
 
 namespace hal::exception {
 
@@ -53,10 +61,15 @@ void Log(const char* msg) {
 }
 
 void TriggerResetUsingISR() {
+  #ifdef SAMD21G18A
   EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | EVENTSYS_CHANNEL;
+  #elif SAMD51J20A
+  EVSYS->SWEVT.reg |= EVSYS_SWEVT_CHANNEL_0;
+  #endif
 }
 
 void Init() {
+  #ifdef SAMD21G18A
   GCLK->CLKCTRL.reg |=
       GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_ID_EVSYS_0;
   PM->APBCMASK.reg |= PM_APBCMASK_EVSYS;
@@ -67,6 +80,14 @@ void Init() {
   EVSYS->INTENSET.reg = EVSYS_INTFLAG_EVD0;
   NVIC_EnableIRQ(EVSYS_IRQn);
   NVIC_SetPriority(EVSYS_IRQn, EVENTSYS_IRQ_PRIO);
+  #elif SAMD51J20A
+  // Set the EVSYS channel 0 clock to the main clock
+  GCLK->PCHCTRL[GCLK_EVSYS_CHANNEL_0].reg = GCLK_PCHCTRL_GEN_GCLK0_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
+  // Set the core clk of EVSYS to the main clock
+  MCLK->APBBMASK.reg |= MCLK_APBBMASK_EVSYS;
+  EVSYS->CHINTENSET[0].reg |= EVSYS_CHINTENSET_EVD0;
+  NVIC_EnableIRQ(EVSYS_0_IRQn); 
+  #endif
 }
 
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER

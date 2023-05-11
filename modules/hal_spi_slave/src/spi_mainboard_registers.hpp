@@ -27,7 +27,7 @@
 ***********************************************************************************************/
 #ifndef SPI_MAINBOARD_REGISTER_HPP
 #define SPI_MAINBOARD_REGISTER_HPP
-#include <spi_base.hpp>
+#include <spi_mainboard.hpp>
 #include <stdint.h>
 #include <stddef.h>
 
