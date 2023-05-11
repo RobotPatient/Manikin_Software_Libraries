@@ -68,7 +68,7 @@ class UniversalSensor {
    * @return unique sensor identifier
   */
   virtual const uint8_t GetSensorType() = 0;
-  
+
   /**
    * @brief Uninitialize the sensor
   */
