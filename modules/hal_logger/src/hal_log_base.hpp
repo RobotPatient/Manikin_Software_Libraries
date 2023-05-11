@@ -32,29 +32,56 @@
 
 namespace hal::log {
 
+/**
+ * @brief Struct containing all data handles and information needed to initialize flash medium
+ */
 typedef struct {
   const char* FilePath;
   FatVolume* FatHandle;
 } FlashHandle_t;
 
+/**
+ * @brief Union containing all possible data handles to instantiate a logging medium
+ * @note An union was chosen to save on space..
+ */
 typedef union {
   Serial_* SerialHandle;
   FlashHandle_t FlashHandle;
 } communicationHandles;
 
+/**
+ * @brief Union containing all lower level data handles instantiated by class for the logging medium
+ * 
+ * @note This datatype will be used by class to return the raw data handle for some of the logging mediums
+ */
 typedef union {
   Serial_* SerialHandle;
   File32* FlashHandle;
 } CommunicationReturnHandles;
 
-
+/**
+ * @brief Enum class containing all possible communicationMethods
+ * 
+ * @note Enum class usage differs from normal enum as it is scoped:
+ * Usage: communicationMethod::Flash for flash e.g.
+ */
 enum class communicationMethod { None, Serial, Flash };
 
+/**
+ * @brief Struct containing settings needed to instantiate logging medium
+ * communicationHandles contains the handle to the raw medium handle
+ * communicationMethod defines the medium used
+ */
 typedef struct {
   communicationHandles CommHandle;
   communicationMethod CommMethod;
 } LoggerSettings;
 
+/**
+ * @brief This is the base class used for all the logging mediums.
+ *        All loggers have uniform API!
+ * 
+ */
 class Logger {
  public:
   explicit Logger(LoggerSettings* communicationSettings) {}

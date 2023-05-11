@@ -59,7 +59,7 @@ class SerialLogger : public Logger {
 
  private:
   Serial_* SerialHandle_;
-  /* Array used in setcursorpos
+/* Array used in setcursorpos
  * Aha a magic number, well, its calculated...
  * the base string (kVT100..) has size of: 6 characters
  * x can't be more than 2 characters with current setting (80 columns)
