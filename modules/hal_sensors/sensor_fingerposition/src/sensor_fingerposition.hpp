@@ -46,11 +46,12 @@ enum SensorMapIndex {
 
 class FingerPositionSensor : public UniversalSensor {
  public:
-  explicit FingerPositionSensor(I2CDriver *i2c_handle) : UniversalSensor(i2c_handle) {
-    i2c_handle_ = i2c_handle;
-  }
+  FingerPositionSensor() : UniversalSensor() {}
 
-  void Initialize() override;
+  void Initialize(I2CDriver* handle) override;
+  const uint8_t GetSensorType() override {
+    return SensorType_;
+  }
   SensorData GetSensorData() override;
   void Uninitialize() override;
   ~FingerPositionSensor() {
@@ -58,6 +59,7 @@ class FingerPositionSensor : public UniversalSensor {
   }
 
  private:
+  const uint8_t SensorType_ = 0x03;
   const uint8_t kSensorI2CAddress_ = kAds7138Addr;
   I2CDriver *i2c_handle_;
   SensorData sensor_data_{};

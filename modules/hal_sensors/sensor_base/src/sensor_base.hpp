@@ -32,15 +32,18 @@
 #include <i2c_helper.hpp>
 
 typedef struct SensorData {
+  uint16_t sample_num;
+  uint8_t sensor_id;
   uint16_t buffer[8];
   uint8_t num_of_bytes;
 } SensorData_t;
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(I2CDriver *i2c_handle) {}
-  virtual void Initialize() = 0;
+  UniversalSensor() {}
+  virtual void Initialize(I2CDriver* handle) = 0;
   virtual SensorData_t GetSensorData() = 0;
+  virtual const uint8_t GetSensorType() = 0;
   virtual void Uninitialize() = 0;
  private:
   I2C_PERIPHERAL_T i2c_handle_;
