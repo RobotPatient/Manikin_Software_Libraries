@@ -40,42 +40,84 @@ inline constexpr uint8_t kBackspaceAsciiCode = 127;
 inline constexpr int kNoNewCharacter = -1;
 inline constexpr char kPrintOnNextLine[] = "\r\n";
 
-/* Read index is used to keep track of the amount of elements in the read buffer */
+/**
+ * @brief Read index for the read buffer
+ * This variable is used to keep track of the amount of elements in the read buffer
+ */
 static uint8_t read_index = 0;
-/* Dimensions of the buffer that the task being created will use as its stack.
-    NOTE:  This is the number of words the stack will hold, not the number of
-    bytes.  For example, if each stack item is 32-bits, and this is set to 100,
-    then 400 bytes (100 * 32-bits) will be allocated. */
+
+/**
+ * @brief Dimensions of the buffer that the task being created will use as its stack.
+ * 
+ * @note This is the number of words the stack will hold, not the number of bytes.  
+ * For example, if each stack item is 32-bits, and this is set to 100,
+ * then 400 bytes (100 * 32-bits) will be allocated. 
+ */
 inline constexpr uint8_t kReadTaskStackSize = 200;
-/* The priority the task will have, 0 highest priority, 32 lowest priority*/
+
+/**
+ * @brief The priority given to the ReadTask
+ * 
+ * @note The priority can be set to a number within 0-32,
+ * 0 highest priority, 32 lowest priority
+ */
 inline constexpr uint8_t kReadTaskPriority = 5;
-/* Structure that will hold the TCB of the task being created. */
+
+/**
+ * @brief Structure that will hold the TCB of the task being created
+ * 
+ */
 StaticTask_t staticReadTask;
-/* Buffer that the task being created wil l use as its stack.  Note this is
-    an array of StackType_t variables.  The size of StackType_t is dependent on
-    the RTOS port. */
+
+/**
+ * @brief Buffer that the task being created will use as its stack
+ * 
+ * @note This is an array of StackType_t variables.  
+ * The size of StackType_t is dependent on the RTOS port.
+ */
 StackType_t ReadTaskStack[kReadTaskStackSize];
 
+/**
+ * @brief Struct containing parsed arguments
+ * 
+ * This struct is used to pass around parsed arguments from the parser function
+ * to the command interpreter.
+ * 
+ */
 typedef struct {
   char* argsBuffer[kUSBProtoMaxAmountOfArguments];
   uint8_t argNum;
 } ParsedArgs;
 
-
-/* Internal register definitions.
- * These will be set by the init function
+/**
+ * @brief Internal register definitions (exact copy of the parameters given in Init function)
+ * 
+ * @note serviceProtocolRegister contains a pointer to the array containing the registers used by the usbregister protocol
+ *       NumRegisters contains the number of registers in the pointer array.
  */
 USBServiceProtocolRegisters* serviceProtocolRegisters = NULL;
 uint8_t NumRegisters = 0;
 
-/* This variable is used to save the last command..
+/**
+ * @brief This variable contains the Last executed command/register
  * It is needed to remember if previous register was stream cmd
  */
 USBServiceProtocolRegisters* LastRegister;
 
-/* This function replaces spaces in the input string with terminated \0 character
- * It returns a pointer to the place where it has terminated+1 (new substring)
- * or NULL (if no space was found or end of string!). */
+
+/**
+ * @brief This function replaces spaces in the input string with terminated \0 character
+ * 
+ * @param input The \0 terminated string to be parsed
+ * 
+ * @return NULL if no space was found or end of buffer reached. Char* pointer to location after space
+ * 
+ * @note Output of this function will look like this:
+ *       inpur: "CMD ARG"
+ *       AFTER RUNNING the function (input buffer will be altered by function):
+ *       input: "CMD\0ARG"
+ *       function will return: Pointer to "ARG" section of string.
+ */
 constexpr char* Getarg(char* input) {
   if (input == NULL)
     return NULL;
@@ -99,6 +141,15 @@ constexpr char* Getarg(char* input) {
   return input + 1;
 }
 
+/**
+ * @brief Parse the arguments out of string entered by user in console
+ * 
+ * @note This function uses the Getarg function to get all arguments and puts them in the 
+ *       Parsedarg struct.
+ * 
+ * @param buffer \0 terminated string entered by user in console containing zero or more arguments
+ * @return ParsedArgs Struct containing pointers to all the locations of the arguments in the string.
+ */
 ParsedArgs Parsearg(char* buffer) {
   ParsedArgs Args;
   Args.argNum = 0;
@@ -117,12 +168,18 @@ ParsedArgs Parsearg(char* buffer) {
   return Args;
 }
 
-/* This function takes the readbuffer and parses its entered command and arguments from it
- * The arguments are parsed first then the command.. 
+/**
+ * @brief Parse the command and arguments and run the command entered by user in console
+ * 
+ * @note The arguments are parsed first then the command.. 
  * Parsing the arguments terminates the readbuffer at the first argument place 
  * (if arguments entered, spaces will be replaced with \0), making reading the command easier
  * Then a linear search is done to lookup the command in the register descriptions array (ServiceProtocolRegisters).
- * If the command name matches the command argument, the number of arguments is evaluated and the cb function is executed! */
+ * If the command name matches the command argument, the number of arguments is evaluated and the cb function is executed!
+ * 
+ * @param buffer This buffer contains the user entered \0 terminated string
+ * @return The command response of the command ran or error message (with unrecognized commmand, too few, too many arguments)
+ */
 const char* Runcmd(char* buffer) {
   ParsedArgs args = Parsearg(buffer);
   for (uint8_t command_index = 0; command_index < NumRegisters; command_index++) {
@@ -146,7 +203,10 @@ const char* Runcmd(char* buffer) {
   return "!E Command unrecognized!";
 }
 
-/* ParseInput takes the character, read_buffer and stream command parameters from the ReadTask
+/**
+ * @brief ParseInput parses the incoming characters
+ * 
+ * @note ParseInput takes the character, read_buffer and stream command parameters from the ReadTask
  * and decides on basis of the character coming in: 
  * - To run the input command from the readbuffer (Carriage return character)
  * - Remove character from the readbuffer (Backspace character)
@@ -156,10 +216,17 @@ const char* Runcmd(char* buffer) {
  * an enter has to be entered in the serial console while running. 
  * But if the carriage return is parsed like normal, it would run an empty command.
  * Resulting in an command unrecognized error!
- * Thats why an extra if statement is added... To catch this specific condition*/
+ * Thats why an extra if statement is added... To catch this specific condition
+ * 
+ * @param read_buffer Pointer to the read_buffer containing the previous user input
+ * @param character The new incoming character
+ * @param last_command_was_stream_cmd Boolean indicating whether the previous ran command is a streaming command
+ */
 inline void ParseInput(char* read_buffer, int character,  const bool last_command_was_stream_cmd) {
   switch (character) {
     case kBackspaceAsciiCode: {
+      // Backspace means removing previous character in buffer
+      // And moving the cursor back 1 position
       read_buffer[read_index] = kStrTerminationCharacter;
       const bool buffer_not_empty = (read_index != 0);
       if (buffer_not_empty) {
@@ -169,9 +236,10 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
       break;
     }
     case kCarriageReturnCharacter: {
-      Serial.write(kNewLineCharacter);
-      read_buffer[read_index++] = character;
-      Serial.write(character);
+      // Entered means new command was entered!
+      Serial.write(kNewLineCharacter);  // Move cursor down one line
+      Serial.write(character);  // Now print the \r so the cursor pos is at the beginning of the line
+      // We of course don't want to run the entered empty command when a stream command is interrupted by enter key
       if (last_command_was_stream_cmd) {
         LastRegister->stream_cmd_ = false;
       } else {
@@ -181,11 +249,13 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
         Serial.write(character);
       }
       Serial.write(kTerminalEntryCharacter);
+      // Empty the read buffer and fill with \0 characters, command execution was succesfull!
       memset(read_buffer, kStrTerminationCharacter, read_index + 1);
       read_index = 0;
       break;
     }
     default: {
+      // Echo back the character
       Serial.write(character);
       read_buffer[read_index++] = character;
       break;
@@ -193,10 +263,13 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
   }
 }
 
-/* This task is launched and will continuously monitor
- * the serial console for incoming characters.
+/**
+ * @brief  This task will continuously monitor the serial console for incoming characters.
  * Or run the previous command if the command is stream command.
- * (Stream commands are commands that run continuously until enter key pressed)*/
+ *  (Stream commands are commands that run continuously until enter key pressed).
+ * 
+ * @param pvParameters function parameters forwarded from its declaration in the init function.
+ */
 void ReadTask(void* pvParameters) {
   static char read_buffer[kReadBufferSize];
   int character = kNoNewCharacter;
