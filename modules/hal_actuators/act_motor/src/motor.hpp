@@ -31,19 +31,19 @@
 
 #include <gpio.hpp>
 
+#define MOTOR_OFF 0
+#define MOTOR_ON 1
+
 namespace actuator {
 
 class Motor {
  public:
-  Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin)
-      : motorPort_(motorPort), motorPin_(motorPin) {
-    SetGPIOPinDirection(motorPort_, motorPin_, hal::gpio::kGPIODirOutput);
-    SetGPIOPinDriveStrength(motorPort_, motorPin_,
-                            hal::gpio::kGPIONormalDriveStrength);
-  }
+  Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin);
   ~Motor();
 
-  void startRotate(uint16_t pwm);
+  void initPwmPin();
+
+  void startRotate(uint8_t pwm);
   void stopRotate();
 
  private:
