@@ -28,6 +28,7 @@
 #ifndef HAL_LOGTRANSPORT_FLASH_HPP
 #define HAL_LOGTRANSPORT_FLASH_HPP
 #include <hal_log_base.hpp>
+#include <hal_exception.hpp>
 
 namespace hal::log {
 // The amount of characters reserved for the filepath
@@ -35,6 +36,10 @@ inline constexpr uint8_t kMaxFilePathSize = 100;
 
 class FlashLogger : public Logger {
  public:
+ /**
+  * @brief init the flash logging medium, by creating a file handle using the
+  *        filepath and fatfs handle given in the communicationSettings struct!
+ */
   explicit FlashLogger(LoggerSettings* communicationSettings)
       : Logger(communicationSettings) {
     if (communicationSettings->CommMethod == communicationMethod::Flash) {
@@ -44,7 +49,13 @@ class FlashLogger : public Logger {
       // We unfornately need to memset our filepath buffer.
       // Because if we do not memset, our filepath will get garbled characters at the end :/
       memset(FilePath_, '\0', kMaxFilePathSize);
-      memcpy(FilePath_, FilePath, strlen(FilePath));
+      // We copy the FilePath to our internal buffer..
+      const int kFilePathSize = strlen(FilePath);
+      if (kFilePathSize < kMaxFilePathSize) {
+        memcpy(FilePath_, FilePath, strlen(FilePath));
+      } else {
+        THROW_WARN("FilePath is too long!", hal::exception::OUT_OF_BOUNDS);
+      }
     }
   }
   /**
