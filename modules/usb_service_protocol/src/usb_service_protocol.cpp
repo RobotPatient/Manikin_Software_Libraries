@@ -250,14 +250,16 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
       }
       Serial.write(kTerminalEntryCharacter);
       // Empty the read buffer and fill with \0 characters, command execution was succesfull!
-      memset(read_buffer, kStrTerminationCharacter, read_index + 1);
+      memset(read_buffer, kStrTerminationCharacter, read_index);
       read_index = 0;
       break;
     }
     default: {
-      // Echo back the character
-      Serial.write(character);
-      read_buffer[read_index++] = character;
+      if (read_index < kReadBufferSize) {
+        // Echo back the character
+        Serial.write(character);
+        read_buffer[read_index++] = character;
+      }
       break;
     }
   }
