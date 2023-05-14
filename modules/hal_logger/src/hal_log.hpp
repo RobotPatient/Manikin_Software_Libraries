@@ -1,7 +1,7 @@
 /* *******************************************************************************************
  * Copyright (c) 2023 by RobotPatient Simulators
  *
- * Author: Victor Hogeweij
+ * Authors: Victor Hogeweij
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"),
@@ -25,29 +25,9 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
-
-#ifndef SPI_BASE_HPP
-#define SPI_BASE_HPP
-#include <stdint.h>
-namespace hal::spi {
-
-inline constexpr uint8_t kPermissionsRW = 0;
-inline constexpr uint8_t kPermissionsRO = 1;
-
-typedef struct {
-    volatile uint8_t *data;
-    volatile uint8_t data_crc;
-    uint8_t size;
-    const uint8_t access_permissions;
-} SpiSlaveData;
-
-
-
-class SPISlave {
- public:
-    SPISlave() {}
-    virtual void begin() = 0;
-    virtual void deinit() = 0;
-};
-}  // namespace hal::spi
+#ifndef HAL_LOG_HPP
+#define HAL_LOG_HPP
+#include <hal_log_base.hpp>
+#include <hal_log_flash.hpp>
+#include <hal_log_serial.hpp>
 #endif

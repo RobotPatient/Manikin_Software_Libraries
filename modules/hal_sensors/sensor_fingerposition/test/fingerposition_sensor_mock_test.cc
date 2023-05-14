@@ -79,7 +79,7 @@ TEST(FingerPositionTest, initCalls) {
   const uint8_t kData4 = 0x01;
   /* Initialize handles and classes */
   I2CDriver i2c_mock_handle;
-  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_mock_handle);
+  FingerPositionSensor finger_pos_sensor;
   /* Setup mock calls */
   EXPECT_CALL(i2c_mock_handle, ChangeAddress(kAds7138Addr));
   {
@@ -90,7 +90,7 @@ TEST(FingerPositionTest, initCalls) {
     EXPECT_CALL(i2c_mock_handle, WriteReg(kReg4, kData4));
   }
   /* Run the "real" call */
-  finger_pos_sensor.Initialize();
+  finger_pos_sensor.Initialize(&i2c_mock_handle);
   Mock::VerifyAndClearExpectations(&i2c_mock_handle);
 }
 
@@ -102,7 +102,8 @@ TEST(FingerPositionTest, GetSensorData) {
   const uint8_t kData2 = 1 << 4;
   // Initialize mocks
   I2CDriver i2c_mock_handle;
-  FingerPositionSensor finger_pos_sensor = FingerPositionSensor(&i2c_mock_handle);
+  FingerPositionSensor finger_pos_sensor;
+  finger_pos_sensor.Initialize(&i2c_mock_handle);
 
   /* Setup mock calls */
   {

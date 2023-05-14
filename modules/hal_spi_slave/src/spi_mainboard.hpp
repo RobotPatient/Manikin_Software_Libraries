@@ -29,9 +29,10 @@
 #ifndef SPI_MAINBOARD_HPP
 #define SPI_MAINBOARD_HPP
 
-#include <spi_base.hpp>
+#include <spi_mainboard_registers.hpp>
 
 namespace hal::spi {
+
 /* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
 inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;
 inline constexpr uint8_t kSTATUS_REG = 0;
@@ -48,11 +49,20 @@ inline constexpr uint8_t kACTDATA_REG = 0x0A;
 /* The array with the SPI slave registers */
 extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
 
-class SPIMainBoard : public SPISlave {
+/**
+ * @brief This class can be used to create a SPI slave module
+ * 
+ */
+class SPIMainBoard {
  public:
-  SPIMainBoard() : SPISlave() {}
-
+  SPIMainBoard() {}
+  /**
+   * @brief Begin inits the internal ISR and starts the SPI slave module
+   */
   void begin();
+  /**
+   * @brief Deinit the SPI slave module
+   */
   void deinit();
 };
 }  // namespace hal::spi

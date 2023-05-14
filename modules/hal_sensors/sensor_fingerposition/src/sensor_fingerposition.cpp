@@ -39,14 +39,18 @@
 #define sleep(ms) usleep(1000*ms)
 #endif  // __arm__
 
-void FingerPositionSensor::Initialize() {
+void FingerPositionSensor::Initialize(I2CDriver* handle) {
+  i2c_handle_ = handle;
   i2c_handle_->ChangeAddress(kSensorI2CAddress_);
   initDefaultRead();
+  sensor_data_.sample_num = 0;
 }
 
 SensorData FingerPositionSensor::GetSensorData() {
   sensor_data_.num_of_bytes = kNumOfSensorDataBytes;
   readADC(sensor_data_.buffer);
+  sensor_data_.sample_num++;
+  sensor_data_.sensor_id = 0x03;
   return sensor_data_;
 }
 
