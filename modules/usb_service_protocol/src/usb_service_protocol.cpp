@@ -235,7 +235,7 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
       break;
     }
     case kCarriageReturnCharacter: {
-      Serial.write(kNewLineCharacter);  
+      Serial.write(kNewLineCharacter);
       Serial.write(character);  // Now print the \r so the cursor pos is at the beginning of the line
       // We of course don't want to run the entered empty command when a stream command is interrupted by enter key
       if (last_command_was_stream_cmd) {
