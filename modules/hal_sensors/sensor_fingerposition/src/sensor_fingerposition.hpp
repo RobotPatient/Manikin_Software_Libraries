@@ -48,11 +48,32 @@ class FingerPositionSensor : public UniversalSensor {
  public:
   FingerPositionSensor() : UniversalSensor() {}
 
+  /**
+  * @brief Initialises the sensor with its default settings
+  * 
+  * @param handle Pointer to I2C slave driver instance
+  */
   void Initialize(I2CDriver* handle) override;
+
+  /**
+   * @brief Get the sensortype
+   * 
+   * @return unique sensor identifier
+  */
   const uint8_t GetSensorType() override {
     return SensorType_;
   }
+
+  /**
+  * @brief Read the sensor
+  * 
+  * @return SensorData_t SensorData struct with the sensordata, sample_num and sensor_id
+  */
   SensorData GetSensorData() override;
+
+  /**
+  * @brief Uninitialize the sensor
+  */
   void Uninitialize() override;
   ~FingerPositionSensor() {
     Uninitialize();
