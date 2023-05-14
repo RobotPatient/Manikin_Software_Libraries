@@ -29,7 +29,6 @@
 #include <usb_service_protocol.hpp>
 
 namespace usb_service_protocol {
-/* Defines (kinda but instead of macro's inline constexpr) */
 inline constexpr uint8_t kReadBufferSize = 100;
 inline constexpr char kTerminalEntryCharacter = '>';
 inline constexpr char kNewLineCharacter = '\n';
@@ -236,8 +235,7 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
       break;
     }
     case kCarriageReturnCharacter: {
-      // Entered means new command was entered!
-      Serial.write(kNewLineCharacter);  // Move cursor down one line
+      Serial.write(kNewLineCharacter);  
       Serial.write(character);  // Now print the \r so the cursor pos is at the beginning of the line
       // We of course don't want to run the entered empty command when a stream command is interrupted by enter key
       if (last_command_was_stream_cmd) {
@@ -249,14 +247,12 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
         Serial.write(character);
       }
       Serial.write(kTerminalEntryCharacter);
-      // Empty the read buffer and fill with \0 characters, command execution was succesfull!
       memset(read_buffer, kStrTerminationCharacter, read_index);
       read_index = 0;
       break;
     }
     default: {
       if (read_index < kReadBufferSize) {
-        // Echo back the character
         Serial.write(character);
         read_buffer[read_index++] = character;
       }
@@ -276,9 +272,7 @@ void ReadTask(void* pvParameters) {
   static char read_buffer[kReadBufferSize];
   int character = kNoNewCharacter;
   // Buffers are never terminated when uninitialized.
-  // Therefore it needs to be memset.
   // If not memset our parsing functions will not work!
-  // Because it also will contain random data
   memset(read_buffer, kStrTerminationCharacter, kReadBufferSize);
   // This gives our lovely '>' character at the beginning of terminal
   Serial.write(kTerminalEntryCharacter);
