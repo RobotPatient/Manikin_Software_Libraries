@@ -53,8 +53,6 @@ class FlashLogger : public Logger {
       const int kFilePathSize = strlen(FilePath);
       if (kFilePathSize < kMaxFilePathSize) {
         memcpy(FilePath_, FilePath, strlen(FilePath));
-      } else {
-        THROW_WARN("FilePath is too long!", hal::exception::OUT_OF_BOUNDS);
       }
     }
   }
