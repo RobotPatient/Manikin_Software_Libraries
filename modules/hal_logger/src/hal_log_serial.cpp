@@ -32,10 +32,6 @@ namespace hal::log {
 
 
 void SerialLogger::init() {
-  if (SerialHandle_ != NULL) {
-    // We might as well notify that the logger is initiated!
-    SerialHandle_->println("LOGGER INIT!");
-  }
 }
 
 void SerialLogger::writestr(const char* str) {
