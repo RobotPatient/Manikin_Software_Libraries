@@ -37,10 +37,6 @@ void FlashLogger::init() {
   }
   FileHandle_.close();
   FileHandle_.open(FilePath_, FILE_WRITE);
-  // Check if the file is opened and ready for write/read operation
-  if (FileHandle_) {
-    Serial.println("File opened for writing!");
-  }
 }
 
 void FlashLogger::writestr(const char* str) {
