@@ -181,7 +181,7 @@ ParsedArgs Parsearg(char* buffer) {
  */
 const char* Runcmd(char* buffer) {
   ParsedArgs args = Parsearg(buffer);
-  for (uint8_t command_index = 0; command_index < 6; command_index++) {
+  for (uint8_t command_index = 0; command_index < NumRegisters; command_index++) {
     const bool command_found = (strcmp(serviceProtocolRegisters[command_index].cmd_, buffer) == 0);
     if (command_found) {
       const bool too_many_arguments =
