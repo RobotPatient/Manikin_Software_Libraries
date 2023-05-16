@@ -181,7 +181,7 @@ ParsedArgs Parsearg(char* buffer) {
  */
 const char* Runcmd(char* buffer) {
   ParsedArgs args = Parsearg(buffer);
-  for (uint8_t command_index = 0; command_index < NumRegisters; command_index++) {
+  for (uint8_t command_index = 0; command_index < 6; command_index++) {
     const bool command_found = (strcmp(serviceProtocolRegisters[command_index].cmd_, buffer) == 0);
     if (command_found) {
       const bool too_many_arguments =
@@ -237,9 +237,10 @@ inline void ParseInput(char* read_buffer, int character,  const bool last_comman
     case kCarriageReturnCharacter: {
       Serial.write(kNewLineCharacter);
       Serial.write(character);  // Now print the \r so the cursor pos is at the beginning of the line
+      read_buffer[read_index++] = character;
       // We of course don't want to run the entered empty command when a stream command is interrupted by enter key
       if (last_command_was_stream_cmd) {
-        LastRegister->stream_cmd_ = false;
+        LastRegister = NULL;
       } else {
         const char* command_output = Runcmd(read_buffer);
         Serial.write(command_output);
@@ -278,8 +279,8 @@ void ReadTask(void* pvParameters) {
   Serial.write(kTerminalEntryCharacter);
   for (;;) {
     character = Serial.read();
-    const bool last_command_was_stream_cmd = LastRegister->stream_cmd_;
-    const bool new_character = character != kNoNewCharacter;
+    bool last_command_was_stream_cmd = LastRegister != NULL ? LastRegister->stream_cmd_ : false;
+    bool new_character = character != kNoNewCharacter;
     if (new_character) {
       ParseInput(read_buffer, character, last_command_was_stream_cmd);
     } else if (last_command_was_stream_cmd) {
@@ -311,3 +312,4 @@ void SetPollingTask(TaskHandle_t* task_handle) {
 }
 }
 }  // namespace usb_service_protocol
+
