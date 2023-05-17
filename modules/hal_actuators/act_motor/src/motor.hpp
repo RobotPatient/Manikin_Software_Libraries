@@ -43,12 +43,23 @@ class Motor {
 
   void initPwmPin();
 
-  void startRotate(uint8_t pwm);
+  void startRotate();
+
+  /**
+   * @brief
+   *
+   * @param dutyCycle procentage between 0 and 100 procent
+   */
+  void setDuctyCycle(uint32_t dutyCycle);
   void stopRotate();
 
+ protected:
+  int getGCLK();
+
  private:
-  hal::gpio::GPIOPort motorPort_;
-  uint8_t motorPin_;
+  uint32_t period_ = 48 - 1;
+  const hal::gpio::GPIOPort motorPort_;
+  const uint8_t motorPin_;
 };
 
 }  // namespace actuator
