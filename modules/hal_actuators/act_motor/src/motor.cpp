@@ -64,25 +64,41 @@ void Motor::initPwmPin() {
   while (GCLK->STATUS.bit.SYNCBUSY)
     ;  // Wait for synchronization
 
-  // Divide counter by 1 giving 48 MHz (20.83 ns) on each TCC0 tick
-  TCC0->CTRLA.reg |= TCC_CTRLA_PRESCALER(TCC_CTRLA_PRESCALER_DIV1_Val);
+  if (getGCLK() == 4) {
+    // Divide counter by 1 giving 48 MHz (20.83 ns) on each TCC0 tick
+    TCC0->CTRLA.reg |= TCC_CTRLA_PRESCALER(TCC_CTRLA_PRESCALER_DIV1_Val);
 
-  // Use "Normal PWM" (single-slope PWM): count up to PER, match on CC[n]
-  TCC0->WAVE.reg = TCC_WAVE_WAVEGEN_NPWM;  // Select NPWM as waveform
-  while (TCC0->SYNCBUSY.bit.WAVE)
-    ;  // Wait for synchronization
+    // Use "Normal PWM" (single-slope PWM): count up to PER, match on CC[n]
+    TCC0->WAVE.reg = TCC_WAVE_WAVEGEN_NPWM;  // Select NPWM as waveform
+    while (TCC0->SYNCBUSY.bit.WAVE)
+      ;  // Wait for synchronization
 
-  // Set the period (the number to count to (TOP) before resetting timer)
-  TCC0->PER.reg = period_;
-  while (TCC0->SYNCBUSY.bit.PER)
-    ;
+    // Set the period (the number to count to (TOP) before resetting timer)
+    TCC0->PER.reg = period_;
+    while (TCC0->SYNCBUSY.bit.PER)
+      ;
 
-  // Set PWM signal to output 50% duty cycle
-  // n for CC[n] is determined by n = x % 4 where x is from WO[x]
-  TCC0->CC[2].reg = 30;  // period_ / 2;
-  while (TCC0->SYNCBUSY.bit.CC2)
-    ;
+    // Set PWM signal to output 50% duty cycle
+    // n for CC[n] is determined by n = x % 4 where x is from WO[x]
+    TCC0->CC[2].reg = 30;  // period_ / 2;
+    while (TCC0->SYNCBUSY.bit.CC2)
+      ;
+  }
 
+  if (getGCLK() == 5) {
+    // ADDITIONS MODIFIED IN samd21g18a.h NEEDED FOR TC7
+    // TC 6 and 7 base address picked from samd21g18au.h
+    //  TC6 ((Tc *)0x42003800UL) /**< \brief (TC6) APB Base Address */
+    //  TC7 ((Tc *)0x42003C00UL) /**< \brief (TC7) APB Base Address */
+    //  TC_INST_NUM 5            /**< \brief (TC) Number of instances */
+    //  TC_INSTS {TC3, TC4, TC5, TC6, TC7} /**< \brief (TC) Instances List */
+    TC7->COUNT16.CTRLA.reg &=
+        ~TC_CTRLA_ENABLE;  // Disable the TC before writing to the registers
+    TC7->COUNT16.CTRLA.reg |=
+        TC_CTRLA_MODE_COUNT16 |  // Set counter mode to 16 bits
+        TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val);  // Set prescaler to 1
+    // TC7->COUNT32.CTRLA.bit.
+  }
   // Configure PA18 to be output
   hal::gpio::SetGPIOPinDirection(motorPort_, motorPin_,
                                  hal::gpio::kGPIODirOutput);
