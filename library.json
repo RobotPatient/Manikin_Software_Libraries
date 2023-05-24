@@ -15,6 +15,9 @@
             "-I modules/hal_exception/src",
             "-I modules/ringbuffer/src",
             "-I modules/hal_actuators/act_motor/src",
+            "-I modules/hal_pwm/hal_tcc/src",
+            "-I modules/hal_pwm/hal_tc/src",
+            "-I modules/hal_pwm/hal_pwm_base/src",
             "-std=gnu++17"
         ]
     },
