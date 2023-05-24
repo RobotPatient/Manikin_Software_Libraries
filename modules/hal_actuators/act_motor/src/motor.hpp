@@ -25,20 +25,22 @@
  *OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
  *OR OTHER DEALINGS IN THE SOFTWARE.
  ***********************************************************************************************/
-
 #ifndef MOTOR_HPP
 #define MOTOR_HPP
 
 #include <gpio.hpp>
+#include <pwm_tc.hpp>
+#include <pwm_tcc.hpp>
 
 #define MOTOR_OFF 0
 #define MOTOR_ON 1
 
 namespace actuator {
-
 class Motor {
  public:
-  Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin);
+  Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
+        hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,
+        uint8_t tc_tcc);
   ~Motor();
 
   void initPwmPin();
@@ -57,9 +59,10 @@ class Motor {
   int getGCLK();
 
  private:
-  uint32_t period_ = 48 - 1;
+  hal::pwm::pwm_base* pwm_;
   const hal::gpio::GPIOPort motorPort_;
   const uint8_t motorPin_;
+  hal::gpio::GPIOPinFunction motorFunction_;
 };
 
 }  // namespace actuator
