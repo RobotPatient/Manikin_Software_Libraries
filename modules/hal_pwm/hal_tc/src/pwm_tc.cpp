@@ -60,19 +60,21 @@ void pwm_tc::init() {
   //  TC7 ((Tc *)0x42003C00UL) /**< \brief (TC7) APB Base Address */
   //  TC_INST_NUM 5            /**< \brief (TC) Number of instances */
   //  TC_INSTS {TC3, TC4, TC5, TC6, TC7} /**< \brief (TC) Instances List */
-  selectTCx(tc_)->COUNT16.CTRLA.reg &=
+  selectTx(tc_cc_)->COUNT16.CTRLA.reg &=
       ~TC_CTRLA_ENABLE;  // Disable the TC before writing to the registers
-  selectTCx(tc_)->COUNT16.CTRLA.reg |=
+  selectTx(tc_cc_)->COUNT16.CTRLA.reg |=
       TC_CTRLA_MODE_COUNT16 |  // Set counter mode to 16 bits
       TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val);  // Set prescaler to 1
   // selectTCx(tc_)->COUNT32.CTRLA.bit.
 }
 
-void pwm_tc::start() {}
-void pwm_tc::stop() {}
-void pwm_tc::setDutyCycle(uint32_t dutycyle) {}
+void pwm_tc::start() { ; }
 
-Tc* pwm_tc::selectTCx(uint8_t TCx) {
+void pwm_tc::stop() { ; }
+
+void pwm_tc::setDutyCycle(uint32_t dutycyle) { ; }
+
+Tc* pwm_tc::selectTx(uint8_t TCx) {
   switch (TCx) {
     case 3:
       return TC3;

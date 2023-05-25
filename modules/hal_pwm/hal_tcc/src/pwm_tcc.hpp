@@ -32,13 +32,15 @@
 #include <stdint.h>
 
 #include <gpio.hpp>
-#include <pwm_base.hpp>
+#include <pwm_helper.hpp>
 
 namespace hal::pwm {
 class pwm_tcc : public pwm_base {
  public:
-  pwm_tcc(uint8_t gclk, uint8_t tcc) : gclk_(gclk), tcc_(tcc) {}
-  ~pwm_tcc() override;
+  pwm_tcc(uint8_t gclk, uint8_t tcc) {
+    gclk_ = gclk;
+    tc_cc_ = tcc;
+  }
 
   void init() override;
 
@@ -47,10 +49,7 @@ class pwm_tcc : public pwm_base {
   void setDutyCycle(uint32_t) override;
 
  private:
-  Tcc* selectTCCx(uint8_t);
-  uint8_t gclk_;
-  uint8_t tcc_;
-  const uint32_t period_ = 48 - 1;
+  Tcc* selectTx(uint8_t);
 };
 }  // namespace hal::pwm
 #endif

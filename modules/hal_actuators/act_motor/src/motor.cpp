@@ -29,6 +29,9 @@
 
 #include <sam.h>
 
+#include <pwm_tc.hpp>
+#include <pwm_tcc.hpp>
+
 namespace actuator {
 Motor::Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
              hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,

@@ -55,30 +55,37 @@ void pwm_tcc::init() {
     ;  // Wait for synchronization
 
   // Divide counter by 1 giving 48 MHz (20.83 ns) on each TCC0 tick
-  selectTCCx(tcc_)->CTRLA.reg |=
+  selectTx(tc_cc_)->CTRLA.reg |=
       TCC_CTRLA_PRESCALER(TCC_CTRLA_PRESCALER_DIV1_Val);
 
   // Use "Normal PWM" (single-slope PWM): count up to PER, match on CC[n]
-  selectTCCx(tcc_)->WAVE.reg =
+  selectTx(tc_cc_)->WAVE.reg =
       TCC_WAVE_WAVEGEN_NPWM;  // Select NPWM as waveform
-  while (selectTCCx(tcc_)->SYNCBUSY.bit.WAVE)
+  while (selectTx(tc_cc_)->SYNCBUSY.bit.WAVE)
     ;  // Wait for synchronization
 
   // Set the period (the number to count to (TOP) before resetting timer)
-  selectTCCx(tcc_)->PER.reg = period_;
-  while (selectTCCx(tcc_)->SYNCBUSY.bit.PER)
+  selectTx(tc_cc_)->PER.reg = period_;
+  while (selectTx(tc_cc_)->SYNCBUSY.bit.PER)
     ;
 
   // Set PWM signal to output 50% duty cycle
   // n for CC[n] is determined by n = x % 4 where x is from WO[x]
-  selectTCCx(tcc_)->CC[2].reg = 30;  // period_ / 2;
-  while (selectTCCx(tcc_)->SYNCBUSY.bit.CC2)
+  selectTx(tc_cc_)->CC[2].reg = 30;  // period_ / 2;
+  while (selectTx(tc_cc_)->SYNCBUSY.bit.CC2)
     ;
 }
 
 void pwm_tcc::start() {
   // Enable output (start PWM)
   TCC0->CTRLA.reg |= (TCC_CTRLA_ENABLE);
+  while (TCC0->SYNCBUSY.bit.ENABLE)
+    ;  // Wait for synchronization
+}
+
+void pwm_tcc::stop() {
+  // Disable the PWM output (stop the timer)
+  TCC0->CTRLA.reg &= ~TCC_CTRLA_ENABLE;
   while (TCC0->SYNCBUSY.bit.ENABLE)
     ;  // Wait for synchronization
 }
@@ -90,14 +97,7 @@ void pwm_tcc::setDutyCycle(uint32_t dutyCycle) {
     ;  // Wait for synchronization
 }
 
-void pwm_tcc::stop() {
-  // Disable the PWM output (stop the timer)
-  TCC0->CTRLA.reg &= ~TCC_CTRLA_ENABLE;
-  while (TCC0->SYNCBUSY.bit.ENABLE)
-    ;  // Wait for synchronization
-}
-
-Tcc* pwm_tcc::selectTCCx(uint8_t TCCx) {
+Tcc* pwm_tcc::selectTx(uint8_t TCCx) {
   switch (TCCx) {
     case 0:
       return TCC0;

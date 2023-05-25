@@ -33,11 +33,16 @@
 namespace hal::pwm {
 class pwm_base {
  public:
-  virtual ~pwm_base() {}
+  virtual ~pwm_base() = default;
   virtual void init() = 0;
   virtual void start() = 0;
   virtual void stop() = 0;
   virtual void setDutyCycle(uint32_t) = 0;
+
+ protected:
+  uint8_t gclk_;
+  uint8_t tc_cc_;
+  const uint32_t period_ = 48 - 1;
 };
 }  // namespace hal::pwm
 #endif
