@@ -30,27 +30,16 @@
 #include <sam.h>
 
 namespace hal::pwm {
-void pwm_tc::init() {
-  // Number to count to with PWM (TOP value). Frequency can be calculated by
-  // freq = GCLK4_freq / (TCC0_prescaler * (1 + TOP_value))
-  // With TOP of 47, we get a 1 MHz square wave in this example
-  GCLK->GENCTRL.reg = GCLK_GENCTRL_IDC |          // Improve duty cycle
-                      GCLK_GENCTRL_GENEN |        // Enable generic clock gen
-                      GCLK_GENCTRL_SRC_DFLL48M |  // Select 48MHz as source
-                      GCLK_GENCTRL_ID(gclk_);     // Select GCLKx
-  while (GCLK->STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchronization
+pwm_tc::pwm_tc(uint8_t gclk, uint8_t tc) {
+  gclk_ = gclk;
+  selectTx(tc);
+}
 
-  // Set clock divider of 1 to generic clock generator 4
-  GCLK->GENDIV.reg = GCLK_GENDIV_DIV(1) |    // Divide 48 MHz by 1
-                     GCLK_GENDIV_ID(gclk_);  // Apply to GCLKx 4
-  while (GCLK->STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchronization
-
+void pwm_tc::initTcTcc() {
   // Enable GCLK4 and connect it to TCC0 and TCC1
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |        // Enable generic clock
-                      GCLK_CLKCTRL_GEN(gclk_) |   // Select GCLKx
-                      GCLK_CLKCTRL_ID_TCC0_TCC1;  // Feed GCLKx to TCC0/1
+  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |       // Enable generic clock
+                      GCLK_CLKCTRL_GEN(gclk_) |  // Select GCLKx
+                      tc_tcc_connector_mask_;    // Feed GCLKx to TCCx or TCx
   while (GCLK->STATUS.bit.SYNCBUSY)
     ;  // Wait for synchronization
 
@@ -60,9 +49,9 @@ void pwm_tc::init() {
   //  TC7 ((Tc *)0x42003C00UL) /**< \brief (TC7) APB Base Address */
   //  TC_INST_NUM 5            /**< \brief (TC) Number of instances */
   //  TC_INSTS {TC3, TC4, TC5, TC6, TC7} /**< \brief (TC) Instances List */
-  selectTx(tc_cc_)->COUNT16.CTRLA.reg &=
+  tc_->COUNT16.CTRLA.reg &=
       ~TC_CTRLA_ENABLE;  // Disable the TC before writing to the registers
-  selectTx(tc_cc_)->COUNT16.CTRLA.reg |=
+  tc_->COUNT16.CTRLA.reg |=
       TC_CTRLA_MODE_COUNT16 |  // Set counter mode to 16 bits
       TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val);  // Set prescaler to 1
   // selectTCx(tc_)->COUNT32.CTRLA.bit.
@@ -74,16 +63,25 @@ void pwm_tc::stop() { ; }
 
 void pwm_tc::setDutyCycle(uint32_t dutycyle) { ; }
 
-Tc* pwm_tc::selectTx(uint8_t TCx) {
+void pwm_tc::selectTx(uint8_t TCx) {
   switch (TCx) {
     case 3:
-      return TC3;
+      tc_ = TC3;
+      tc_tcc_connector_mask_ = GCLK_CLKCTRL_ID_TCC2_TC3;
+      break;
     case 4:
-      return TC4;
+      tc_ = TC4;
+      tc_tcc_connector_mask_ = GCLK_CLKCTRL_ID_TC4_TC5;
+      break;
     case 5:
-      return TC5;
+      tc_ = TC5;
+      tc_tcc_connector_mask_ = GCLK_CLKCTRL_ID_TC4_TC5;
+      break;
     default:
-      return nullptr;
+      // TODO: ASSERT ERROR OR SOMETHING!
+      tc_ = nullptr;
+      tc_tcc_connector_mask_ = 0ul;
+      break;
   }
 }
 }  // namespace hal::pwm

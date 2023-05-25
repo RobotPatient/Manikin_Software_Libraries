@@ -34,14 +34,21 @@ namespace hal::pwm {
 class pwm_base {
  public:
   virtual ~pwm_base() = default;
-  virtual void init() = 0;
   virtual void start() = 0;
   virtual void stop() = 0;
   virtual void setDutyCycle(uint32_t) = 0;
 
+  void init();
+
  protected:
+  virtual void initTcTcc() = 0;
+  virtual void initTimer();
   uint8_t gclk_;
-  uint8_t tc_cc_;
+  unsigned long tc_tcc_connector_mask_;
+
+  // Number to count to with PWM (TOP value). Frequency can be calculated by
+  // freq = GCLK4_freq / (TCC0_prescaler * (1 + TOP_value))
+  // With TOP of 47, we get a 1 MHz square wave in this example
   const uint32_t period_ = 48 - 1;
 };
 }  // namespace hal::pwm

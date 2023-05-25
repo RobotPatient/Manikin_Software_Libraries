@@ -55,6 +55,7 @@ Motor::~Motor() { delete pwm_; }
 
 void Motor::initPwmPin() {
   pwm_->init();
+  pwm_->init();
 
   // Configure motorPin_ to be output
   hal::gpio::SetGPIOPinDirection(motorPort_, motorPin_,

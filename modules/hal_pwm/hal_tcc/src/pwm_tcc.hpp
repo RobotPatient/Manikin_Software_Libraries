@@ -37,19 +37,16 @@
 namespace hal::pwm {
 class pwm_tcc : public pwm_base {
  public:
-  pwm_tcc(uint8_t gclk, uint8_t tcc) {
-    gclk_ = gclk;
-    tc_cc_ = tcc;
-  }
-
-  void init() override;
+  pwm_tcc(uint8_t gclk, uint8_t tcc);
 
   void start() override;
   void stop() override;
   void setDutyCycle(uint32_t) override;
 
  private:
-  Tcc* selectTx(uint8_t);
+  void initTcTcc() override;
+  void selectTx(uint8_t);
+  Tcc* tcc_;
 };
 }  // namespace hal::pwm
 #endif
