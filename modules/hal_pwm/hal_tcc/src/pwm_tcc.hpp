@@ -32,7 +32,7 @@
 #include <stdint.h>
 
 #include <gpio.hpp>
-#include <pwm_helper.hpp>
+#include <pwm_base.hpp>
 
 namespace hal::pwm {
 class pwm_tcc : public pwm_base {

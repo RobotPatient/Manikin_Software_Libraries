@@ -29,7 +29,7 @@
 #define MOTOR_HPP
 
 #include <gpio.hpp>
-#include <pwm_helper.hpp>
+#include <pwm_base.hpp>
 
 #define MOTOR_OFF 0
 #define MOTOR_ON 1
