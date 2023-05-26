@@ -35,16 +35,17 @@
 namespace actuator {
 Motor::Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
              hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,
-             uint8_t tc_tcc)
+             uint8_t tc_tcc, uint8_t wo)
     : motorPort_(motorPort),
       motorPin_(motorPin),
       motorFunction_(motorFunction) {
   if (tc_tcc == 0 || tc_tcc == 1 || tc_tcc == 2) {
-    pwm_ = new hal::pwm::pwm_tcc(gclkNumber, tc_tcc);
+    pwm_ = new hal::pwm::pwm_tcc(gclkNumber, tc_tcc, wo);
   }
   if (tc_tcc == 3 || tc_tcc == 4 || tc_tcc == 5) {
-    pwm_ = new hal::pwm::pwm_tc(gclkNumber, tc_tcc);
+    pwm_ = new hal::pwm::pwm_tc(gclkNumber, tc_tcc, wo);
   }
+
   SetGPIOPinDirection(motorPort_, motorPin_, hal::gpio::kGPIODirOutput);
   SetGPIOPinDriveStrength(motorPort_, motorPin_,
                           hal::gpio::kGPIONormalDriveStrength);
@@ -55,20 +56,19 @@ Motor::~Motor() { delete pwm_; }
 
 void Motor::initPwmPin() {
   pwm_->init();
-  pwm_->init();
 
   // Configure motorPin_ to be output
   hal::gpio::SetGPIOPinDirection(motorPort_, motorPin_,
                                  hal::gpio::kGPIODirOutput);
   hal::gpio::SetGPIOPinLevel(motorPort_, motorPin_, 0);
 
-  // Connect TCCx timer to motorPin_.
+  // Connect TCCx or TCx timer to motorPin_.
   hal::gpio::SetGPIOPinFunction(motorPort_, motorPin_, motorFunction_);
 }
 
 void Motor::startRotate() { pwm_->start(); }
 
-void Motor::setDuctyCycle(uint32_t dutyCycle) { pwm_->setDutyCycle(dutyCycle); }
+void Motor::setDuctyCycle(uint8_t dutyCycle) { pwm_->setDutyCycle(dutyCycle); }
 
 void Motor::stopRotate() { pwm_->stop(); }
 

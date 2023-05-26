@@ -46,10 +46,12 @@ class pwm_base {
   uint8_t gclk_;
   unsigned long tc_tcc_connector_mask_;
 
+  uint16_t wo_;
+
   // Number to count to with PWM (TOP value). Frequency can be calculated by
   // freq = GCLK4_freq / (TCC0_prescaler * (1 + TOP_value))
   // With TOP of 47, we get a 1 MHz square wave in this example
-  const uint32_t period_ = 48 - 1;
+  const uint8_t period_ = 48 - 1;
 };
 }  // namespace hal::pwm
 #endif

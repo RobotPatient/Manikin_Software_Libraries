@@ -30,38 +30,61 @@
 #include <sam.h>
 
 namespace hal::pwm {
-pwm_tc::pwm_tc(uint8_t gclk, uint8_t tc) {
+pwm_tc::pwm_tc(uint8_t gclk, uint8_t tc, uint8_t wo) {
   gclk_ = gclk;
   selectTx(tc);
+  wo_ = wo % 2;
 }
 
 void pwm_tc::initTcTcc() {
-  // Enable GCLK4 and connect it to TCC0 and TCC1
+  // Enable GCLKx and connect it to TCC0 and TCC1
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |       // Enable generic clock
                       GCLK_CLKCTRL_GEN(gclk_) |  // Select GCLKx
-                      tc_tcc_connector_mask_;    // Feed GCLKx to TCCx or TCx
+                      tc_tcc_connector_mask_;    // Feed GCLKx to TCx
   while (GCLK->STATUS.bit.SYNCBUSY)
     ;  // Wait for synchronization
 
-  // ADDITIONS MODIFIED IN samd21g18a.h NEEDED FOR TC7
-  // TC 6 and 7 base address picked from samd21g18au.h
-  //  TC6 ((Tc *)0x42003800UL) /**< \brief (TC6) APB Base Address */
-  //  TC7 ((Tc *)0x42003C00UL) /**< \brief (TC7) APB Base Address */
-  //  TC_INST_NUM 5            /**< \brief (TC) Number of instances */
-  //  TC_INSTS {TC3, TC4, TC5, TC6, TC7} /**< \brief (TC) Instances List */
-  tc_->COUNT16.CTRLA.reg &=
+  tc_->COUNT8.CTRLA.reg &=
       ~TC_CTRLA_ENABLE;  // Disable the TC before writing to the registers
-  tc_->COUNT16.CTRLA.reg |=
-      TC_CTRLA_MODE_COUNT16 |  // Set counter mode to 16 bits
-      TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val);  // Set prescaler to 1
-  // selectTCx(tc_)->COUNT32.CTRLA.bit.
+  while (tc_->COUNT16.STATUS.bit.SYNCBUSY)
+    ;  // Wait for synchonization
+
+  tc_->COUNT8.CTRLA.reg |=
+      TC_CTRLA_MODE_COUNT8 |  // Set counter mode to 16 bits
+      TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val) |  // Set prescaler to 1
+      TC_CTRLA_PRESCSYNC(TC_CTRLA_PRESCSYNC_GCLK_Val) |  // set presync to gclk
+      TC_CTRLA_WAVEGEN(TC_CTRLA_WAVEGEN_NPWM_Val);       // set mode to npwm
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
+    ;  // Wait for synchonization
+
+  tc_->COUNT8.PER.reg = period_;
+  // TODO: set TOP value somehow
+
+  // Set PWM signal to output 50% duty cycle
+  // n for CC[n] is determined by n = x % 4 where x is from WO[x]
+  // maybe the same as tcc?
+  tc_->COUNT8.CC[wo_].reg = period_ / 2;  // sets the duty cycle
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
+    ;  // Wait for synchonization
 }
 
-void pwm_tc::start() { ; }
+void pwm_tc::start() {
+  tc_->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
+    ;
+}
 
-void pwm_tc::stop() { ; }
+void pwm_tc::stop() {
+  tc_->COUNT8.CTRLA.reg &= ~TC_CTRLA_ENABLE;
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
+    ;
+}
 
-void pwm_tc::setDutyCycle(uint32_t dutycyle) { ; }
+void pwm_tc::setDutyCycle(uint32_t dutyCycle) {
+  tc_->COUNT8.CC[wo_].reg = (period_ * dutyCycle) / 100;
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
+    ;  // Wait for synchonization
+}
 
 void pwm_tc::selectTx(uint8_t TCx) {
   switch (TCx) {

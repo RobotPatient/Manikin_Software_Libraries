@@ -31,16 +31,17 @@
 
 namespace hal::pwm {
 
-pwm_tcc::pwm_tcc(uint8_t gclk, uint8_t tcc) {
+pwm_tcc::pwm_tcc(uint8_t gclk, uint8_t tcc, uint8_t wo) {
   gclk_ = gclk;
   selectTx(tcc);
+  wo_ = wo % 4;
 }
 
 void pwm_tcc::initTcTcc() {
-  // Enable GCLK4 and connect it to TCC0 and TCC1
+  // Enable GCLKx and connect it to TCC0 and TCC1
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |       // Enable generic clock
                       GCLK_CLKCTRL_GEN(gclk_) |  // Select GCLKx
-                      tc_tcc_connector_mask_;    // Feed GCLKx to TCCx or TCx
+                      tc_tcc_connector_mask_;    // Feed GCLKx to TCCx
   while (GCLK->STATUS.bit.SYNCBUSY)
     ;  // Wait for synchronization
 
@@ -59,7 +60,7 @@ void pwm_tcc::initTcTcc() {
 
   // Set PWM signal to output 50% duty cycle
   // n for CC[n] is determined by n = x % 4 where x is from WO[x]
-  tcc_->CC[2].reg = 30;  // period_ / 2;
+  tcc_->CC[wo_].reg = period_ / 2;
   while (tcc_->SYNCBUSY.bit.CC2)
     ;
 }

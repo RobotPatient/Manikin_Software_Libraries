@@ -39,7 +39,7 @@ class Motor {
  public:
   Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
         hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,
-        uint8_t tc_tcc);
+        uint8_t tc_tcc, uint8_t wo);
   ~Motor();
 
   void initPwmPin();
@@ -51,7 +51,7 @@ class Motor {
    *
    * @param dutyCycle procentage between 0 and 100 procent
    */
-  void setDuctyCycle(uint32_t dutyCycle);
+  void setDuctyCycle(uint8_t dutyCycle);
   void stopRotate();
 
  protected:

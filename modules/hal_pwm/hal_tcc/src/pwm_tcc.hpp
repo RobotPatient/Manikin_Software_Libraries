@@ -37,7 +37,7 @@
 namespace hal::pwm {
 class pwm_tcc : public pwm_base {
  public:
-  pwm_tcc(uint8_t gclk, uint8_t tcc);
+  pwm_tcc(uint8_t gclk, uint8_t tcc, uint8_t wo);
 
   void start() override;
   void stop() override;
