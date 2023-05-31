@@ -30,7 +30,19 @@
 
 #include <stdint.h>
 
+#ifndef GCLK_AMOUNT
+#define GCLK_AMOUNT 8
+#endif
+
 namespace hal::pwm {
+
+static volatile bool
+    GCLKFlag_[GCLK_AMOUNT];  //!< Flags if a GCLK is already in use.
+
+/**
+ * @brief pwm_base class for creating a pwm signal. Needed so the TCx and TCCx
+ * can be abstracted behind this base class.
+ */
 class pwm_base {
  public:
   virtual ~pwm_base() = default;
@@ -38,20 +50,33 @@ class pwm_base {
   virtual void stop() = 0;
   virtual void setDutyCycle(uint32_t) = 0;
 
+  /**
+   * @brief Inizializes the GCLK and the TCx or TCCx
+   */
   void init();
 
  protected:
-  virtual void initTcTcc() = 0;
+  /**
+   * @brief Inizialzes a gclk with the gclk_ as its number and a 1Mhz cycle
+   *
+   * if a gclk_ is already in use it does nothing.
+   */
   virtual void initTimer();
-  uint8_t gclk_;
-  unsigned long tc_tcc_connector_mask_;
 
-  uint16_t wo_;
+  virtual void initTcTcc() = 0;
+
+  uint8_t gclk_;                         //!< number of GCLKx
+  unsigned long tc_tcc_connector_mask_;  //!< Mask used to connect the GCLKx to
+                                         //!< the TCx and/or TCCx
+  uint16_t wo_;                          //!< number of the WO[x]
 
   // Number to count to with PWM (TOP value). Frequency can be calculated by
   // freq = GCLK4_freq / (TCC0_prescaler * (1 + TOP_value))
-  // With TOP of 47, we get a 1 MHz square wave in this example
-  const uint8_t period_ = 48 - 1;
+  // With TOP of 47, we get a 1 MHz square wave
+  const uint8_t period_ = 48 - 1;  //!< TOP value for frequency, set at 1Mhz
+
+ private:
+  bool checkFlag();
 };
 }  // namespace hal::pwm
 #endif

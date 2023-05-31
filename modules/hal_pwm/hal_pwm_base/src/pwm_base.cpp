@@ -37,6 +37,10 @@ void pwm_base::init() {
 }
 
 void pwm_base::initTimer() {
+  if (!checkFlag()) {
+    // if the gclk_ is alredy in use, don't set the gclk_ again
+    return;
+  }
   GCLK->GENCTRL.reg = GCLK_GENCTRL_IDC |          // Improve duty cycle
                       GCLK_GENCTRL_GENEN |        // Enable generic clock gen
                       GCLK_GENCTRL_SRC_DFLL48M |  // Select 48MHz as source
@@ -51,6 +55,17 @@ void pwm_base::initTimer() {
     ;  // Wait for synchronization
 
   // Generic Clock x is now ready to be enabled...
+}
+
+bool pwm_base::checkFlag() {
+  if (GCLKFlag_[gclk_]) {
+    // gclk_ is already in use! show a warining or something!
+    return false;
+  } else {
+    GCLKFlag_[gclk_] =
+        true;  // gclk_ is not yet used, you can use the gclk without worry
+    return true;
+  }
 }
 
 }  // namespace hal::pwm
