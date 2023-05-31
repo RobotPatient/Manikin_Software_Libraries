@@ -28,46 +28,29 @@
 #include <sam.h>
 #include <hal_exception.hpp>
 
+namespace hal::exception {
+
+/**
+ * @brief Private copy of pointer to logging medium instance
+ * @note Logger module has to be enabled in hal_exception_config.hpp for this to function
+ */
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 static hal::log::Logger* log_obj = NULL;
 #endif
 
-inline constexpr uint8_t EVENTSYS_IRQ_PRIO = 5;
-inline constexpr uint8_t EVENTSYS_CHANNEL = 0;
-
-// The reasoning behind the ISR:
-// The ISR has low IRQ priority...
-// This way peripherals like the SERCOMS can finish their transactions, before reset.
-void EVSYS_Handler() {
-  EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
-  NVIC_SystemReset();
-}
-
-namespace hal::exception {
-
+/**
+ * @brief Logs message to logging medium
+ * 
+ * @param msg The message to log
+ */
+#ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 void Log(const char* msg) {
   if (log_obj != NULL) {
     log_obj->pushbackstr(msg);
     log_obj->flush();
   }
 }
-
-void TriggerResetUsingISR() {
-  EVSYS->CHANNEL.reg |= EVSYS_CHANNEL_SWEVT | EVENTSYS_CHANNEL;
-}
-
-void Init() {
-  GCLK->CLKCTRL.reg |=
-      GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK1 | GCLK_CLKCTRL_ID_EVSYS_0;
-  PM->APBCMASK.reg |= PM_APBCMASK_EVSYS;
-  EVSYS->CTRL.reg = EVSYS_CTRL_GCLKREQ;
-  EVSYS->INTFLAG.reg = EVSYS_INTFLAG_EVD0;
-  EVSYS->CHANNEL.reg = EVSYS_CHANNEL_EDGSEL_BOTH_EDGES |
-                       EVSYS_CHANNEL_PATH_RESYNCHRONIZED | EVENTSYS_CHANNEL;
-  EVSYS->INTENSET.reg = EVSYS_INTFLAG_EVD0;
-  NVIC_EnableIRQ(EVSYS_IRQn);
-  NVIC_SetPriority(EVSYS_IRQn, EVENTSYS_IRQ_PRIO);
-}
+#endif
 
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
 void attachLogger(hal::log::Logger* Logger_obj) {
@@ -82,7 +65,7 @@ void ThrowException(const char* exception_message,
   Log(exception_message);
 #endif
   if (exception_action == SOFT_RESET) {
-    TriggerResetUsingISR();
+    NVIC_SystemReset();  // Reset the MCU
   }
 }
 
@@ -99,7 +82,7 @@ void assert_reset(const char* assert_msg, bool condition) {
 #ifdef EXCEPTION_MODULE_ENABLE_LOGGER
     Log(assert_msg);
 #endif
-    TriggerResetUsingISR();
+    NVIC_SystemReset();
   }
 }
 
@@ -110,7 +93,7 @@ void assert_custom_action(const char* assert_msg, bool condition,
     Log(assert_msg);
 #endif
     if (exception_action == SOFT_RESET) {
-      TriggerResetUsingISR();
+      NVIC_SystemReset();
     }
   }
 }

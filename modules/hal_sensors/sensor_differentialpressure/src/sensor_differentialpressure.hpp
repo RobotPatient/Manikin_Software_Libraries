@@ -36,27 +36,50 @@ inline constexpr uint8_t kSdp810BufferSize = 9;
 
 class DifferentialPressureSensor : public UniversalSensor {
  public:
-  explicit DifferentialPressureSensor(I2CDriver *I2C_handle) : UniversalSensor(I2C_handle) {
-    i2c_handle_ = I2C_handle;
+  DifferentialPressureSensor() : UniversalSensor() {}
+
+  /**
+  * @brief Initialises the sensor with its default settings
+  * 
+  * @param handle Pointer to I2C slave driver instance
+  */
+  void Initialize(I2CDriver* handle) override;
+
+  /**
+  * @brief Get the sensortype
+  * 
+  * @return unique sensor identifier
+  */
+  const uint8_t GetSensorType() override {
+    return SensorType_;
   }
 
-  void Initialize() override;
+  /**
+   * @brief Read the sensor
+   * 
+   * @return SensorData_t SensorData struct with the sensordata, sample_num and sensor_id
+   */
   SensorData GetSensorData() override;
+
+  /**
+   * @brief Uninitialize the sensor
+  */
   void Uninitialize() override;
   ~DifferentialPressureSensor() {
     Uninitialize();
   }
 
  private:
+  const uint8_t SensorType_ = 0x02;
   const uint8_t kSensorI2CAddress_ = kSdp810I2CAddr;
   I2CDriver *i2c_handle_;
   SensorData sensor_data_{};
 
-// Low level driver functions:
   int16_t sensor_raw_;
   int16_t conversion_factor_;
   uint8_t sensor_buffer_[kSdp810BufferSize];
 
+// Low level driver functions:
   void BeginSDP810();
   void ReadSdp810();
   int16_t GetRawSDP810();

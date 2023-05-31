@@ -31,19 +31,48 @@
 
 #include <i2c_helper.hpp>
 
+inline constexpr uint8_t kMaxAmountOfSensorBytes = 8;
+/**
+ * @brief Sensordata struct contains the read sensor data with samplenum and sensortype
+ * 
+ * @note buffer contains the raw sensordata
+ */
 typedef struct SensorData {
-  uint16_t buffer[8];
+  uint16_t sample_num;
+  uint8_t sensor_id;
+  uint16_t buffer[kMaxAmountOfSensorBytes];
   uint8_t num_of_bytes;
 } SensorData_t;
 
 class UniversalSensor {
  public:
-  explicit UniversalSensor(I2CDriver *i2c_handle) {}
-  virtual void Initialize() = 0;
+  UniversalSensor() {}
+
+  /**
+   * @brief Initialises the sensor with its default settings
+   * 
+   * @param handle Pointer to I2C slave driver instance
+   */
+  virtual void Initialize(I2CDriver* handle) = 0;
+
+  /**
+   * @brief Read the sensor
+   * 
+   * @return SensorData_t SensorData struct with the sensordata, sample_num and sensor_id
+   */
   virtual SensorData_t GetSensorData() = 0;
+
+  /**
+   * @brief Get the sensortype
+   * 
+   * @return unique sensor identifier
+  */
+  virtual const uint8_t GetSensorType() = 0;
+
+  /**
+   * @brief Uninitialize the sensor
+  */
   virtual void Uninitialize() = 0;
- private:
-  I2C_PERIPHERAL_T i2c_handle_;
 };
 
 #endif  // SENSOR_BASE_H

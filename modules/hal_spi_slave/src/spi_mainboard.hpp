@@ -26,28 +26,44 @@
  * OTHER DEALINGS IN THE SOFTWARE.
 ***********************************************************************************************/
 
-#ifndef SPI_BASE_HPP
-#define SPI_BASE_HPP
-#include <stdint.h>
+#ifndef SPI_MAINBOARD_HPP
+#define SPI_MAINBOARD_HPP
+
+#include <spi_mainboard_registers.hpp>
+
 namespace hal::spi {
 
-inline constexpr uint8_t kPermissionsRW = 0;
-inline constexpr uint8_t kPermissionsRO = 1;
+/* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
+inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;
+inline constexpr uint8_t kSTATUS_REG = 0;
+inline constexpr uint8_t kBBSETA_REG = 0x01;
+inline constexpr uint8_t kBBSETB_REG = 0x02;
+inline constexpr uint8_t kBBSETC_REG = 0x03;
+inline constexpr uint8_t kBBSETD_REG = 0x04;
+inline constexpr uint8_t kREQWORDA_REG = 0x05;
+inline constexpr uint8_t kREQWORDB_REG = 0x06;
+inline constexpr uint8_t kREQWORDC_REG = 0x07;
+inline constexpr uint8_t kREQWORDD_REG = 0x08;
+inline constexpr uint8_t kSENSDATA_REG = 0x09;
+inline constexpr uint8_t kACTDATA_REG = 0x0A;
+/* The array with the SPI slave registers */
+extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
 
-typedef struct {
-    volatile uint8_t *data;
-    volatile uint8_t data_crc;
-    uint8_t size;
-    const uint8_t access_permissions;
-} SpiSlaveData;
-
-
-
-class SPISlave {
+/**
+ * @brief This class can be used to create a SPI slave module
+ * 
+ */
+class SPIMainBoard {
  public:
-    SPISlave() {}
-    virtual void begin() = 0;
-    virtual void deinit() = 0;
+  SPIMainBoard() {}
+  /**
+   * @brief Begin inits the internal ISR and starts the SPI slave module
+   */
+  void begin();
+  /**
+   * @brief Deinit the SPI slave module
+   */
+  void deinit();
 };
 }  // namespace hal::spi
 #endif
