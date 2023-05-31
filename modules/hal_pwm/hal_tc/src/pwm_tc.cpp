@@ -41,49 +41,48 @@ void pwm_tc::initTcTcc() {
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |       // Enable generic clock
                       GCLK_CLKCTRL_GEN(gclk_) |  // Select GCLKx
                       tc_tcc_connector_mask_;    // Feed GCLKx to TCx
-  while (GCLK->STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchronization
+  while (GCLK->STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchronization
 
   tc_->COUNT8.CTRLA.reg &=
       ~TC_CTRLA_ENABLE;  // Disable the TC before writing to the registers
-  while (tc_->COUNT16.STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchonization
+  while (tc_->COUNT16.STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchonization
 
   tc_->COUNT8.CTRLA.reg |=
       TC_CTRLA_MODE_COUNT8 |  // Set counter mode to 16 bits
       TC_CTRLA_PRESCALER(TC_CTRLA_PRESCALER_DIV1_Val) |  // Set prescaler to 1
       TC_CTRLA_PRESCSYNC(TC_CTRLA_PRESCSYNC_GCLK_Val) |  // set presync to gclk
       TC_CTRLA_WAVEGEN(TC_CTRLA_WAVEGEN_NPWM_Val);       // set mode to npwm
-  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchonization
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchonization
 
   tc_->COUNT8.PER.reg = period_;
-  // TODO: set TOP value somehow
 
   // Set PWM signal to output 50% duty cycle
   // n for CC[n] is determined by n = x % 4 where x is from WO[x]
   // maybe the same as tcc?
   tc_->COUNT8.CC[wo_].reg = period_ / 2;  // sets the duty cycle
-  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchonization
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchonization
 }
 
 void pwm_tc::start() {
   tc_->COUNT8.CTRLA.reg |= TC_CTRLA_ENABLE;
-  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
-    ;
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY) {
+  }
 }
 
 void pwm_tc::stop() {
   tc_->COUNT8.CTRLA.reg &= ~TC_CTRLA_ENABLE;
-  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
-    ;
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY) {
+  }
 }
 
 void pwm_tc::setDutyCycle(uint32_t dutyCycle) {
   tc_->COUNT8.CC[wo_].reg = (period_ * dutyCycle) / 100;
-  while (tc_->COUNT8.STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchonization
+  while (tc_->COUNT8.STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchonization
 }
 
 void pwm_tc::selectTx(uint8_t TCx) {
@@ -101,7 +100,7 @@ void pwm_tc::selectTx(uint8_t TCx) {
       tc_tcc_connector_mask_ = GCLK_CLKCTRL_ID_TC4_TC5;
       break;
     default:
-      // TODO: ASSERT ERROR OR SOMETHING!
+      // TODO(Thomas): ASSERT ERROR OR SOMETHING!
       tc_ = nullptr;
       tc_tcc_connector_mask_ = 0ul;
       break;

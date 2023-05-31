@@ -65,10 +65,10 @@ class pwm_base {
 
   virtual void initTcTcc() = 0;
 
-  uint8_t gclk_;                         //!< number of GCLKx
-  unsigned long tc_tcc_connector_mask_;  //!< Mask used to connect the GCLKx to
-                                         //!< the TCx and/or TCCx
-  uint16_t wo_;                          //!< number of the WO[x]
+  uint8_t gclk_;                    //!< number of GCLKx
+  uint32_t tc_tcc_connector_mask_;  //!< Mask used to connect the GCLKx to
+                                    //!< the TCx and/or TCCx
+  uint16_t wo_;                     //!< number of the WO[x]
 
   // Number to count to with PWM (TOP value). Frequency can be calculated by
   // freq = GCLK4_freq / (TCC0_prescaler * (1 + TOP_value))

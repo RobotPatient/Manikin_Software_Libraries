@@ -42,48 +42,48 @@ void pwm_tcc::initTcTcc() {
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN |       // Enable generic clock
                       GCLK_CLKCTRL_GEN(gclk_) |  // Select GCLKx
                       tc_tcc_connector_mask_;    // Feed GCLKx to TCCx
-  while (GCLK->STATUS.bit.SYNCBUSY)
-    ;  // Wait for synchronization
+  while (GCLK->STATUS.bit.SYNCBUSY) {
+  }  // Wait for synchronization
 
   // Divide counter by 1 giving 48 MHz (20.83 ns) on each TCC0 tick
   tcc_->CTRLA.reg |= TCC_CTRLA_PRESCALER(TCC_CTRLA_PRESCALER_DIV1_Val);
 
   // Use "Normal PWM" (single-slope PWM): count up to PER, match on CC[n]
   tcc_->WAVE.reg = TCC_WAVE_WAVEGEN_NPWM;  // Select NPWM as waveform
-  while (tcc_->SYNCBUSY.bit.WAVE)
-    ;  // Wait for synchronization
+  while (tcc_->SYNCBUSY.bit.WAVE) {
+  }  // Wait for synchronization
 
   // Set the period (the number to count to (TOP) before resetting timer)
   tcc_->PER.reg = period_;
-  while (tcc_->SYNCBUSY.bit.PER)
-    ;
+  while (tcc_->SYNCBUSY.bit.PER) {
+  }
 
   // Set PWM signal to output 50% duty cycle
   // n for CC[n] is determined by n = x % 4 where x is from WO[x]
   tcc_->CC[wo_].reg = period_ / 2;
-  while (tcc_->SYNCBUSY.bit.CC2)
-    ;
+  while (tcc_->SYNCBUSY.bit.CC2) {
+  }
 }
 
 void pwm_tcc::start() {
   // Enable output (start PWM)
   TCC0->CTRLA.reg |= (TCC_CTRLA_ENABLE);
-  while (TCC0->SYNCBUSY.bit.ENABLE)
-    ;  // Wait for synchronization
+  while (TCC0->SYNCBUSY.bit.ENABLE) {
+  }  // Wait for synchronization
 }
 
 void pwm_tcc::stop() {
   // Disable the PWM output (stop the timer)
   TCC0->CTRLA.reg &= ~TCC_CTRLA_ENABLE;
-  while (TCC0->SYNCBUSY.bit.ENABLE)
-    ;  // Wait for synchronization
+  while (TCC0->SYNCBUSY.bit.ENABLE) {
+  }  // Wait for synchronization
 }
 
 void pwm_tcc::setDutyCycle(uint32_t dutyCycle) {
   // Change dutyCycle
   TCC0->CC[2].reg = (period_ * dutyCycle) / 100;
-  while (TCC0->SYNCBUSY.bit.CC2)
-    ;  // Wait for synchronization
+  while (TCC0->SYNCBUSY.bit.CC2) {
+  }  // Wait for synchronization
 }
 
 void pwm_tcc::selectTx(uint8_t TCCx) {
@@ -101,7 +101,7 @@ void pwm_tcc::selectTx(uint8_t TCCx) {
       tc_tcc_connector_mask_ = GCLK_CLKCTRL_ID_TCC2_TC3;
       break;
     default:
-      // TODO: ASSERT ERROR OR SOMETHING!
+      // TODO(Thomas): ASSERT ERROR OR SOMETHING!
       tcc_ = nullptr;
       tc_tcc_connector_mask_ = 0ul;
       break;
