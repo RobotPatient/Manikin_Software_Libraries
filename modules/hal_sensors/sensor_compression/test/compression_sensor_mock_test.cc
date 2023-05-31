@@ -120,14 +120,14 @@ void SetVL6180xDefaultSettingsCalls(I2CDriver *i2c_handle_mock) {
 
 TEST(compressionTest, initCalls) {
   I2CDriver i2c_handle_mock;
-  CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
+  CompressionSensor CompSensor;
   EXPECT_CALL(i2c_handle_mock, ChangeAddress(kSensorAddr));
   {
     InSequence seq;
     InitVL6180xCalls(&i2c_handle_mock);
     SetVL6180xDefaultSettingsCalls(&i2c_handle_mock);
   }
-  CompSensor.Initialize();
+  CompSensor.Initialize(&i2c_handle_mock);
   Mock::VerifyAndClearExpectations(&i2c_handle_mock);
 }
 
@@ -136,7 +136,8 @@ TEST(compressionTest, GetSensorData) {
   SensorData ExpectedOutput;
   ExpectedOutput.buffer[0] = 0xAF;
   ExpectedOutput.num_of_bytes = 1;
-  CompressionSensor CompSensor = CompressionSensor(&i2c_handle_mock);
+  CompressionSensor CompSensor;
+  CompSensor.Initialize(&i2c_handle_mock);
   EXPECT_CALL(i2c_handle_mock, WriteReg(kVl6180XSysrangeStart, 0x01));
   EXPECT_CALL(i2c_handle_mock, WriteReg(kVl6180XSystemInterruptClear, 0x07));
   EXPECT_CALL(i2c_handle_mock, ReadReg(kVl6180XResultRangeVal))

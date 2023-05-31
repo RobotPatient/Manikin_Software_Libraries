@@ -42,24 +42,107 @@ class SerialLogger : public Logger {
       SerialHandle_ = communicationSettings->CommHandle.SerialHandle;
     }
   }
+  /**
+  * @brief Normally this will init the module.. However the serial module
+  *        get's passed a pointer to an already instantiated serial object.
+  *        Therefore this function doesn't do anything!
+  */
   void init();
+
+  /**
+  * @brief Write a string to the current position in serial console
+  * 
+  * @param str The string to be written
+  */
   void writestr(const char* str);
+
+  /**
+  * @brief Write a byte to the current position in serial console
+  * 
+  * @param byte The byte to be written
+  */
   void writebyte(const uint8_t byte);
+
+  /**
+  * @brief Write a byte after the latest written element in serial console
+  * 
+  * @param byte The byte to be written
+  */
   void pushbackbyte(const uint8_t byte);
+
+  /**
+  * @brief Write a string after the latest written element in serial console
+  * 
+  * @param byte The string to be written
+  */
   void pushbackstr(const char* str);
+
+  /**
+  * @brief Read the latest written bytes in serial console
+  * 
+  * @param buffer The buffer to store the bytes in
+  * @param num_of_bytes The amount of bytes to read
+  */
   void readLatestBytes(char* buffer, const uint8_t num_of_bytes);
+
+  /**
+  * @brief Read the latest written byte in serial console
+  * 
+  * @param buffer The buffer to store the byte in
+  */
   void readLatestByte(char* buffer);
+
+  /**
+  * @brief Set cursor position in serial console
+  * 
+  * @param pos The position is determined in memory by the addr_pos,
+  *            This pos is directly related to this addr_pos
+  *            For consoles like serial it is set to (x,y) position
+  *            with y being pos / (LINE_COUNT) and x being the pos-(pos*LINE_COUNT)
+  *            LINE_COUNT is declared within it's respective source file
+  */
   void setcursorpos(const uint64_t pos);
+
+  /**
+  * @brief Read the byte at the current cursorpos
+  * 
+  * @param buffer The buffer to store the byte in
+  */
   void readbyte(char* buffer);
+
+  /**
+  * @brief Read num_of_bytes amount of bytes at the current cursorpos
+  * 
+  * @param buffer The buffer to store the bytes in
+  * @param num_of_bytes The amount of bytes to read
+  */
   void readbytes(char* buffer, uint8_t num_of_bytes);
+
+  /**
+  * @brief Flush the internal buffers of serial object
+  */
   void flush();
+
+  /**
+  * @brief Close the connection to the serial console
+  */
   void close();
+
+  /**
+  * @brief Give the internal communication handle of the logging medium.
+  *        Sometimes functions are not yet implemented in this class,
+  *        this is a nice way to still gain access to special feature of 
+  *        the logging medium. And bypass this wrapper.
+  *        In this case it will return the handle to the used serial object!
+  * 
+  * @return Internal communication handle of the logging medium.
+  */
   CommunicationReturnHandles getnativehandle();
   ~SerialLogger() { SerialHandle_->end(); }
 
  private:
   Serial_* SerialHandle_;
-  /* Array used in setcursorpos
+/* Array used in setcursorpos
  * Aha a magic number, well, its calculated...
  * the base string (kVT100..) has size of: 6 characters
  * x can't be more than 2 characters with current setting (80 columns)

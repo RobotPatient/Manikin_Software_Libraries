@@ -30,16 +30,13 @@
 namespace hal::log {
 
 void FlashLogger::init() {
-  bool File_has_no_write_and_or_read_permission = !(FileHandle_.isReadable()) || !(FileHandle_.isWritable());
-  if (FileHandle_ && !File_has_no_write_and_or_read_permission) return;
-  if (FileHandle_ && File_has_no_write_and_or_read_permission) {
+  bool File_has_no_write_or_read_permission = !(FileHandle_.isReadable()) || !(FileHandle_.isWritable());
+  if (FileHandle_ && !File_has_no_write_or_read_permission) return;
+  if (FileHandle_ && File_has_no_write_or_read_permission) {
     FileHandle_.close();
   }
   FileHandle_.close();
   FileHandle_.open(FilePath_, FILE_WRITE);
-  if (FileHandle_) {
-    Serial.println("File opened for writing!");
-  }
 }
 
 void FlashLogger::writestr(const char* str) {
@@ -75,15 +72,20 @@ void FlashLogger::pushbackstr(const char* str) {
 void FlashLogger::readLatestBytes(char* buffer,
                                          const uint8_t num_of_bytes) {
   if (FileHandle_) {
+    // We want to read the latest bytes of the file
     fspos_t pos;
+    // First set cursor pos to end of file
     FileHandle_.seekEnd();
     FileHandle_.fgetpos(&pos);
+    // Substract amount of bytes from the current cursor pos
     if (pos.position - num_of_bytes >= 0) {
       pos.position -= num_of_bytes;
     } else {
       pos.position = 0;
     }
+    // Set the new cursor position
     FileHandle_.fsetpos(&pos);
+    // Finally read the bytes from the file
     FileHandle_.readBytes(buffer, num_of_bytes);
   }
 }
@@ -92,6 +94,7 @@ void FlashLogger::readLatestByte(char* buffer) {
   if (FileHandle_) {
     fspos_t pos;
     FileHandle_.fgetpos(&pos);
+    // Move the cursor position back one position
     if (pos.position != 0) {
       pos.position--;
       FileHandle_.fsetpos(&pos);
@@ -133,6 +136,7 @@ void FlashLogger::close() {
 CommunicationReturnHandles FlashLogger::getnativehandle() {
   CommunicationReturnHandles handle;
   handle.FlashHandle = &FileHandle_;
+  // Return the file handle created in this class by the init function.
   return handle;
 }
 
