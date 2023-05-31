@@ -35,18 +35,50 @@
 #include <pwm_base.hpp>
 
 namespace hal::pwm {
+/**
+ * @brief pwm_tcc class implements the functions of pwm_base and uses the TCCx
+ * pointer to create a pwm signal with dynamically variable duty cyle
+ */
 class pwm_tcc : public pwm_base {
  public:
+  /**
+   * @brief pwm_tcc class implements the functions of pwm_base and uses the TCCx
+   * pointer to create a pwm signal with dynamically variable duty cyle.
+   */
   pwm_tcc(uint8_t gclk, uint8_t tcc, uint8_t wo);
 
+  /**
+   * @brief Enables/starts the PWM signal
+   */
   void start() override;
+
+  /**
+   * @brief Disables/stops the PWM signal
+   */
   void stop() override;
+
+  /**
+   * @brief Changes the dutycycle of the PWM signal to the new given PWM signal
+   *
+   * @param dutyCycle The new dutycyle in %
+   */
   void setDutyCycle(uint32_t) override;
 
  private:
+  /**
+   * @brief Inizializes the TCCx, after this the pin can be set as output and
+   * connected by setting the right function (See muliplex table in datasheet)
+   */
   void initTcTcc() override;
+
+  /**
+   * @brief Helper function to select the TCCx pointer
+   *
+   * @param TCCx Number of the TCCx
+   */
   void selectTx(uint8_t);
-  Tcc* tcc_;
+
+  Tcc* tcc_;  //!< Pointer to the TCCx
 };
 }  // namespace hal::pwm
 #endif

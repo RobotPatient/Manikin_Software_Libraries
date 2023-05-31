@@ -35,33 +35,61 @@
 #define MOTOR_ON 1
 
 namespace actuator {
+/**
+ * @brief Motor class uses a pwm signal to speed up or slow down a motor
+ */
 class Motor {
  public:
+  /**
+   * @brief Constructor Motor class
+   *
+   * @example If you want to connect a Motor, lookup the corrosponding function,
+   * TCx/TCCx and WO[x] in the datasheet. If you use PA20 Use: Port
+   * hal::gpio::GPIOPort::kGPIOPortA, Pin 20, Function
+   * hal::gpio::GPIOPinFunction::kGPIOFunctionF, GCLKx 4, TCCx 0, WO[x] 6.
+   *
+   * @param motorPort The port of the GPIO used
+   * @param motorPin The pin number of the GPIO used
+   * @param motorFunction The GPIO function that connects the TCx or TCCx to the
+   * GPIO
+   * @param gclkNumber The GCLKx number used to generate a clock for the PWM
+   * signal
+   * @param tc_tcc The TCx or TCCx number used to generate the PWM signal
+   * @param wo The WO[x] number used as the output of the PWM signal
+   */
   Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
         hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,
         uint8_t tc_tcc, uint8_t wo);
   ~Motor();
 
+  /**
+   * @brief initializes the PWM pin to control the speed of the motor
+   */
   void initPwmPin();
 
+  /**
+   * @brief Starts the motor rotation
+   */
   void startRotate();
 
   /**
-   * @brief
+   * @brief Stops the motor rotation
+   */
+  void stopRotate();
+
+  /**
+   * @brief Sets the speed of the motor by using a new duty cycle
    *
    * @param dutyCycle procentage between 0 and 100 procent
    */
   void setDuctyCycle(uint8_t dutyCycle);
-  void stopRotate();
-
- protected:
-  int getGCLK();
 
  private:
-  hal::pwm::pwm_base* pwm_;
-  const hal::gpio::GPIOPort motorPort_;
-  const uint8_t motorPin_;
-  hal::gpio::GPIOPinFunction motorFunction_;
+  hal::pwm::pwm_base* pwm_;              //!< Pointer to the PWM object
+  const hal::gpio::GPIOPort motorPort_;  //!< Port for the motorpin
+  const uint8_t motorPin_;               //!< Pin to the motorpin
+  hal::gpio::GPIOPinFunction
+      motorFunction_;  //!< The function that connects the GPIOx to the TCx/TCCx
 };
 
 }  // namespace actuator
