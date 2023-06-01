@@ -63,11 +63,6 @@ class Motor {
   ~Motor();
 
   /**
-   * @brief initializes the PWM pin to control the speed of the motor
-   */
-  void initPwmPin();
-
-  /**
    * @brief Starts the motor rotation
    */
   void startRotate();
@@ -85,6 +80,11 @@ class Motor {
   void setDuctyCycle(uint8_t dutyCycle);
 
  private:
+  /**
+   * @brief initializes the PWM pin to control the speed of the motor
+   */
+  void initPwmPin();
+
   hal::pwm::pwm_base* pwm_;              //!< Pointer to the PWM object
   const hal::gpio::GPIOPort motorPort_;  //!< Port for the motorpin
   const uint8_t motorPin_;               //!< Pin to the motorpin
