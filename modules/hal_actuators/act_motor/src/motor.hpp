@@ -31,6 +31,7 @@
 #include <gpio.hpp>
 #include <pwm_base.hpp>
 
+#ifdef _SAMD21_
 #define MOTOR_OFF 0
 #define MOTOR_ON 1
 
@@ -93,4 +94,5 @@ class Motor {
 };
 
 }  // namespace actuator
+#endif
 #endif

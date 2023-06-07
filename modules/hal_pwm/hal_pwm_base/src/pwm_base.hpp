@@ -34,6 +34,10 @@
 #define GCLK_AMOUNT 8
 #endif
 
+#include <sam.h>
+
+#ifdef _SAMD21_
+
 namespace hal::pwm {
 
 static volatile bool
@@ -79,4 +83,5 @@ class pwm_base {
   bool checkFlag();
 };
 }  // namespace hal::pwm
+#endif
 #endif

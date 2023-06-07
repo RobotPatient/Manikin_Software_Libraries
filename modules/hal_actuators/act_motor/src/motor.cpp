@@ -32,6 +32,7 @@
 #include <pwm_tc.hpp>
 #include <pwm_tcc.hpp>
 
+#ifdef _SAMD21_
 namespace actuator {
 Motor::Motor(hal::gpio::GPIOPort motorPort, uint8_t motorPin,
              hal::gpio::GPIOPinFunction motorFunction, uint8_t gclkNumber,
@@ -73,3 +74,4 @@ void Motor::setDuctyCycle(uint8_t dutyCycle) { pwm_->setDutyCycle(dutyCycle); }
 void Motor::stopRotate() { pwm_->stop(); }
 
 }  // namespace actuator
+#endif

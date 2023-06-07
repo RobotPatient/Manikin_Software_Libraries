@@ -34,6 +34,7 @@
 #include <gpio.hpp>
 #include <pwm_base.hpp>
 
+#ifdef _SAMD21_
 namespace hal::pwm {
 /**
  * @brief pwm_tcc class implements the functions of pwm_base and uses the TCCx
@@ -81,4 +82,5 @@ class pwm_tcc : public pwm_base {
   Tcc* tcc_;  //!< Pointer to the TCCx
 };
 }  // namespace hal::pwm
+#endif
 #endif

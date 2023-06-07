@@ -29,6 +29,7 @@
 
 #include <sam.h>
 
+#ifdef _SAMD21_
 namespace hal::pwm {
 
 pwm_tcc::pwm_tcc(uint8_t gclk, uint8_t tcc, uint8_t wo) {
@@ -108,3 +109,4 @@ void pwm_tcc::selectTx(uint8_t TCCx) {
   }
 }
 }  // namespace hal::pwm
+#endif

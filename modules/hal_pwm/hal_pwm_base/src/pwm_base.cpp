@@ -29,6 +29,8 @@
 
 #include <sam.h>
 
+#ifdef _SAMD21_
+
 namespace hal::pwm {
 
 void pwm_base::init() {
@@ -69,3 +71,4 @@ bool pwm_base::checkFlag() {
 }
 
 }  // namespace hal::pwm
+#endif
