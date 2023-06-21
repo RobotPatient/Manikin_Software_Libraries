@@ -1,5 +1,5 @@
 {
-    "name":"Sensor",
+    "name": "Sensor",
     "build": {
         "srcDir": "modules/",
         "srcFilter": "+<*> -<*/test/> -<hal_sensors/*/test>",
@@ -14,18 +14,20 @@
             "-I modules/hal_logger/src",
             "-I modules/hal_exception/src",
             "-I modules/ringbuffer/src",
+            "-I modules/hal_actuators/act_motor/src",
+            "-I modules/hal_pwm/hal_tcc/src",
+            "-I modules/hal_pwm/hal_tc/src",
+            "-I modules/hal_pwm/hal_pwm_base/src",
             "-I modules/usb_service_protocol/src",
             "-std=gnu++17"
         ]
     },
-    "dependencies":
-    [
+    "dependencies": [
         {
-            "name":"Adafruit_SPIFlash"
+            "name": "Adafruit_SPIFlash"
         },
         {
-            "name":"SdFat - Adafruit Fork"
+            "name": "SdFat - Adafruit Fork"
         }
     ]
 }
-
