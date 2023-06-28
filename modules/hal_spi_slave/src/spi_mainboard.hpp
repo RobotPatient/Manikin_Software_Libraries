@@ -68,17 +68,16 @@ extern volatile SpiSlaveData SPIMainboard_reg_data_[kMainBoardSPINumOfRegs];
  * @brief This class can be used to create a SPI slave module
  * 
  */
-class SPIMainBoard {
- public:
-  SPIMainBoard() {}
-  /**
-   * @brief Begin inits the internal ISR and starts the SPI slave module
-   */
-  void begin();
-  /**
-   * @brief Deinit the SPI slave module
-   */
-  void deinit();
-};
+
+ /**
+  * @brief Begin inits the internal ISR and starts the SPI slave module
+  */
+ void begin_spi_slave();
+ 
+ /**
+  * @brief Deinit the SPI slave module
+  */
+void deinit_spi_slave();
+
 }  // namespace hal::spi
 #endif

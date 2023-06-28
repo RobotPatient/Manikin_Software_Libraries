@@ -31,6 +31,7 @@
 #include <sam.h>
 #include <FastCRC.h>
 #include <spi_mainboard_registers.hpp>
+#include <gpio.hpp>
 
 FastCRC8 CRC8;
 
@@ -73,6 +74,7 @@ uint8_t getRegister(const uint8_t reg_addr) {
 
 void SERCOM3_3_Handler() {
   if (SERCOM3->SPI.INTFLAG.reg & SERCOM_SPI_INTFLAG_SSL) {
+    //Serial.println("SSL");
     SERCOM3->SPI.INTFLAG.bit.SSL = 1;  // CLEAR the SSL interrupt flag. So that this ISR doesn't run continuously
     if (CurrTransaction.State == STATE_IGNORE_ISR) {
       CurrTransaction.State = STATE_INIT_REG;  // RESET State machine from IDLE state to INIT reg state
@@ -86,6 +88,7 @@ void SERCOM3_2_Handler() {
     switch (CurrTransaction.State) {
       case STATE_INIT_REG: {
         uint8_t data = SERCOM3->SPI.DATA.reg;
+        //Serial.println(data);
         uint8_t reg_addr = first_word_reg_addr(data);
         bool valid_register = getRegister(reg_addr) == 0;
         if (valid_register & first_word_start_bit(data)) {
@@ -177,7 +180,7 @@ volatile SpiSlaveData
                                                       {SENSORDATA, 0, SENSORDATA_size, kPermissionsRO},
                                                       {ACTDATA, 0, ACTDATA_size, kPermissionsRW}};
 
-void SPIMainBoard::begin() {
+void begin_spi_slave() {
   // Set the core clk of SERCOM3 to the main clock
   GCLK->PCHCTRL[SERCOM3_GCLK_ID_CORE].reg = GCLK_PCHCTRL_GEN_GCLK0_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
   GCLK->PCHCTRL[SERCOM3_GCLK_ID_SLOW].reg = GCLK_PCHCTRL_GEN_GCLK3_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
@@ -235,30 +238,18 @@ void SPIMainBoard::begin() {
   SERCOM3->SPI.CTRLA.reg = tmp;
   while (SERCOM3->SPI.SYNCBUSY.reg & (SERCOM_SPI_SYNCBUSY_SWRST | SERCOM_SPI_SYNCBUSY_ENABLE)) {}
 
-  PORT->Group[0].OUTCLR.reg = PORT_PA22;
-  PORT->Group[0].DIRSET.reg = PORT_PA22;
-  PORT->Group[0].PINCFG[PIN_PA22].reg |= PORT_PINCFG_PMUXEN;
-  PORT->Group[0].PMUX[PIN_PA22 >> 1].bit.PMUXE = MUX_PA22C_SERCOM3_PAD0;
+  hal::gpio::SetGPIOPinFunction(hal::gpio::kGPIOPortA, 22, hal::gpio::kGPIOFunctionC);
+  hal::gpio::SetGPIOPinFunction(hal::gpio::kGPIOPortA, 16, hal::gpio::kGPIOFunctionD);
+  hal::gpio::SetGPIOPinFunction(hal::gpio::kGPIOPortA, 18, hal::gpio::kGPIOFunctionD);
+  hal::gpio::SetGPIOPinFunction(hal::gpio::kGPIOPortA, 19, hal::gpio::kGPIOFunctionD);
 
-  PORT->Group[0].OUTCLR.reg = PORT_PA16;
-  PORT->Group[0].DIRSET.reg = PORT_PA16;
-  PORT->Group[0].PINCFG[PIN_PA16].reg |= PORT_PINCFG_PMUXEN;
-  PORT->Group[0].PMUX[PIN_PA16 >> 1].bit.PMUXE = MUX_PA16D_SERCOM3_PAD1;
-
-  PORT->Group[0].DIRCLR.reg = PORT_PA18;
-  PORT->Group[0].PINCFG[PIN_PA18].reg |= PORT_PINCFG_PMUXEN;
-  PORT->Group[0].PMUX[PIN_PA18 >> 1].bit.PMUXE = MUX_PA18D_SERCOM3_PAD2;
-
-  PORT->Group[0].DIRCLR.reg = PORT_PA19;
-  PORT->Group[0].PINCFG[PIN_PA19].reg |= PORT_PINCFG_PMUXEN;
-  PORT->Group[0].PMUX[PIN_PA19 >> 1].bit.PMUXO = MUX_PA19D_SERCOM3_PAD3;
   NVIC_EnableIRQ(SERCOM3_2_IRQn);
   NVIC_SetPriority(SERCOM3_2_IRQn, kRXCInterruptPriority);
   NVIC_EnableIRQ(SERCOM3_3_IRQn);
   NVIC_SetPriority(SERCOM3_3_IRQn, kSSLInterruptPriority);
 }
 
-void SPIMainBoard::deinit() {
+void deinit_spi_slave() {
   SERCOM3->SPI.CTRLA.reg &= ~SERCOM_SPI_CTRLA_ENABLE;
 }
 
