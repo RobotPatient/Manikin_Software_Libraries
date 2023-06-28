@@ -37,22 +37,6 @@
 inline constexpr uint8_t kPermissionsRW = 0;
 inline constexpr uint8_t kPermissionsRO = 1;
 
-/**
- * @brief Struct used to store the registers of the SPI slave. Is also used
- *        to passthrough data from the internal SPI slave state machine to the external
- *        modules making use of the SPI slave module.
- * 
- * @note The data attribute is used to point to a static array. 
- *       The data_crc attribute has an CRC-8 checksum of the data in the static array.
- *       The size attribute has the size in bytes of the register.
- *       The access_permissions attribute has the permissions (read/write) or (read-only)
-*/
-typedef struct {
-    volatile uint8_t *data;
-    volatile uint8_t data_crc;
-    uint8_t size;
-    const uint8_t access_permissions;
-} SpiSlaveData;
 
 /**
  * @brief This is internally used by the SPI slave state machine
@@ -152,19 +136,6 @@ inline constexpr
 uint8_t first_word_start_bit(const uint8_t reg) {
     return ~(reg & kStartBitBitMask);
 }
-
-/**
- * @brief This struct is internally used by the statemachine of the SPI slave module.
- *        To pass through information between the different ISR's.
-*/
-typedef struct {
-    volatile SpiSlaveData *reg;
-    SPIStateMachine State;
-    bool WR;
-    int seq_num;
-    int byte_cnt;
-    volatile uint8_t calc_crc;
-} spi_transaction;
 
 
 

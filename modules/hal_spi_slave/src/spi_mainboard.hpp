@@ -28,10 +28,25 @@
 
 #ifndef SPI_MAINBOARD_HPP
 #define SPI_MAINBOARD_HPP
-
-#include <spi_mainboard_registers.hpp>
-
+#include <stdint.h>
+#include <stddef.h>
 namespace hal::spi {
+/**
+ * @brief Struct used to store the registers of the SPI slave. Is also used
+ *        to passthrough data from the internal SPI slave state machine to the external
+ *        modules making use of the SPI slave module.
+ * 
+ * @note The data attribute is used to point to a static array. 
+ *       The data_crc attribute has an CRC-8 checksum of the data in the static array.
+ *       The size attribute has the size in bytes of the register.
+ *       The access_permissions attribute has the permissions (read/write) or (read-only)
+*/
+typedef struct {
+    volatile uint8_t *data;
+    volatile uint8_t data_crc;
+    uint8_t size;
+    const uint8_t access_permissions;
+} SpiSlaveData;
 
 /* Macro's which define the register offsets within the SPIMainboard_reg_data_ array */
 inline constexpr uint8_t kMainBoardSPINumOfRegs = 11;

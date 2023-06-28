@@ -30,6 +30,7 @@
 #include <Arduino.h>
 #include <sam.h>
 #include <FastCRC.h>
+#include <spi_mainboard_registers.hpp>
 
 FastCRC8 CRC8;
 
@@ -37,6 +38,19 @@ inline constexpr uint8_t kSSLInterruptPriority = 1;
 inline constexpr uint8_t kRXCInterruptPriority = 2;
 
 volatile uint8_t clrflag;
+
+/**
+ * @brief This struct is internally used by the statemachine of the SPI slave module.
+ *        To pass through information between the different ISR's.
+*/
+typedef struct {
+    volatile hal::spi::SpiSlaveData *reg;
+    SPIStateMachine State;
+    bool WR;
+    int seq_num;
+    int byte_cnt;
+    volatile uint8_t calc_crc;
+} spi_transaction;
 
 volatile spi_transaction CurrTransaction = {NULL, STATE_IGNORE_ISR, true, 0, 0, 0};
 
