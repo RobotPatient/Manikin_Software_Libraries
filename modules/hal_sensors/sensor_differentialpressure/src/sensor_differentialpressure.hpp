@@ -30,6 +30,7 @@
 #define SENSOR_DIFFERENTIALPRESSURE_HPP_
 
 #include <sensor_base.hpp>
+#include <cmath>
 
 inline constexpr uint8_t kSdp810I2CAddr = 0x25;
 inline constexpr uint8_t kSdp810BufferSize = 9;
@@ -78,6 +79,14 @@ class DifferentialPressureSensor : public UniversalSensor {
   int16_t sensor_raw_;
   int16_t conversion_factor_;
   uint8_t sensor_buffer_[kSdp810BufferSize];
+  uint16_t sampleTime;
+  double air_drag;
+  double hose_orifice_ratio;
+  double orifice_diameter;
+  double correction_factor;
+  double orifice_surface;
+  double volume;
+  double volume_;
 
 // Low level driver functions:
   void BeginSDP810();
